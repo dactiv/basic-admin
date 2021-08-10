@@ -3,28 +3,27 @@
   <a-breadcrumb>
     <a-breadcrumb-item><router-link to='/'>首页</router-link></a-breadcrumb-item>
     <a-breadcrumb-item>系统管理</a-breadcrumb-item>
-    <a-breadcrumb-item>后台用户管理</a-breadcrumb-item>
+    <a-breadcrumb-item>系统用户管理</a-breadcrumb-item>
   </a-breadcrumb>
 
   <a-card title="后台用户管理">
 
     <template #extra>
-      <icon-font type="icon-user"></icon-font>
+      <icon-font type="icon-system-user"></icon-font>
     </template>
 
     <a-space :size="10" class="margin-bottom-15">
       <a-button @click="this.searchDialogVisible=true;"><icon-font type="icon-search" />搜索</a-button>
-      <a-button @click="edit"><icon-font type="icon-add" />添加</a-button>
+      <a-button @click="edit" ><icon-font type="icon-add" />添加</a-button>
 
-      <a-button type="primary" danger><icon-font type="icon-ashbin" /> 删除选中</a-button>
+      <a-button type="primary" danger ><icon-font type="icon-ashbin" /> 删除选中</a-button>
     </a-space>
 
     <a-table class="ant-table-striped" :rowKey="record=>record.id" :row-selection="{ onChange: onSelectChange }" :data-source="page.content" :columns="columns" :loading="loading" bordered>
       <template #action="{ record }">
         <a-space :size="10">
-          <a-button size="small"><icon-font type="icon-add" @click="edit(record)" />编辑</a-button>
-
-          <a-button size="small" type="primary" danger><icon-font type="icon-ashbin" @click="remove(record)" /> 删除</a-button>
+          <a-button size="small" @click="edit(record)"><icon-font type="icon-edit" />编辑</a-button>
+          <a-button size="small" type="primary" danger @click="remove(record)"><icon-font type="icon-ashbin" /> 删除</a-button>
         </a-space>
       </template>
     </a-table>

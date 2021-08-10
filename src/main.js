@@ -27,22 +27,43 @@ import {
     Dropdown,
     Space,
     Modal,
-    ConfigProvider
+    ConfigProvider,
+    Typography
 } from "ant-design-vue";
 
 import { createFromIconfontCN } from '@ant-design/icons-vue';
 import moment from "moment";
 
-import '@/assets/less/style.css';
-import '@/assets/less/basic.css';
+import '@/assets/css/style.css';
+import '@/assets/css/basic.css';
 
 const app = createApp(App);
 
+moment.locale("zh-cn")
+
+app.config.globalProperties.$moment = moment;
+
+app.config.globalProperties.formUrlencoded = function(json) {
+    let param = new URLSearchParams();
+
+    for (let j in json) {
+        param.append(j, json[j]);
+    }
+
+    return param;
+}
+
+app.config.globalProperties.loadConfig = function(params, callback) {
+    this.$http.get(process.env.VUE_APP_SERVER_CONFIG_URI_SUFFIX,{params: params}).then(callback);
+}
+
 const IconFont = createFromIconfontCN({
-    scriptUrl: '//at.alicdn.com/t/font_2732722_p2ovf7ovr2.js',
+    scriptUrl: '//at.alicdn.com/t/font_2732722_vsg5a78b3wp.js',
 });
 
 app.component('IconFont', IconFont);
+
+window.vueContext = app;
 
 app.use(store)
     .use(router)
@@ -68,22 +89,5 @@ app.use(store)
     .use(Space)
     .use(Modal)
     .use(ConfigProvider)
+    .use(Typography)
     .mount('#app');
-
-moment.locale("zh-cn")
-
-app.config.globalProperties.$moment = moment;
-
-app.config.globalProperties.formUrlencoded = function(json) {
-    let param = new URLSearchParams();
-
-    for (let j in json) {
-        param.append(j, json[j]);
-    }
-
-    return param;
-}
-
-app.config.globalProperties.loadConfig = function(params, callback) {
-    this.$http.get(process.env.VUE_APP_SERVER_CONFIG_URI_SUFFIX,{params: params}).then(callback);
-}

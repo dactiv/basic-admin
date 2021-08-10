@@ -6,6 +6,12 @@ body {
 
 .main-container {
   margin: 15px 15px 15px 275px;
+  transition: 0.2s;
+}
+
+.main-container.toggle {
+  margin-left: 100px;
+  transition: 0.3s;
 }
 
 .header-navbar {
@@ -24,24 +30,22 @@ body {
 }
 
 .logo {
-  color: #40b883;
   background-color: #ffffff;
   padding: 20px;
 }
 
 .logo img {
-  height: 36px;
-  width: 36px;
+  height: 40px;
+  width: 40px;
 }
 
-.logo span, .logo i {
+.logo span{
   line-height: 36px;
   vertical-align: middle;
-}
-
-.logo span {
+  color: #40b883!important;
   font-weight: 600;
   font-size: 1.714rem;
+  margin-left: 10px;
 }
 
 .main-aside {
@@ -93,11 +97,6 @@ body {
 
 .picture-captcha .ant-input-group-addon{
   padding: 0;
-}
-
-.anticon {
-  font-size: 18px!important;
-  vertical-align: sub;
 }
 
 .ant-breadcrumb {

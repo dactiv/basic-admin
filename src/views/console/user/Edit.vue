@@ -4,105 +4,64 @@
     <a-breadcrumb-item><router-link to='/'>首页</router-link></a-breadcrumb-item>
     <a-breadcrumb-item>系统管理</a-breadcrumb-item>
     <a-breadcrumb-item><router-link to='/index/console/user'>系统用户管理</router-link></a-breadcrumb-item>
-    <a-breadcrumb-item>编辑系统用户</a-breadcrumb-item>
+    <a-breadcrumb-item>{{ '编辑' + (form.username !== '' ? ' [' + form.username + '] ': '系统') + '用户' }}</a-breadcrumb-item>
   </a-breadcrumb>
 
-<!--  <el-card>
-    <template #header>
-      <span>编辑后台用户</span>
-    </template>
+  <a-card :title="'编辑' + (form.username !== '' ? ' [' + form.username + '] ': '系统') + '用户'">
+    <a-form ref="edit-form" :model="form" :rules="rules" layout="vertical" :loading="formLoading">
 
-    <el-form ref="search-form" :model="form" label-position="top" v-loading="formLoading">
+      <a-row>
+        <a-col :span="12" class="padding-left-10 padding-right-10">
+          <a-form-item label="登陆账户:" name="username">
+            <a-input v-model:value="form.username"></a-input>
+          </a-form-item>
+        </a-col>
+        <a-col :span="12" class="padding-left-10 padding-right-10">
+          <a-form-item label="真是姓名:" name="realName">
+            <a-input v-model:value="form.realName"></a-input>
+          </a-form-item>
+        </a-col>
+      </a-row>
 
-      <el-row>
-        <el-col :span="12" class="padding-left-10 padding-right-10">
-          <el-form-item label="登陆账户:">
-            <el-input v-model="form.username"></el-input>
-          </el-form-item>
-        </el-col>
-        <el-col :span="12" class="padding-left-10 padding-right-10">
-          <el-form-item label="真是姓名:">
-            <el-input v-model="form.realName"></el-input>
-          </el-form-item>
-        </el-col>
-      </el-row>
+      <a-row v-if="query.id === undefined">
+        <a-col :span="12" class="padding-left-10 padding-right-10">
+          <a-form-item label="登陆密码:" name="password">
+            <a-input v-model:value="form.password"></a-input>
+          </a-form-item>
+        </a-col>
+        <a-col :span="12" class="padding-left-10 padding-right-10">
+          <a-form-item label="确认密码:" name="confirmPassword">
+            <a-input v-model:value="form.confirmPassword"></a-input>
+          </a-form-item>
+        </a-col>
+      </a-row>
 
-      <el-row v-if="query.id === undefined">
-        <el-col :span="12" class="padding-left-10 padding-right-10">
-          <el-form-item label="登陆密码:">
-            <el-input v-model="form.password"></el-input>
-          </el-form-item>
-        </el-col>
-        <el-col :span="12" class="padding-left-10 padding-right-10">
-          <el-form-item label="确认密码:">
-            <el-input v-model="form.confirmPassword"></el-input>
-          </el-form-item>
-        </el-col>
-      </el-row>
+      <a-row>
+        <a-col :span="12" class="padding-left-10 padding-right-10">
+          <a-form-item label="电子邮箱:" name="email">
+            <a-input v-model:value="form.email"></a-input>
+          </a-form-item>
+        </a-col>
+        <a-col :span="12" class="padding-left-10 padding-right-10">
+          <a-form-item label="状态:" name="status">
+            <a-select style="width: 100%" v-model:value="form.status">
+              <a-select-option v-for="(value, name) in statusOptions" :key="value" :value="value">
+                {{name}}
+              </a-select-option>
+            </a-select>
+          </a-form-item>
+        </a-col>
 
-      <el-row>
-        <el-col :span="12" class="padding-left-10 padding-right-10">
-          <el-form-item label="电子邮箱:">
-            <el-input v-model="form.email"></el-input>
-          </el-form-item>
-        </el-col>
-        <el-col :span="12" class="padding-left-10 padding-right-10">
-          <el-form-item label="状态:" prop="status">
-            <el-select style="width: 100%" v-model="form.status" placeholder="请选择">
-              <el-option v-for="(value, name) in statusOptions" :key="value" :label="name" :value="value">
-              </el-option>
-            </el-select>
-          </el-form-item>
-        </el-col>
+      </a-row>
 
-      </el-row>
+    </a-form>
 
-      <el-row>
-        <el-col :span="24" class="padding-left-10 padding-right-10">
+    <a-space :size="10" class="padding-left-10 padding-right-10">
+      <a-button type="primary" @click="submitForm"><icon-font type="icon-select" />保存</a-button>
+      <a-button @click="this.refs['edit-form'].resetFields();"><icon-font type="icon-ashbin" />重置</a-button>
+    </a-space>
 
-          <el-tabs>
-            <el-tab-pane label="所在用户组">
-
-              <el-input class="margin-bottom-15" prefix-icon="el-icon-search" placeholder="请输入要查询的内容">
-
-                <template #prepend>
-                    <el-button size="medium" icon="el-icon-edit">添加</el-button>
-                    <el-button size="medium" icon="el-icon-delete" type="danger">删除</el-button>
-                </template>
-
-              </el-input>
-
-              <GroupTable :userId="this.$route.query.id" />
-
-            </el-tab-pane>
-            <el-tab-pane label="独立权限">
-
-              <el-input class="margin-bottom-15" prefix-icon="el-icon-search" placeholder="请输入要查询的内容"></el-input>
-
-              <ResourceTable :userId="this.$route.query.id" />
-
-            </el-tab-pane>
-          </el-tabs>
-
-        </el-col>
-      </el-row>
-
-      <el-row>
-
-        <el-col :span="24" class="padding-left-10 padding-right-10">
-          <el-divider/>
-        </el-col>
-
-      </el-row>
-
-    </el-form>
-
-    <el-button-group>
-      <el-button icon="el-icon-check" type="success">保存</el-button>
-      <el-button icon="el-icon-delete" type="warning">重置</el-button>
-    </el-button-group>
-
-  </el-card>-->
+  </a-card>
 
 </template>
 
@@ -121,8 +80,23 @@ export default {
         password: "",
         confirmPassword:"",
         email: "",
-        status:""
+        status: 1
+      },
+      rules: {
+        username: { required: true, message: '请输入登陆账户', trigger: 'blur' },
+        password: { required: true, message: '请输入登陆密码', trigger: 'blur' },
+        realName: { required: true, message: '请输入真实姓名', trigger: 'blur' },
+        confirmPassword: { required: true, message: '请输入确认密码', trigger: 'blur' },
+        status: { required: true, message: '请选择状态', trigger: 'blur' }
       }
+    }
+  },
+  methods: {
+    submitForm:function() {
+      let _this = this;
+      _this.$refs['edit-form'].validate().then(() => {
+
+      });
     }
   },
   created() {

@@ -4,11 +4,11 @@
 
     <a-layout class="authentication-inner">
       <a-layout-header class="logo">
-        <img alt="Dactiv logo" src="../assets/logo.png">
+        <a-image :src="require('../assets/logo.png')" />
         <span> Dactiv </span>
       </a-layout-header>
       <a-layout-content class="display-flex align-items-center justify-content-center">
-        <img alt="Dactiv logo" src="../assets/login.svg">
+        <a-image :src="require('../assets/login.svg')" />
       </a-layout-content>
       <a-layout-footer class="main-footer text-center">COPYRIGHT © 2021 Dactiv, All rights ReservedHand-crafted & Made with</a-layout-footer>
     </a-layout>
@@ -121,6 +121,8 @@ export default {
             .then(response => {
 
               localStorage.setItem(process.env.VUE_APP_PRINCIPAL_NAME, JSON.stringify(response));
+
+              _this.principal = response;
 
               let requestPath = localStorage.getItem("requestPath");
 

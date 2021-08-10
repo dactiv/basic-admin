@@ -1,29 +1,25 @@
 <template>
   <a-layout>
 
-    <a-layout-sider class="main-aside" width="260">
-      <div class="logo">
-        <a-row>
-          <a-col :span="24">
-            <img alt="Dactiv logo" src="../assets/logo.png">
-            <span> Dactiv </span>
-          </a-col>
-        </a-row>
+    <a-layout-sider class="main-aside" width="260" v-model:collapsed="menu.collapsed" :trigger="null" collapsible>
+      <div class="logo display-flex">
+          <img alt="Dactiv logo" src="../assets/logo.png">
+          <span class="display-block" v-if="!menu.collapsed"> Dactiv </span>
       </div>
       <div class="main-menu">
-        <a-menu mode="inline">
-          <recursion-menu :data="this.menus" />
+        <a-menu mode="inline" :selectedKeys="menu.selectedKeys" :openKeys="menu.openKeys">
+          <recursion-menu :data="this.menu.data" />
         </a-menu>
       </div>
     </a-layout-sider>
 
-    <a-layout class="main-container">
+    <a-layout :class="menu.collapsed ? 'main-container toggle' : 'main-container'">
 
       <a-layout-header class="header-navbar">
         <a-row>
           <a-col :span="16">
             <a-menu mode="horizontal" class="left">
-              <a-menu-item key="1"><icon-font type="icon-arrow-left-circle" /></a-menu-item>
+              <a-menu-item key="1" @click="toggleCollapsed"><icon-font :type="this.menu.collapsed ? 'icon-arrow-right-circle' : 'icon-arrow-left-circle'" /></a-menu-item>
               <a-menu-item key="2"><icon-font type="icon-calendar" /></a-menu-item>
               <a-menu-item key="3"><icon-font type="icon-comment" /></a-menu-item>
             </a-menu>
@@ -33,9 +29,9 @@
               <a-menu-item key="1"><icon-font type="icon-moon" /></a-menu-item>
               <a-sub-menu key="2">
                 <template #title>
-                  <a-avatar size="medium" ></a-avatar>
+                  <a-avatar :src="require('../assets/avatar/男生-紫.png')" ></a-avatar>
                 </template>
-                <a-menu-item key="2-1"><a-button type="text"><icon-font type="icon-user" /> {{ principal.username }}</a-button></a-menu-item>
+                <a-menu-item key="2-1"><a-button type="text"><icon-font type="icon-profile" /> {{ principal.username }}</a-button></a-menu-item>
                 <a-menu-item key="2-2"><a-button type="text"><icon-font type="icon-setting" /> 系统设置</a-button> </a-menu-item>
                 <a-menu-item key="2-4"><a-button type="text" @click="logout()"><icon-font type="icon-sign-out" /> 注销账户</a-button></a-menu-item>
               </a-sub-menu>
@@ -63,8 +59,18 @@ export default {
   components:{RecursionMenu},
   created() {
     this.getMenus();
+
+    let collapsed = localStorage.getItem("menu-collapsed");
+
+    if (collapsed === "true") {
+      this.menu.collapsed = true;
+    }
   },
   methods: {
+    toggleCollapsed:function() {
+      this.menu.collapsed = !this.menu.collapsed;
+      localStorage.setItem("menu-collapsed", this.menu.collapsed);
+    },
     logout:function() {
       this.$router.push('/login');
     },
@@ -79,13 +85,18 @@ export default {
               mergeTree:true
             }
           })
-          .then(response => _this.menus = response);
+          .then(response => _this.menu.data = response);
     }
   },
   data() {
     return {
-      principal: JSON.parse(localStorage.getItem(process.env.VUE_APP_PRINCIPAL_NAME)),
-      menus: {}
+      principal:JSON.parse(localStorage.getItem(process.env.VUE_APP_PRINCIPAL_NAME)),
+      menu: {
+        collapsed: false,
+        selectedKeys:[this.$route.meta.selectMenu ? this.$route.meta.selectMenu : this.$route.path],
+        openKeys:[this.$route.meta.parent],
+        data:[]
+      }
     }
   }
 }
