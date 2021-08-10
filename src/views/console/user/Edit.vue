@@ -57,7 +57,7 @@
     </a-form>
 
     <a-space :size="10" class="padding-left-10 padding-right-10">
-      <a-button type="primary" @click="submitForm"><icon-font type="icon-select" />保存</a-button>
+      <a-button type="primary" @click="submitForm" v-if="this.principal.hasPermission('perms[console_user:save]')"><icon-font type="icon-select" />保存</a-button>
       <a-button @click="this.refs['edit-form'].resetFields();"><icon-font type="icon-ashbin" />重置</a-button>
     </a-space>
 

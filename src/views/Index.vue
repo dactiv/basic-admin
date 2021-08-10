@@ -31,7 +31,7 @@
                 <template #title>
                   <a-avatar :src="require('../assets/avatar/男生-紫.png')" ></a-avatar>
                 </template>
-                <a-menu-item key="2-1"><a-button type="text"><icon-font type="icon-profile" /> {{ principal.username }}</a-button></a-menu-item>
+                <a-menu-item key="2-1"><a-button type="text"><icon-font type="icon-profile" /> {{ this.$store.state.principal.username }}</a-button></a-menu-item>
                 <a-menu-item key="2-2"><a-button type="text"><icon-font type="icon-setting" /> 系统设置</a-button> </a-menu-item>
                 <a-menu-item key="2-4"><a-button type="text" @click="logout()"><icon-font type="icon-sign-out" /> 注销账户</a-button></a-menu-item>
               </a-sub-menu>
@@ -53,6 +53,7 @@
 <script>
 
 import RecursionMenu from '../components/RecursionMenu.vue'
+import {PRINCIPAL_ACTION_TYPE} from "@/store/principal"
 
 export default {
   name: 'Index',
@@ -72,7 +73,8 @@ export default {
       localStorage.setItem("menu-collapsed", this.menu.collapsed);
     },
     logout:function() {
-      this.$router.push('/login');
+      let _this = this;
+      this.$store.dispatch(PRINCIPAL_ACTION_TYPE.Logout).then(() => _this.$router.push('/login'));
     },
     getMenus:function() {
 

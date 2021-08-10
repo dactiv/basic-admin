@@ -1,9 +1,8 @@
 import { createRouter, createWebHistory} from 'vue-router' ;
 
-import axios from 'axios'
-
 import Login from '@/views/Login'
 import Index from '@/views/Index'
+import store from '@/store/index'
 
 import NProgress from 'nprogress'
 import 'nprogress/nprogress.css';
@@ -64,18 +63,13 @@ router.beforeEach((to, from, next) => {
   // 如果路径为"登陆", 跳用服务器登出，并把所有的本地数据清除
   if (to.path === "/login") {
 
-    axios.post("/authentication/logout").then(function () {
-      localStorage.removeItem(process.env.VUE_APP_PRINCIPAL_NAME);
-      localStorage.removeItem(process.env.VUE_APP_MENU_NAME);
-    });
+    store.commit("principal/clearPrincipal");
 
     next();
 
   } else {
 
-    let principal = JSON.parse(localStorage.getItem(process.env.VUE_APP_PRINCIPAL_NAME));
-
-    if (principal === null) {
+    if (!store.state.principal.authentication) {
       next("/login");
     } else {
       next();

@@ -51,6 +51,8 @@
 
 <script>
 
+import {PRINCIPAL_ACTION_TYPE} from "@/store/principal"
+
 export default {
   name:"Login",
   data() {
@@ -115,27 +117,22 @@ export default {
 
         _this.spinning = true;
 
-        _this
-            .$http
-            .post("/authentication/login", _this.formUrlencoded(_this.form),{headers:{"X-AUTHENTICATION-TYPE":"Console"}})
-            .then(response => {
+        this
+            .$store
+            .dispatch(PRINCIPAL_ACTION_TYPE.Login, _this.formUrlencoded(_this.form))
+            .then(() => {
 
-              localStorage.setItem(process.env.VUE_APP_PRINCIPAL_NAME, JSON.stringify(response));
-
-              _this.principal = response;
-
-              let requestPath = localStorage.getItem("requestPath");
+              let requestPath = sessionStorage.getItem("requestPath");
 
               if (requestPath !== null) {
                 _this.$router.push(requestPath);
-                localStorage.removeItem("requestPath");
+                sessionStorage.removeItem("requestPath");
               } else {
                 _this.$router.push("/");
               }
 
             })
             .catch(this.validCaptcha);
-
 
       });
     }

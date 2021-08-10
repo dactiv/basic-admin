@@ -2,6 +2,7 @@ import { createApp } from 'vue'
 import App from './App.vue'
 import router from './router'
 import store from './store'
+import {PRINCIPAL_GETTER_TYPE} from './store/principal'
 
 import axios from './http/index'
 import VueAxios from 'vue-axios'
@@ -51,6 +52,11 @@ app.config.globalProperties.formUrlencoded = function(json) {
     }
 
     return param;
+}
+
+app.config.globalProperties.principal = {
+    hasPermission: store.getters[PRINCIPAL_GETTER_TYPE.HasPermission],
+    hasRole: store.getters[PRINCIPAL_GETTER_TYPE.HasRole]
 }
 
 app.config.globalProperties.loadConfig = function(params, callback) {
