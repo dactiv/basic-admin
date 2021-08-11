@@ -25,17 +25,19 @@
             </a-menu>
           </a-col>
           <a-col :span="8">
+
             <a-menu mode="horizontal" class="float-right right">
               <a-menu-item key="1"><icon-font type="icon-moon" /></a-menu-item>
               <a-sub-menu key="2">
                 <template #title>
                   <a-avatar :src="require('../assets/avatar/男生-紫.png')" ></a-avatar>
                 </template>
-                <a-menu-item key="2-1"><a-button type="text"><icon-font type="icon-profile" /> {{ this.$store.state.principal.username }}</a-button></a-menu-item>
+                <a-menu-item key="2-1"><a-button type="text"><icon-font type="icon-profile" /> {{ this.principal.details.username }}</a-button></a-menu-item>
                 <a-menu-item key="2-2"><a-button type="text"><icon-font type="icon-setting" /> 系统设置</a-button> </a-menu-item>
                 <a-menu-item key="2-4"><a-button type="text" @click="logout()"><icon-font type="icon-sign-out" /> 注销账户</a-button></a-menu-item>
               </a-sub-menu>
             </a-menu>
+
           </a-col>
         </a-row>
       </a-layout-header>
@@ -52,7 +54,7 @@
 
 <script>
 
-import RecursionMenu from '../components/RecursionMenu.vue'
+import RecursionMenu from '@/components/RecursionMenu.vue'
 import {PRINCIPAL_ACTION_TYPE} from "@/store/principal"
 
 export default {
@@ -88,11 +90,10 @@ export default {
             }
           })
           .then(response => _this.menu.data = response);
-    }
+    },
   },
   data() {
     return {
-      principal:JSON.parse(localStorage.getItem(process.env.VUE_APP_PRINCIPAL_NAME)),
       menu: {
         collapsed: false,
         selectedKeys:[this.$route.meta.selectMenu ? this.$route.meta.selectMenu : this.$route.path],

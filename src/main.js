@@ -40,8 +40,6 @@ import '@/assets/css/basic.css';
 
 const app = createApp(App);
 
-moment.locale("zh-cn")
-
 app.config.globalProperties.$moment = moment;
 
 app.config.globalProperties.formUrlencoded = function(json) {
@@ -54,11 +52,6 @@ app.config.globalProperties.formUrlencoded = function(json) {
     return param;
 }
 
-app.config.globalProperties.principal = {
-    hasPermission: store.getters[PRINCIPAL_GETTER_TYPE.HasPermission],
-    hasRole: store.getters[PRINCIPAL_GETTER_TYPE.HasRole]
-}
-
 app.config.globalProperties.loadConfig = function(params, callback) {
     this.$http.get(process.env.VUE_APP_SERVER_CONFIG_URI_SUFFIX,{params: params}).then(callback);
 }
@@ -69,7 +62,11 @@ const IconFont = createFromIconfontCN({
 
 app.component('IconFont', IconFont);
 
-window.vueContext = app;
+app.config.globalProperties.principal = {
+    details: store.state.principal,
+    hasPermission: store.getters[PRINCIPAL_GETTER_TYPE.HasPermission],
+    hasRole: store.getters[PRINCIPAL_GETTER_TYPE.HasRole]
+}
 
 app.use(store)
     .use(router)
