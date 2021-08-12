@@ -9,7 +9,7 @@
       <div class="main-menu">
         <a-spin :spinning="spinning" tip="初始化导航...">
             <a-menu mode="inline" :selectedKeys="menu.selectedKeys" :openKeys="menu.openKeys">
-              <recursion-menu :data="this.menu.data" />
+              <recursion-menu :data="this.principal.details.menus" />
             </a-menu>
         </a-spin>
       </div>
@@ -58,8 +58,8 @@
 <script>
 
 import RecursionMenu from '@/components/RecursionMenu.vue'
-import { PRINCIPAL_ACTION_TYPE } from "@/store/principal"
-import { setRouter } from "@/router"
+import { PRINCIPAL_ACTION_TYPE, PRINCIPAL_MUTATION_TYPE } from "@/store/principal"
+import { reloadRouter } from "@/router"
 
 export default {
   name: "Index",
@@ -84,25 +84,30 @@ export default {
     },
     setMenus:function (response) {
 
-      this.menu.data = response;
+      let details = JSON.parse(JSON.stringify(this.principal.details));
 
-      sessionStorage.setItem(process.env.VUE_APP_SESSION_STORAGE_MENUS_NAME, JSON.stringify(response));
+      details.menus = response;
 
-      setRouter(this.menu.data);
+      this.$store.commit(PRINCIPAL_MUTATION_TYPE.SetPrincipal, details);
+
+      reloadRouter(response);
 
       this.spinning = false;
 
     },
     getMenus:function() {
-      this.spinning = true;
-      this.$http
-          .get("/authentication/resource/getConsolePrincipalResources",{
-            params: {
-              type:"Menu",
-              mergeTree:true
-            }
-          })
-          .then(this.setMenus);
+
+      if (this.principal.details.menus.length === 0) {
+        this.spinning = true;
+        this.$http
+            .get("/authentication/resource/getConsolePrincipalResources", {
+              params: {
+                type: "Menu",
+                mergeTree: true
+              }
+            })
+            .then(this.setMenus);
+      }
     },
   },
   data() {
@@ -111,8 +116,7 @@ export default {
       menu: {
         collapsed: false,
         selectedKeys:[this.$route.meta.selectMenu ? this.$route.meta.selectMenu : this.$route.path],
-        openKeys:[this.$route.meta.parent],
-        data:[]
+        openKeys:[this.$route.meta.parent]
       }
     }
   }

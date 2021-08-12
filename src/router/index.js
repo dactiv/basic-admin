@@ -10,7 +10,8 @@ import RecursionMenu from "@/components/RecursionMenu";
 
 const routes = [
   {
-    path: '/',
+    path: "/",
+    name: "root",
     redirect: "/index"
   },
   {
@@ -31,7 +32,20 @@ const routes = [
   }
 ];
 
-export function setRouter(menus) {
+export function reloadRouter(menus) {
+
+  if (router.getRoutes().length !== routes.length) {
+
+    router.getRoutes().forEach(r => router.removeRoute(r.name));
+
+    routes.forEach(r => router.addRoute(r));
+
+  }
+
+  setRouter(menus);
+}
+
+const setRouter = function(menus) {
 
   menus.forEach(m => {
     if (m.children && m.children.length > 0) {
@@ -57,6 +71,7 @@ const router = createRouter({
  * 添加导航卫士
  */
 router.beforeEach((to, from, next) => {
+
   NProgress.start();
 
   // 如果路径为"登陆", 跳用服务器登出，并把所有的本地数据清除

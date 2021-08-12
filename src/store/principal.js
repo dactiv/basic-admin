@@ -8,7 +8,8 @@ const defaultStatus = {
     status: 1,
     statusName: '启用',
     authentication: false,
-    resourceAuthorityStrings: []
+    resourceAuthorityStrings: [],
+    menus:[]
 };
 
 export const PRINCIPAL_MUTATION_TYPE = {
@@ -50,13 +51,13 @@ export default {
             }
 
         },
-        clearPrincipal(state, defaultStatus) {
+        clearPrincipal(state) {
             state.authentication = false;
 
-            for (let key in defaultStatus) {
+            for (let key in this.defaultStatus) {
 
                 if (state[key]) {
-                    state[key] = defaultStatus[key];
+                    state[key] = this.defaultStatus[key];
                 }
 
             }

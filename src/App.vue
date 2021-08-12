@@ -6,16 +6,7 @@
 
 <script>
 
-import {setRouter} from '@/router'
-
 export default {
-  name:"App",
-  mounted() {
-    let menus = JSON.parse(sessionStorage.getItem(process.env.VUE_APP_SESSION_STORAGE_MENUS_NAME));
-
-    if (menus) {
-      setRouter(menus);
-    }
-  }
+  name:"App"
 }
 </script>
