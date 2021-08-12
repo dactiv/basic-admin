@@ -7,9 +7,6 @@
 <script>
 
 export default {
-  name:"App",
-  created() {
-    console.log(this.principal.details.username);
-  }
+  name:"App"
 }
 </script>

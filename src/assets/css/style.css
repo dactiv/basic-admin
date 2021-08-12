@@ -5,7 +5,7 @@ body {
 }
 
 .main-container {
-  margin: 15px 15px 15px 275px;
+  margin: 15px 15px 0 275px;
   transition: 0.2s;
 }
 
@@ -19,6 +19,13 @@ body {
   background-color: #ffffff;
   padding:0 10px;
   box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+  position: fixed;
+  z-index: 999;
+  width: calc(100% - 290px);
+}
+
+.header-navbar.toggle {
+  width: calc(100% - 110px);
 }
 
 .header-navbar .ant-menu-item {
@@ -27,6 +34,19 @@ body {
 
 .header-navbar .right .username {
   margin-right: 10px;
+}
+
+.header-navbar-shadow {
+  background: -webkit-gradient(linear,left top,left bottom,color-stop(44%,hsla(0,0%,97.3%,.95)),color-stop(73%,hsla(0,0%,97.3%,.46)),to(hsla(0,0%,100%,0)));
+  background: linear-gradient(180deg,hsla(0,0%,97.3%,.95) 44%,hsla(0,0%,97.3%,.46) 73%,hsla(0,0%,100%,0));
+  left: 0;
+  padding-top: 2.2rem;
+  display: block;
+  width: 100%;
+  height: 102px;
+  position: fixed;
+  top: 0;
+  z-index: 99;
 }
 
 .logo {
@@ -54,6 +74,7 @@ body {
   overflow: hidden;
   background-color: #ffffff;
   box-shadow: 0 0 15px 0 rgba(0, 0, 0, 0.1);
+  z-index: 100;
 }
 
 .main-footer {
@@ -101,4 +122,8 @@ body {
 
 .ant-breadcrumb {
   margin: 20px 0;
+}
+
+.main-content {
+  padding-top: 60px;
 }

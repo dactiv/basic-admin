@@ -12,54 +12,74 @@
       <icon-font type="icon-system-user"></icon-font>
     </template>
 
-    <a-space :size="10" class="margin-bottom-15">
-      <a-button @click="this.searchDialogVisible=true;"><icon-font type="icon-search" />搜索</a-button>
-      <a-button @click="edit" v-if="this.principal.hasPermission('perms[console_user:save]')">
-        <icon-font type="icon-add" />添加
-      </a-button>
+    <a-spin :spinning="spinning" tip="数据加载中...">
 
-      <a-button type="primary" danger v-if="this.principal.hasPermission('perms[console_user:delete]')">
-        <icon-font type="icon-ashbin" /> 删除选中
-      </a-button>
-    </a-space>
+      <a-space :size="10" class="margin-bottom-15">
+        <a-button @click="this.searchDialogVisible=true;"><icon-font type="icon-search" />搜索</a-button>
+        <a-button @click="edit" v-if="this.principal.hasPermission('perms[console_user:save]')">
+          <icon-font type="icon-add" />添加
+        </a-button>
 
-    <a-table class="ant-table-striped" :rowKey="record=>record.id" :row-selection="{ onChange: onSelectChange }" :data-source="page.content" :columns="columns" :loading="loading" bordered>
-      <template #action="{ record }">
+        <a-button type="primary" @click="remove(null)" danger v-if="this.principal.hasPermission('perms[console_user:delete]')">
+          <icon-font type="icon-ashbin" /> 删除选中
+        </a-button>
+      </a-space>
+
+      <a-table class="ant-table-striped" :row-selection="{ selectedRowKeys: selectedIds, onChange:selectChange }" :rowKey="record=>record.id" :scroll="{ x: 1170 }" :pagination="false" :data-source="page.content" :columns="columns" bordered>
+
+        <template #action="{ record }">
+          <a-space :size="10">
+            <a-button size="small" @click="edit(record)">
+              <icon-font type="icon-edit" v-if="this.principal.hasPermission('perms[console_user:get]')"/>编辑
+            </a-button>
+            <a-button size="small" type="primary" danger @click="remove(record)" v-if="this.principal.hasPermission('perms[console_user:delete]')">
+              <icon-font type="icon-ashbin" /> 删除
+            </a-button>
+          </a-space>
+        </template>
+
+      </a-table>
+
+      <div class="margin-top-15 text-right" >
+
         <a-space :size="10">
-          <a-button size="small" @click="edit(record)">
-            <icon-font type="icon-edit" v-if="this.principal.hasPermission('perms[console_user:get]')"/>编辑
-          </a-button>
-          <a-button size="small" type="primary" danger @click="remove(record)" v-if="this.principal.hasPermission('perms[console_user:delete]')">
-            <icon-font type="icon-ashbin" /> 删除
-          </a-button>
+
+          <a-input v-model:value="page.size" size="small" @pressEnter="search" :maxlength="4" class="text-center" style="width: 50px" />
+          <span>条 1 页</span>
+          <a-button size="small" @click="search(page.number - 1)" :disabled="page.first"><icon-font type="icon-arrow-left-bold" /></a-button>
+          {{page.number}}
+          <a-button size="small" @click="search(page.number + 1)" :disabled="page.last"><icon-font type="icon-arrow-right-bold" /></a-button>
+
         </a-space>
-      </template>
-    </a-table>
+
+      </div>
+
+    </a-spin>
   </a-card>
 
   <a-modal v-model:visible="searchDialogVisible" width="600px" title="查询后台用户" @ok="search" layout="vertical">
     <a-form ref="search-form" :model="form" layout="vertical">
 
-      <a-row>
-        <a-col :span="12" class="padding-left-10 padding-right-10">
+      <a-row :gutter="[24]">
+        <a-col :span="12">
           <a-form-item label="登陆账户:">
             <a-input v-model:value="form['filter_[username_eq]']"></a-input>
           </a-form-item>
         </a-col>
-        <a-col :span="12" class="padding-left-10 padding-right-10">
+        <a-col :span="12">
           <a-form-item label="真是姓名:">
             <a-input v-model:value="form['filter_[real_name_like]']"></a-input>
           </a-form-item>
         </a-col>
       </a-row>
 
-      <a-row>
-        <a-col :span="12" class="padding-left-10 padding-right-10">
+      <a-row :gutter="[24]">
+        <a-col :span="12">
           <a-form-item label="电子邮箱:">
             <a-input v-model:value="form['filter_[email_like]']"></a-input>
           </a-form-item>
         </a-col>
-        <a-col :span="12" class="padding-left-10 padding-right-10">
+        <a-col :span="12">
           <a-form-item label="状态:">
             <a-select v-model:value="form['filter_[status_eq]']">
               <a-select-option value="">
@@ -86,29 +106,40 @@ export default {
     return {
       columns:[
         {
-          title: '登陆账号',
-          dataIndex: 'username',
-          key:"id"
+          title: "登陆账号",
+          dataIndex: "username",
+          key:"id",
+          ellipsis: true,
+          width: 200
         },
         {
-          title: '真是姓名',
-          dataIndex: 'realName',
+          title: "真是姓名",
+          dataIndex: "realName",
+          ellipsis: true,
+          width: 200
         },
         {
-          title: '邮箱',
-          dataIndex: 'email',
+          title: "邮箱",
+          dataIndex: "email",
+          ellipsis: true,
+          width: 200
         },{
-          title: '状态',
-          dataIndex: 'statusName',
+          title: "状态",
+          dataIndex: "statusName",
+          ellipsis: true,
+          width: 200
         },{
-          title: '备注',
-          dataIndex: 'remark',
+          title: "备注",
+          dataIndex: "remark",
+          ellipsis: true,
+          width: 200
         },{
-          title: '操作',
-          fixed: 'right',
-          slots: { customRender: 'action' },
+          title: "操作",
+          fixed: "right",
+          slots: { customRender: "action" },
         }
       ],
+      selectedIds:[],
       form:{
         "filter_[username_eq]":"",
         "filter_[real_name_like]":"",
@@ -121,7 +152,7 @@ export default {
         last:false,
         number:1
       },
-      loading:false,
+      spinning:true,
       statusOptions:[],
       searchDialogVisible: false
     }
@@ -144,34 +175,52 @@ export default {
       this.$router.push(to);
 
     },
+    selectChange:function(selectedIds) {
+      this.selectedIds = selectedIds;
+    },
     remove:function(record) {
-
-      let _this = this;
 
       let ids = [];
 
-      if (record !== undefined) {
+      let confirmMessage, deleteMessage;
+
+      if (record) {
         ids.push(record.id);
+        confirmMessage = "确定要删除 [" + record.username + "] 用户吗?"
+        deleteMessage = "删除 [" + record.username + "] 用户成功";
+      } else {
+        ids = this.selectedIds;
+        confirmMessage = "确定要删除" + ids.length + "条记录吗?"
+        deleteMessage = "删除 " + ids.length + " 条记录成功"
       }
 
-      _this.loading = true;
+      let _this = this;
 
-      _this.$http.post("/authentication/console/user/delete",_this.formUrlencoded({ids:ids})).then(r => {
-        _this.page = r;
-        _this.loading = false;
+      this.confirm(confirmMessage, () => {
+        _this.spinning = true;
+        _this.$http.post("/authentication/console/user/delete",_this.formUrlencoded({ids:ids})).then(() => {
+          _this.$message.success(deleteMessage);
+          _this.selectedIds = [];
+          _this.search();
+        });
       });
 
     },
-    onSelectChange:function(selected) {
-      console.log(selected);
-    },
     search:function() {
       let _this = this;
+
+      this.spinning = true;
+
       _this.searchDialogVisible = false;
 
-      _this.$http.post("/authentication/console/user/page",_this.formUrlencoded(this.form)).then(r => {
+      let data = this.form;
+
+      data.size = this.page.size || 10;
+      data.number = this.page.number || 1;
+
+      _this.$http.post("/authentication/console/user/page",_this.formUrlencoded(data)).then(r => {
         _this.page = r;
-        _this.loading = false;
+        _this.spinning = false;
       });
     }
   }

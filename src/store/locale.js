@@ -4,7 +4,7 @@ import enUs from 'ant-design-vue/es/locale/en_US'
 import moment from "moment";
 
 export const LOCALE_MUTATION_TYPE = {
-    SetLocal:'locale/setLocale'
+    SetLocal:"locale/setLocale"
 }
 
 export const LOCALE_TYPE = [

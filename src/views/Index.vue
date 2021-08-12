@@ -15,7 +15,7 @@
 
     <a-layout :class="menu.collapsed ? 'main-container toggle' : 'main-container'">
 
-      <a-layout-header class="header-navbar">
+      <a-layout-header :class="menu.collapsed ? 'header-navbar toggle' : 'header-navbar'">
         <a-row>
           <a-col :span="16">
             <a-menu mode="horizontal" class="left">
@@ -43,6 +43,7 @@
       </a-layout-header>
 
       <a-layout-content class="main-content">
+        <div class="header-navbar-shadow"></div>
         <router-view />
       </a-layout-content>
 
@@ -58,7 +59,7 @@ import RecursionMenu from '@/components/RecursionMenu.vue'
 import {PRINCIPAL_ACTION_TYPE} from "@/store/principal"
 
 export default {
-  name: 'Index',
+  name: "Index",
   components:{RecursionMenu},
   created() {
     this.getMenus();

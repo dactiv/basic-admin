@@ -7,11 +7,8 @@ module.exports = {
             less: {
                 lessOptions: {
                     modifyVars: {
-                        'btn-height-base': '36px',
-                        'btn-height-lg': '44px',
-                        'btn-height-sm': '28px',
-                        'background-color-light':'#ffffff',
-                        'link-color':'#40b883'
+                        "menu-inline-submenu-bg":"#ffffff",
+                        "menu-item-height":"42px"
                     },
                     javascriptEnabled: true
                 },

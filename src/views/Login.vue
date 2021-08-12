@@ -77,9 +77,9 @@ export default {
         captcha:""
       },
       rules: {
-        username: { required: true, message: '请输入登陆账户', trigger: 'blur' },
-        password: { required: true, message: '请输入登陆密码', trigger: 'blur' },
-        captcha: { required: true, message: '请输入验证码', trigger: 'blur' }
+        username: [{ required: true, message: "请输入登陆账户", trigger: "blur" }],
+        password: [{ required: true, message: "请输入登陆密码", trigger: "blur" }],
+        captcha: [{ required: true, message: "请输入验证码", trigger: "blur" }]
       }
     }
   },

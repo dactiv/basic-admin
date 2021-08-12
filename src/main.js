@@ -1,4 +1,4 @@
-import { createApp } from 'vue'
+import { createApp, createVNode } from 'vue'
 import App from './App.vue'
 import router from './router'
 import store from './store'
@@ -29,10 +29,12 @@ import {
     Space,
     Modal,
     ConfigProvider,
-    Typography
+    Typography,
+    notification,
+    message
 } from "ant-design-vue";
 
-import { createFromIconfontCN } from '@ant-design/icons-vue';
+import { createFromIconfontCN, ExclamationCircleOutlined } from '@ant-design/icons-vue';
 import moment from "moment";
 
 import '@/assets/css/style.css';
@@ -42,11 +44,31 @@ const app = createApp(App);
 
 app.config.globalProperties.$moment = moment;
 
-app.config.globalProperties.formUrlencoded = function(json) {
+app.config.globalProperties.formUrlencoded = function(json, ignoreProperties, valueConvert) {
+
     let param = new URLSearchParams();
 
+    let ignore = [];
+
+    if (typeof ignoreProperties === 'string') {
+        ignore.push(ignoreProperties);
+    } else {
+        ignore = ignoreProperties || [];
+    }
+
     for (let j in json) {
-        param.append(j, json[j]);
+
+        if (ignore.find(s => s === j)) {
+            continue;
+        }
+
+        let val = json[j];
+
+        if (valueConvert) {
+            val = valueConvert(val);
+        }
+
+        param.append(j, val);
     }
 
     return param;
@@ -57,7 +79,7 @@ app.config.globalProperties.loadConfig = function(params, callback) {
 }
 
 const IconFont = createFromIconfontCN({
-    scriptUrl: '//at.alicdn.com/t/font_2732722_vsg5a78b3wp.js',
+    scriptUrl: "//at.alicdn.com/t/font_2732722_6vo8w3427g3.js"
 });
 
 app.component('IconFont', IconFont);
@@ -67,6 +89,30 @@ app.config.globalProperties.principal = {
     hasPermission: store.getters[PRINCIPAL_GETTER_TYPE.HasPermission],
     hasRole: store.getters[PRINCIPAL_GETTER_TYPE.HasRole]
 }
+
+app.config.globalProperties.confirm = function(config, ok, cancel) {
+
+    let props = {
+        icon: createVNode(ExclamationCircleOutlined),
+        onOk:ok,
+        onCancel:cancel
+    };
+
+    if (typeof config === 'string') {
+        props.title = config;
+    } else {
+        for (let key in config) {
+            props[key] = config[key];
+        }
+    }
+
+    Modal.confirm(props);
+
+};
+
+app.config.globalProperties.$message = message;
+
+app.config.globalProperties.$notification = notification;
 
 app.use(store)
     .use(router)
