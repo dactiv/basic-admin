@@ -7,9 +7,11 @@
           <span class="display-block" v-if="!menu.collapsed"> Dactiv </span>
       </div>
       <div class="main-menu">
-        <a-menu mode="inline" :selectedKeys="menu.selectedKeys" :openKeys="menu.openKeys">
-          <recursion-menu :data="this.menu.data" />
-        </a-menu>
+        <a-spin :spinning="spinning" tip="初始化导航...">
+            <a-menu mode="inline" :selectedKeys="menu.selectedKeys" :openKeys="menu.openKeys">
+              <recursion-menu :data="this.menu.data" />
+            </a-menu>
+        </a-spin>
       </div>
     </a-layout-sider>
 
@@ -56,7 +58,8 @@
 <script>
 
 import RecursionMenu from '@/components/RecursionMenu.vue'
-import {PRINCIPAL_ACTION_TYPE} from "@/store/principal"
+import { PRINCIPAL_ACTION_TYPE } from "@/store/principal"
+import { setRouter } from "@/router"
 
 export default {
   name: "Index",
@@ -79,22 +82,32 @@ export default {
       let _this = this;
       this.$store.dispatch(PRINCIPAL_ACTION_TYPE.Logout).then(() => _this.$router.push('/login'));
     },
+    setMenus:function (response) {
+
+      this.menu.data = response;
+
+      sessionStorage.setItem(process.env.VUE_APP_SESSION_STORAGE_MENUS_NAME, JSON.stringify(response));
+
+      setRouter(this.menu.data);
+
+      this.spinning = false;
+
+    },
     getMenus:function() {
-
-      let _this = this;
-
-      _this.$http
+      this.spinning = true;
+      this.$http
           .get("/authentication/resource/getConsolePrincipalResources",{
             params: {
               type:"Menu",
               mergeTree:true
             }
           })
-          .then(response => _this.menu.data = response);
+          .then(this.setMenus);
     },
   },
   data() {
     return {
+      spinning: false,
       menu: {
         collapsed: false,
         selectedKeys:[this.$route.meta.selectMenu ? this.$route.meta.selectMenu : this.$route.path],

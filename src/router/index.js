@@ -6,6 +6,7 @@ import store from '@/store/index'
 
 import NProgress from 'nprogress'
 import 'nprogress/nprogress.css';
+import RecursionMenu from "@/components/RecursionMenu";
 
 const routes = [
   {
@@ -26,28 +27,26 @@ const routes = [
     component: Index,
     meta: {
       title: "首页"
-    },
-    children: [{
-      path: "console/user",
-      component: () => import("@/views/console/user/Index.vue"),
-      name: "console_user",
-      meta: {
-        title: "后台用户管理",
-        parent: "system"
-
-      }
-    },{
-      path: "console/user/edit",
-      component: () => import("@/views/console/user/Edit.vue"),
-      name: "console_user_edit",
-      meta: {
-        title: "编辑后台用户管理",
-        parent: "system",
-        selectMenu: "/index/console/user"
-      }
-    }]
+    }
   }
 ];
+
+export function setRouter(menus) {
+
+  menus.forEach(m => {
+    if (m.children && m.children.length > 0) {
+      setRouter(m.children);
+    } else {
+      let path = RecursionMenu.methods.replaceValue(m.value);
+      import("@/views/" + path + "/router").then(m => addRoute(m.router));
+    }
+  });
+
+}
+
+const addRoute = function(routers) {
+  routers.forEach(r => router.addRoute("index", r));
+}
 
 const router = createRouter({
   history: createWebHistory(process.env.BASE_URL),
@@ -81,6 +80,6 @@ router.beforeEach((to, from, next) => {
 
 router.afterEach(() => {
   NProgress.done()
-})
+});
 
 export default router

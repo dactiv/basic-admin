@@ -88,6 +88,10 @@ body {
   overflow: auto;
 }
 
+.main-menu .ant-spin-nested-loading {
+  min-height: 260px;
+}
+
 .authentication-inner {
   overflow-y: auto;
   width: 100%;
