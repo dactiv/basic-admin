@@ -6,7 +6,7 @@
     <a-breadcrumb-item>系统用户管理</a-breadcrumb-item>
   </a-breadcrumb>
 
-  <a-card title="后台用户管理">
+  <a-card title="后台用户管理" class="basic-box-shadow">
 
     <template #extra>
       <icon-font type="icon-system-user"></icon-font>

@@ -5,7 +5,7 @@ body {
 }
 
 .main-container {
-  margin: 15px 15px 0 275px;
+  margin: 0 15px 0 275px;
   transition: 0.2s;
 }
 
@@ -15,13 +15,12 @@ body {
 }
 
 .header-navbar {
-  border-radius: 10px;
   background-color: #ffffff;
   padding:0 10px;
-  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
   position: fixed;
   z-index: 999;
   width: calc(100% - 290px);
+  margin-top: 10px;
 }
 
 .header-navbar.toggle {
@@ -89,12 +88,6 @@ body {
   overflow: auto;
 }
 
-.main-footer {
-  color: #6e6b7b;
-  line-height: 60px;
-  padding: 0;
-}
-
 .authentication-inner {
   overflow-y: auto;
   width: 100%;
@@ -125,5 +118,6 @@ body {
 }
 
 .main-content {
-  padding-top: 60px;
+  padding-top: 75px;
+  min-height: calc(100% - 60px);
 }

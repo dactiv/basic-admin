@@ -1,5 +1,5 @@
 <template>
-  <a-layout>
+  <a-layout class="height-100-percent">
 
     <a-layout-sider class="main-aside" width="260" v-model:collapsed="menu.collapsed" :trigger="null" collapsible>
       <div class="logo display-flex">
@@ -13,9 +13,9 @@
       </div>
     </a-layout-sider>
 
-    <a-layout :class="menu.collapsed ? 'main-container toggle' : 'main-container'">
+    <a-layout :class="menu.collapsed ? 'main-container toggle height-100-percent' : 'main-container height-100-percent'">
 
-      <a-layout-header :class="menu.collapsed ? 'header-navbar toggle' : 'header-navbar'">
+      <a-layout-header :class="menu.collapsed ? 'header-navbar basic-box-shadow basic-border-radius toggle' : 'header-navbar basic-box-shadow basic-border-radius'">
         <a-row>
           <a-col :span="16">
             <a-menu mode="horizontal" class="left">

@@ -61,3 +61,15 @@
 .text-right {
   text-align: right;
 }
+
+.basic-box-shadow {
+  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+}
+
+.basic-border-radius {
+  border-radius: 10px;
+}
+
+.height-100-percent {
+  height: 100% !important;
+}

@@ -7,7 +7,7 @@
     <a-breadcrumb-item>{{ '编辑' + (form.username !== '' ? ' [' + form.username + '] ': '系统') + '用户' }}</a-breadcrumb-item>
   </a-breadcrumb>
 
-  <a-card :title="'编辑' + (form.username !== '' ? ' [' + form.username + '] ': '系统') + '用户'">
+  <a-card :title="'编辑' + (form.username !== '' ? ' [' + form.username + '] ': '系统') + '用户'" class="basic-box-shadow">
     <a-spin :spinning="spinning">
       <a-form ref="edit-form" :model="form" :rules="rules" layout="vertical">
 
