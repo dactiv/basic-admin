@@ -1,6 +1,6 @@
 <template>
 
-  <a-breadcrumb>
+  <a-breadcrumb class="hidden-xs">
     <a-breadcrumb-item><router-link to='/'>首页</router-link></a-breadcrumb-item>
     <a-breadcrumb-item>系统管理</a-breadcrumb-item>
     <a-breadcrumb-item><router-link to='/index/console/user'>系统用户管理</router-link></a-breadcrumb-item>

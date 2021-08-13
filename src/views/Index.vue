@@ -21,7 +21,7 @@
         <a-row>
           <a-col :span="16">
             <a-menu mode="horizontal" class="left">
-              <a-menu-item key="1" @click="toggleCollapsed"><icon-font :type="this.menu.collapsed ? 'icon-arrow-right-circle' : 'icon-arrow-left-circle'" /></a-menu-item>
+              <a-menu-item key="1" @click="toggleCollapsed" class="hidden-xs"><icon-font :type="this.menu.collapsed ? 'icon-arrow-right-circle' : 'icon-arrow-left-circle'" /></a-menu-item>
               <a-menu-item key="2"><icon-font type="icon-calendar" /></a-menu-item>
               <a-menu-item key="3"><icon-font type="icon-comment" /></a-menu-item>
             </a-menu>
@@ -66,11 +66,26 @@ export default {
   created() {
     this.getMenus();
 
+    window.onresize = () => {
+      return (() => {
+        if (document.body.clientWidth <= 768) {
+          this.menu.collapsed = true;
+        } else {
+          let collapsed = localStorage.getItem("menu-collapsed");
+
+          if (collapsed !== "true") {
+            this.menu.collapsed = false;
+          }
+        }
+      })()
+    }
+
     let collapsed = localStorage.getItem("menu-collapsed");
 
     if (collapsed === "true") {
       this.menu.collapsed = true;
     }
+
   },
   methods: {
     toggleCollapsed:function() {
@@ -109,6 +124,7 @@ export default {
   },
   data() {
     return {
+      screenWidth: document.body.clientWidth,
       spinning: false,
       menu: {
         collapsed: false,

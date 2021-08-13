@@ -7,6 +7,8 @@ import {PRINCIPAL_GETTER_TYPE} from '@/store/principal'
 import axios from '@/http/index'
 import VueAxios from 'vue-axios'
 
+import '@/assets/less/responsive-utilities.less'
+
 import {
     DatePicker,
     Button,

@@ -94,8 +94,15 @@ router.beforeEach((to, from, next) => {
     } else {
 
       if (router.getRoutes().length === routes.length) {
+
         reload();
-        next({ ...to, replace: true })
+
+        if (routes.find(r => r.path === to.path)) {
+          next();
+        } else {
+          next({ ...to, replace: true });
+        }
+
       } else {
         next();
       }
