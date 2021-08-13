@@ -3,7 +3,7 @@
 
     <a-layout-sider class="main-aside" width="260" v-model:collapsed="menu.collapsed" :trigger="null" collapsible>
       <div class="logo display-flex">
-          <img alt="Dactiv logo" src="../assets/logo.png">
+          <a-image :src="require('../assets/logo.png')" />
           <span class="display-block" v-if="!menu.collapsed"> Dactiv </span>
       </div>
       <div class="main-menu">
@@ -59,7 +59,6 @@
 
 import RecursionMenu from '@/components/RecursionMenu.vue'
 import { PRINCIPAL_ACTION_TYPE, PRINCIPAL_MUTATION_TYPE } from "@/store/principal"
-import { reloadRouter } from "@/router"
 
 export default {
   name: "Index",
@@ -89,8 +88,6 @@ export default {
       details.menus = response;
 
       this.$store.commit(PRINCIPAL_MUTATION_TYPE.SetPrincipal, details);
-
-      reloadRouter(response);
 
       this.spinning = false;
 

@@ -84,8 +84,11 @@ export default {
     }
   },
   created() {
+
     let _this = this;
+
     _this.$http.get("/authentication/prepare").then(this.validCaptcha);
+
   },
   methods: {
     validCaptcha:function(error) {

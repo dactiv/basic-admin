@@ -1,7 +1,7 @@
 import { createStore } from 'vuex'
 
-import principal, {PRINCIPAL_MUTATION_TYPE} from './principal'
-import locale, {LOCALE_MUTATION_TYPE} from './locale'
+import principal, {PRINCIPAL_MUTATION_TYPE} from '@/store/principal'
+import locale, {LOCALE_MUTATION_TYPE} from '@/store/locale'
 
 const storeSubscribeMethod = {
   [PRINCIPAL_MUTATION_TYPE.SetPrincipal](mutation) {

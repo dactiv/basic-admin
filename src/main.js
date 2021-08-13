@@ -1,10 +1,10 @@
 import { createApp, createVNode } from 'vue'
-import App from './App.vue'
-import router from './router'
-import store from './store'
-import {PRINCIPAL_GETTER_TYPE} from './store/principal'
+import App from '@/App.vue'
+import router from '@/router'
+import store from '@/store'
+import {PRINCIPAL_GETTER_TYPE} from '@/store/principal'
 
-import axios from './http/index'
+import axios from '@/http/index'
 import VueAxios from 'vue-axios'
 
 import {
@@ -114,8 +114,8 @@ app.config.globalProperties.$message = message;
 
 app.config.globalProperties.$notification = notification;
 
-app.use(store)
-    .use(router)
+app.use(router)
+    .use(store)
     .use(VueAxios, axios)
     .use(DatePicker)
     .use(Button)

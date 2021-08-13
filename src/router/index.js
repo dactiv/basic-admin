@@ -2,7 +2,7 @@ import { createRouter, createWebHistory} from 'vue-router' ;
 
 import Login from '@/views/Login'
 import Index from '@/views/Index'
-import store from '@/store/index'
+import store from '@/store'
 
 import NProgress from 'nprogress'
 import 'nprogress/nprogress.css';
@@ -32,7 +32,7 @@ const routes = [
   }
 ];
 
-export function reloadRouter(menus) {
+export function reload() {
 
   if (router.getRoutes().length !== routes.length) {
 
@@ -42,7 +42,7 @@ export function reloadRouter(menus) {
 
   }
 
-  setRouter(menus);
+  setRouter(store.state.principal.menus);
 }
 
 const setRouter = function(menus) {
@@ -52,7 +52,13 @@ const setRouter = function(menus) {
       setRouter(m.children);
     } else {
       let path = RecursionMenu.methods.replaceValue(m.value);
-      import("@/views/" + path + "/router").then(m => addRoute(m.router));
+
+      try {
+        let r = require("@/views/" + path + "/router");
+        addRoute(r.router);
+        // eslint-disable-next-line no-empty
+      } catch (e) {}
+
     }
   });
 
@@ -61,6 +67,7 @@ const setRouter = function(menus) {
 const addRoute = function(routers) {
   routers.forEach(r => router.addRoute("index", r));
 }
+
 
 const router = createRouter({
   history: createWebHistory(process.env.BASE_URL),
@@ -74,7 +81,6 @@ router.beforeEach((to, from, next) => {
 
   NProgress.start();
 
-  // 如果路径为"登陆", 跳用服务器登出，并把所有的本地数据清除
   if (to.path === "/login") {
 
     store.commit("principal/clearPrincipal");
@@ -86,7 +92,14 @@ router.beforeEach((to, from, next) => {
     if (!store.state.principal.authentication) {
       next("/login");
     } else {
-      next();
+
+      if (router.getRoutes().length === routes.length) {
+        reload();
+        next({ ...to, replace: true })
+      } else {
+        next();
+      }
+
     }
 
   }
