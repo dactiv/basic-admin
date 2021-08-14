@@ -1,9 +1,9 @@
 <template>
 
   <a-breadcrumb class="hidden-xs">
-    <a-breadcrumb-item><router-link to='/'>首页</router-link></a-breadcrumb-item>
-    <a-breadcrumb-item>系统管理</a-breadcrumb-item>
-    <a-breadcrumb-item>系统用户管理</a-breadcrumb-item>
+    <a-breadcrumb-item><router-link to='/'><icon-font type="icon-home"></icon-font> 首页</router-link></a-breadcrumb-item>
+    <a-breadcrumb-item><icon-font type="icon-setting"></icon-font> 系统管理</a-breadcrumb-item>
+    <a-breadcrumb-item><icon-font type="icon-system-user"></icon-font> 系统用户管理</a-breadcrumb-item>
   </a-breadcrumb>
 
   <a-card title="系统用户管理" class="basic-box-shadow margin-top-20">
@@ -127,7 +127,7 @@ export default {
           width: 200
         },
         {
-          title: "邮箱",
+          title: "电子邮箱",
           dataIndex: "email",
           ellipsis: true,
           width: 200
@@ -195,8 +195,8 @@ export default {
 
       if (record) {
         ids.push(record.id);
-        confirmMessage = "确定要删除 [" + record.username + "] 用户吗?"
-        deleteMessage = "删除 [" + record.username + "] 用户成功";
+        confirmMessage = "确定要删除 [" + record.username + "] 系统用户吗?"
+        deleteMessage = "删除 [" + record.username + "] 系统用户成功";
       } else {
         ids = this.selectedIds;
         confirmMessage = "确定要删除" + ids.length + "条记录吗?"

@@ -36,7 +36,7 @@ function httpError(error) {
         }
 
         if (error.response.status === 401) {
-            router.push("/login");
+            router.push(process.env.VUE_APP_LOGIN_PAGE);
         }
 
         let serverCode = error.response.data[process.env.VUE_APP_SERVER_ERROR_CODE_FIELD];
@@ -63,8 +63,12 @@ function httpError(error) {
  */
 function responseInterceptor(response) {
 
-    if (response.status === 200 && response.data.executeCode === "200") {
-        return response.data.data;
+    if (response.status === 200 && response.data.executeCode === "200" ) {
+        if (response.data.data) {
+            return response.data.data;
+        } else {
+            return response.data;
+        }
     }
 
     return response

@@ -22,9 +22,9 @@
       <template #action="{ record }">
         <div class="text-center">
           <a-space :size="10">
-            <a-button size="small" @click="edit(record)" v-if="this.principal.hasPermission('perms[resource:get]')">
-              <icon-font type="icon-edit"/>
-              <span class="hidden-xs">查看</span>
+            <a-button size="small" @click="detail(record)" v-if="this.principal.hasPermission('perms[resource:get]')">
+              <icon-font type="icon-file"/>
+              <span class="hidden-xs">详情</span>
             </a-button>
           </a-space>
         </div>
@@ -80,7 +80,7 @@ export default {
     }
   },
   methods:{
-    select:function(record, selected/*, selectedRows, nativeEvent*/) {
+    select:function(record, selected) {
 
       if (selected) {
 
@@ -160,10 +160,10 @@ export default {
     selectChange:function(selectedIds) {
       this.selectedIds = selectedIds;
     },
-    edit:function (record) {
+    detail:function (record) {
 
       let to = {
-        name: "resource_edit"
+        name: "resource_detail"
       }
 
       if (record !== undefined) {

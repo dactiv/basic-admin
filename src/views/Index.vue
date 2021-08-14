@@ -96,7 +96,7 @@ export default {
     },
     logout:function() {
       let _this = this;
-      this.$store.dispatch(PRINCIPAL_ACTION_TYPE.Logout).then(() => _this.$router.push('/login'));
+      this.$store.dispatch(PRINCIPAL_ACTION_TYPE.Logout).then(() => _this.$router.push(process.env.VUE_APP_LOGIN_PAGE));
     },
     setMenus:function (response) {
 

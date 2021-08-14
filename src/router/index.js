@@ -13,19 +13,19 @@ const routes = [
   {
     path: "/",
     name: "root",
-    redirect: "/index"
+    redirect: "/dactiv"
   },
   {
-    path: "/login",
-    name: "login",
+    path: process.env.VUE_APP_LOGIN_PAGE,
+    name: process.env.VUE_APP_LOGIN_PAGE.replace("/",""),
     component: Login,
     meta: {
       title: "用户登陆"
     }
   },
   {
-    path: "/index",
-    name: "index",
+    path: process.env.VUE_APP_SITE_ROOT,
+    name: process.env.VUE_APP_SITE_ROOT.replace("/",""),
     component: Index,
     meta: {
       title: "首页"
@@ -52,11 +52,10 @@ const setRouter = function(menus) {
     if (m.children && m.children.length > 0) {
       setRouter(m.children);
     } else {
-      let path = RecursionMenu.methods.replaceValue(m.value);
-
+      let path = RecursionMenu.methods.replaceValue(m);
       try {
         let r = require("@/views/" + path + "/router");
-        r.router.forEach(r => router.addRoute("index", r));
+        r.router.forEach(r => router.addRoute(process.env.VUE_APP_SITE_ROOT.replace("/",""), r));
         // eslint-disable-next-line no-empty
       } catch (e) {}
 
@@ -77,7 +76,7 @@ router.beforeEach((to, from, next) => {
 
   NProgress.start();
 
-  if (to.path === "/login") {
+  if (to.path === process.env.VUE_APP_LOGIN_PAGE) {
 
     store.commit(PRINCIPAL_MUTATION_TYPE.ClearPrincipal);
 
@@ -86,7 +85,7 @@ router.beforeEach((to, from, next) => {
   } else {
 
     if (!store.state.principal.authentication) {
-      next("/login");
+      next(process.env.VUE_APP_LOGIN_PAGE);
     } else {
 
       if (router.getRoutes().length === routes.length) {

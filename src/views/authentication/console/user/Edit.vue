@@ -1,13 +1,18 @@
 <template>
 
   <a-breadcrumb class="hidden-xs">
-    <a-breadcrumb-item><router-link to='/'>首页</router-link></a-breadcrumb-item>
-    <a-breadcrumb-item>系统管理</a-breadcrumb-item>
-    <a-breadcrumb-item><router-link to='/index/console/user'>系统用户管理</router-link></a-breadcrumb-item>
-    <a-breadcrumb-item>{{ (form.id ? '编辑 [' + form.username + '] ': '添加') + '系统用户' }}</a-breadcrumb-item>
+    <a-breadcrumb-item><router-link to='/'><icon-font type="icon-home"></icon-font> 首页</router-link></a-breadcrumb-item>
+    <a-breadcrumb-item><icon-font type="icon-setting"></icon-font> 系统管理</a-breadcrumb-item>
+    <a-breadcrumb-item><router-link :to="{name:'console_user'}"> <icon-font type="icon-system-user"></icon-font> 系统用户管理</router-link></a-breadcrumb-item>
+    <a-breadcrumb-item><icon-font type="icon-edit"></icon-font> {{ (form.id ? '编辑 [' + form.username + '] ': '添加') + '系统用户' }}</a-breadcrumb-item>
   </a-breadcrumb>
 
   <a-card :title="(form.id ? '编辑 [' + form.username + '] ': '添加') + '系统用户'" class="basic-box-shadow">
+
+    <template #extra>
+      <icon-font type="icon-edit"></icon-font>
+    </template>
+
     <a-spin :spinning="spinning">
       <a-form ref="edit-form" :model="form" :rules="rules" layout="vertical">
 
@@ -171,6 +176,17 @@ export default {
             .catch(() => _this.spinning = false);
 
       });
+    },
+    setResourceAndGroup: function(id) {
+      this
+          .$http
+          .get("/authentication/resource/getUserResource?userId=" + id)
+          .then(r => this.$refs['resource-table'].selectedIds = r);
+
+      this
+          .$http
+          .get("/authentication/group/getConsoleUserGroups?userId=" + id)
+          .then(r => this.$refs['group-table'].selectedIds = r);
     }
   },
   mounted() {
@@ -192,7 +208,8 @@ export default {
           .then(r => {
             _this.form = r;
             _this.form.status = _this.form.status + '';
-            _this.spinning = false
+            _this.spinning = false;
+            _this.setResourceAndGroup(_this.form.id);
           })
           .catch(() => _this.spinning = false);
 

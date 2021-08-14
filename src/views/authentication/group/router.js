@@ -1,6 +1,6 @@
 export const router = [{
-    path: "group",
-    component: () => import("@/views/group/Index.vue"),
+    path: "authentication/group",
+    component: () => import("@/views/authentication/group/Index.vue"),
     name: "group",
     meta: {
         title: "组管理",
@@ -8,8 +8,8 @@ export const router = [{
 
     }
 },{
-    path: "group/edit",
-    component: () => import("@/views/group/Edit.vue"),
+    path: "authentication/group/edit",
+    component: () => import("@/views/authentication/group/Edit.vue"),
     name: "group_edit",
     meta: {
         title: "编辑组",

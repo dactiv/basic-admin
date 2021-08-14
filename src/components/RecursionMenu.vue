@@ -1,7 +1,7 @@
 <template>
   <template v-for="d of data" :key="d.id">
-    <a-menu-item :key="getPath(d.value)" v-if="!hasChildren(d)">
-      <router-link :to='getPath(d.value)'>
+    <a-menu-item :key="getPath(d)" v-if="!hasChildren(d)">
+      <router-link :to='getPath(d)'>
         <icon-font :type="d.icon" v-if="d.icon ? d.icon : 'icon-file'" />
         <span>{{d.name}}</span>
       </router-link>
@@ -39,12 +39,12 @@ export default {
     /**
      * 替换后台菜单 value 值
      *
-     * @param v 值
+     * @param d 记录
      *
      * @returns {*} 替换后的值
      */
-    replaceValue:function(v) {
-      return v.replace("/**","");
+    replaceValue:function(d) {
+      return d.applicationName + "/" + d.value.replace("/**","");
     },
     /**
      * 获取路由路径
@@ -54,7 +54,7 @@ export default {
      * @returns {string} 路由路径值
      */
     getPath:function(v) {
-      return "/index/" + this.replaceValue(v);
+      return process.env.VUE_APP_SITE_ROOT + "/" + this.replaceValue(v);
     }
   }
 }

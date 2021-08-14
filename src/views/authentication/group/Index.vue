@@ -1,9 +1,9 @@
 <template>
 
   <a-breadcrumb class="hidden-xs">
-    <a-breadcrumb-item><router-link to='/'>首页</router-link></a-breadcrumb-item>
-    <a-breadcrumb-item>系统管理</a-breadcrumb-item>
-    <a-breadcrumb-item>组管理</a-breadcrumb-item>
+    <a-breadcrumb-item><router-link to='/'><icon-font type="icon-home"></icon-font> 首页</router-link></a-breadcrumb-item>
+    <a-breadcrumb-item><icon-font type="icon-setting"></icon-font> 系统管理</a-breadcrumb-item>
+    <a-breadcrumb-item><icon-font type="icon-group"></icon-font> 组管理</a-breadcrumb-item>
   </a-breadcrumb>
 
   <a-card title="组管理" class="basic-box-shadow margin-top-20">

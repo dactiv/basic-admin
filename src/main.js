@@ -35,6 +35,8 @@ import {
     Tag,
     Tabs,
     Divider,
+    Badge,
+    Descriptions,
     notification,
     message
 } from "ant-design-vue";
@@ -77,7 +79,12 @@ app.config.globalProperties.formUrlencoded = function(json, ignoreProperties, va
             val = valueConvert(val);
         }
 
-        param.append(j, val);
+        if(Array.isArray(val)) {
+            val.forEach(v => param.append(j, v))
+        } else {
+            param.append(j, val);
+        }
+
     }
 
     return param;
@@ -151,4 +158,6 @@ app.use(router)
     .use(Tag)
     .use(Tabs)
     .use(Divider)
+    .use(Descriptions)
+    .use(Badge)
     .mount('#app');
