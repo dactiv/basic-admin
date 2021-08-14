@@ -15,7 +15,7 @@
       </div>
     </a-layout-sider>
 
-    <a-layout :class="menu.collapsed ? 'main-container toggle height-100-percent' : 'main-container height-100-percent'">
+    <a-layout :class="menu.collapsed ? 'main-container toggle' : 'main-container'">
 
       <a-layout-header :class="menu.collapsed ? 'header-navbar basic-box-shadow basic-border-radius toggle' : 'header-navbar basic-box-shadow basic-border-radius'">
         <a-row>
@@ -52,7 +52,9 @@
       <a-layout-footer class="main-footer text-center">COPYRIGHT © 2021 Dactiv, All rights ReservedHand-crafted & Made with </a-layout-footer>
 
     </a-layout>
+
   </a-layout>
+
 </template>
 
 <script>

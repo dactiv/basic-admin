@@ -1,3 +1,60 @@
 <template>
-  组管理
+
+  <a-breadcrumb class="hidden-xs">
+    <a-breadcrumb-item><router-link to='/'>首页</router-link></a-breadcrumb-item>
+    <a-breadcrumb-item>系统管理</a-breadcrumb-item>
+    <a-breadcrumb-item>组管理</a-breadcrumb-item>
+  </a-breadcrumb>
+
+  <a-card title="组管理" class="basic-box-shadow margin-top-20">
+
+    <template #extra>
+      <icon-font type="icon-group"></icon-font>
+    </template>
+
+    <a-input v-model:value="form['filter_[name_like]']" placeholder="请输入名称进行查询" size="large" class="margin-bottom-20">
+      <template #addonAfter>
+        <a-button type="text" @click="$refs['group-table'].search(this.form)">
+          <icon-font type="icon-search" />
+          <span class="hidden-xs">搜索</span>
+        </a-button>
+      </template>
+      <template #addonBefore>
+        <a-button type="text" @click="$refs['group-table'].edit()" v-if="this.principal.hasPermission('perms[group:save]')">
+          <icon-font type="icon-add"/>
+          <span class="hidden-xs">添加</span>
+        </a-button>
+        <a-button type="text" danger @click="$refs['group-table'].remove(null)" v-if="this.principal.hasPermission('perms[group:delete]')">
+          <icon-font type="icon-ashbin" />
+          <span class="hidden-xs">删除选中</span>
+        </a-button>
+      </template>
+    </a-input>
+
+    <group-table ref="group-table" :enable-disabled-checkbox="true"/>
+
+  </a-card>
+
 </template>
+
+<script>
+
+import GroupTable from '@/components/GroupTable';
+
+export default {
+  name:"GroupIndex",
+  components: {GroupTable},
+  data() {
+    return {
+      form:{
+        "mergeTree":true,
+        "filter_[name_like]":""
+      }
+    }
+  },
+  mounted() {
+    this.$refs['group-table'].search(this.form);
+  }
+}
+
+</script>

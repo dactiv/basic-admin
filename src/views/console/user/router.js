@@ -12,7 +12,7 @@ export const router = [{
     component: () => import("@/views/console/user/Edit.vue"),
     name: "console_user_edit",
     meta: {
-        title: "编辑后台用户管理",
+        title: "编辑后台用户",
         parent: "system",
         selectMenu: "/index/console/user"
     }

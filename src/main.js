@@ -32,6 +32,9 @@ import {
     Modal,
     ConfigProvider,
     Typography,
+    Tag,
+    Tabs,
+    Divider,
     notification,
     message
 } from "ant-design-vue";
@@ -65,6 +68,10 @@ app.config.globalProperties.formUrlencoded = function(json, ignoreProperties, va
         }
 
         let val = json[j];
+
+        if (!val) {
+            continue;
+        }
 
         if (valueConvert) {
             val = valueConvert(val);
@@ -141,4 +148,7 @@ app.use(router)
     .use(Modal)
     .use(ConfigProvider)
     .use(Typography)
+    .use(Tag)
+    .use(Tabs)
+    .use(Divider)
     .mount('#app');

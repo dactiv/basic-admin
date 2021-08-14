@@ -8,7 +8,8 @@ module.exports = {
                 lessOptions: {
                     modifyVars: {
                         "menu-inline-submenu-bg":"#ffffff",
-                        "menu-item-height":"42px"
+                        "menu-item-height":"42px",
+                        "card-padding-base": "20px"
                     },
                     javascriptEnabled: true
                 },

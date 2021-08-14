@@ -55,7 +55,7 @@ const setRouter = function(menus) {
 
       try {
         let r = require("@/views/" + path + "/router");
-        addRoute(r.router);
+        r.router.forEach(r => router.addRoute("index", r));
         // eslint-disable-next-line no-empty
       } catch (e) {}
 
@@ -63,11 +63,6 @@ const setRouter = function(menus) {
   });
 
 }
-
-const addRoute = function(routers) {
-  routers.forEach(r => router.addRoute("index", r));
-}
-
 
 const router = createRouter({
   history: createWebHistory(process.env.BASE_URL),

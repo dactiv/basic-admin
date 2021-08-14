@@ -4,17 +4,17 @@
     <a-breadcrumb-item><router-link to='/'>首页</router-link></a-breadcrumb-item>
     <a-breadcrumb-item>系统管理</a-breadcrumb-item>
     <a-breadcrumb-item><router-link to='/index/console/user'>系统用户管理</router-link></a-breadcrumb-item>
-    <a-breadcrumb-item>{{ '编辑' + (form.username !== '' ? ' [' + form.username + '] ': '系统') + '用户' }}</a-breadcrumb-item>
+    <a-breadcrumb-item>{{ (form.id ? '编辑 [' + form.username + '] ': '添加') + '系统用户' }}</a-breadcrumb-item>
   </a-breadcrumb>
 
-  <a-card :title="'编辑' + (form.username !== '' ? ' [' + form.username + '] ': '系统') + '用户'" class="basic-box-shadow">
+  <a-card :title="(form.id ? '编辑 [' + form.username + '] ': '添加') + '系统用户'" class="basic-box-shadow">
     <a-spin :spinning="spinning">
       <a-form ref="edit-form" :model="form" :rules="rules" layout="vertical">
 
         <a-row :gutter="[24]">
           <a-col :span="12">
             <a-form-item label="登陆账户:" name="username">
-              <a-input v-model:value="form.username" :disabled="form.id === null"></a-input>
+              <a-input v-model:value="form.username" :disabled="form.id !== null"></a-input>
             </a-form-item>
           </a-col>
           <a-col :span="12">
@@ -47,7 +47,7 @@
           <a-col :span="12" >
 
             <a-form-item label="状态:" name="status">
-              <a-select style="width: 100%" v-model:value="form.status">
+              <a-select class="width-100-percent" v-model:value="form.status">
                 <a-select-option v-for="(value, name) in statusOptions" :key="value + ''" :value="value + ''">
                   {{name}}
                 </a-select-option>
@@ -57,11 +57,38 @@
 
         </a-row>
 
+        <a-row>
+          <a-col :span="24">
+            <a-form-item label="备注:" name="remark">
+              <a-textarea v-model:value="form.remark" :auto-size="{ minRows: 2, maxRows: 5 }"/>
+            </a-form-item>
+          </a-col>
+
+        </a-row>
+
       </a-form>
 
-      <a-space :size="10">
-        <a-button type="primary" @click="submitForm" v-if="this.principal.hasPermission('perms[console_user:save]')"><icon-font type="icon-select" />保存</a-button>
-        <a-button @click="this.refs['edit-form'].resetFields();"><icon-font type="icon-ashbin" />重置</a-button>
+      <a-tabs active-key="group">
+
+        <a-tab-pane key="group" tab="所在组">
+          <group-table ref="group-table" :enable-disabled-checkbox="false" />
+        </a-tab-pane>
+
+        <a-tab-pane key="resource" tab="独立权限">
+
+        </a-tab-pane>
+
+      </a-tabs>
+
+      <a-space :size="10" class="margin-top-20">
+        <a-button type="primary" @click="submitForm" v-if="this.principal.hasPermission('perms[console_user:save]')">
+          <icon-font type="icon-select" />
+          <span class="hidden-xs">保存</span>
+        </a-button>
+        <a-button @click="this.refs['edit-form'].resetFields();">
+          <icon-font type="icon-ashbin" />
+          <span class="hidden-xs">重置</span>
+        </a-button>
       </a-space>
 
     </a-spin>
@@ -72,13 +99,17 @@
 
 <script>
 
+
+import GroupTable from '@/components/GroupTable';
+
 export default {
   name:"ConsoleUserEdit",
+  components:{GroupTable},
   data() {
     return {
       spinning:true,
       statusOptions:[],
-      query:null,
+      groupData:[],
       form: {
         id:null,
         username: "",
@@ -86,6 +117,7 @@ export default {
         password: "",
         confirmPassword:"",
         email: "",
+        remark: "",
         status: "1"
       },
       rules: {
@@ -99,8 +131,7 @@ export default {
         confirmPassword: [
           { required: true, message: "请输入确认密码", trigger: "blur" },
           { validator:this.validatePass, trigger: "blur"}
-        ],
-        status: [{ required: true, message: "请选择状态", trigger: "change" }]
+        ]
       }
     }
   },
@@ -113,10 +144,14 @@ export default {
       }
     },
     submitForm:function() {
+
       let _this = this;
+
       _this.$refs['edit-form'].validate().then(() => {
 
         _this.spinning = true;
+
+        _this.form.groupIds = this.$refs['group-table'].selectedIds;
 
         _this
             .$http
@@ -127,20 +162,30 @@ export default {
       });
     }
   },
+  mounted() {
+    this.$refs['group-table'].search({mergeTree:true});
+  },
   created() {
-    this.loadConfig({service:"config", enumerateName:"UserStatus"}, r=> this.statusOptions = r);
-    this.query = this.$route.query;
+    let _this = this;
 
-    if (this.query.id !== undefined) {
+    _this.loadConfig({service:"config", enumerateName:"UserStatus"}, r=> _this.statusOptions = r);
+
+    _this
+        .$http
+        .post("/authentication/group/find",_this.formUrlencoded({mergeTree:true}))
+        .then(r => _this.groupData = r);
+
+    if (this.$route.query.id !== undefined) {
 
       this
           .$http
-          .get("/authentication/console/user/get?id=" + this.query.id)
+          .get("/authentication/console/user/get?id=" + this.$route.query.id)
           .then(r => {
-            this.form = r;
-            this.form.status = this.form.status + '';
-            this.spinning = false
-          });
+            _this.form = r;
+            _this.form.status = _this.form.status + '';
+            _this.spinning = false
+          })
+          .catch(() => _this.spinning = false);
 
     } else {
       this.spinning = false
