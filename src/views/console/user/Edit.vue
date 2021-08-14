@@ -68,14 +68,22 @@
 
       </a-form>
 
-      <a-tabs active-key="group">
+      <a-tabs>
 
-        <a-tab-pane key="group" tab="所在组">
+        <a-tab-pane key="group-table">
+          <template #tab>
+            <icon-font type="icon-group" />
+            <span class="hidden-xs">所在组</span>
+          </template>
           <group-table ref="group-table" :enable-disabled-checkbox="false" />
         </a-tab-pane>
 
-        <a-tab-pane key="resource" tab="独立权限">
-
+        <a-tab-pane key="resource-table" forceRender>
+          <template #tab>
+            <icon-font type="icon-attachment" />
+            <span class="hidden-xs">独立权限</span>
+          </template>
+          <resource-table ref="resource-table" :selection="true"/>
         </a-tab-pane>
 
       </a-tabs>
@@ -100,21 +108,23 @@
 <script>
 
 
-import GroupTable from '@/components/GroupTable';
+import GroupTable from '@/components/GroupTable.vue';
+import ResourceTable from "@/components/ResourceTable";
 
 export default {
   name:"ConsoleUserEdit",
-  components:{GroupTable},
+  components:{GroupTable, ResourceTable},
   data() {
     return {
       spinning:true,
       statusOptions:[],
-      groupData:[],
       form: {
         id:null,
         username: "",
         realName: "",
         password: "",
+        groupIds:[],
+        resourceIds:[],
         confirmPassword:"",
         email: "",
         remark: "",
@@ -152,6 +162,7 @@ export default {
         _this.spinning = true;
 
         _this.form.groupIds = this.$refs['group-table'].selectedIds;
+        _this.form.resourceIds = this.$refs['resource-table'].selectedIds;
 
         _this
             .$http
@@ -163,17 +174,15 @@ export default {
     }
   },
   mounted() {
-    this.$refs['group-table'].search({mergeTree:true});
+    this.$refs['group-table'].search({"mergeTree":true, "filter_[status_eq]": 1, "filter_[source_in]":["Console"]});
+
+    this.$refs['resource-table'].search({"mergeTree":true, "filter_[status_eq]": 1, "filter_[source_in]":["Console"]});
   },
   created() {
+
     let _this = this;
 
     _this.loadConfig({service:"config", enumerateName:"UserStatus"}, r=> _this.statusOptions = r);
-
-    _this
-        .$http
-        .post("/authentication/group/find",_this.formUrlencoded({mergeTree:true}))
-        .then(r => _this.groupData = r);
 
     if (this.$route.query.id !== undefined) {
 

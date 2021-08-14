@@ -63,7 +63,7 @@ app.config.globalProperties.formUrlencoded = function(json, ignoreProperties, va
 
     for (let j in json) {
 
-        if (ignore.find(s => s === j)) {
+        if (ignore.includes(j)) {
             continue;
         }
 

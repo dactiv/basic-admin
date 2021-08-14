@@ -14,28 +14,28 @@ const defaultStatus = {
 
 export const PRINCIPAL_MUTATION_TYPE = {
     SetPrincipal:"principal/setPrincipal",
-    ClearPrincipal:"principal/clearPrincipal",
+    ClearPrincipal:"principal/clearPrincipal"
 }
 
 export const PRINCIPAL_ACTION_TYPE = {
     Login:"principal/login",
-    Logout:"principal/logout",
+    Logout:"principal/logout"
 }
 
 export const PRINCIPAL_GETTER_TYPE = {
     HasPermission:"principal/hasPermission",
-    HasRole:"principal/hasRole",
+    HasRole:"principal/hasRole"
 }
 
 export default {
     namespaced:true,
-    state: defaultStatus,
+    state: JSON.parse(JSON.stringify(defaultStatus)),
     getters: {
         hasPermission: (state) => (permission) => {
-            return state.resourceAuthorityStrings.find(r => r === permission);
+            return state.resourceAuthorityStrings.includes(permission);
         },
         hasRole: (state) => (role) => {
-            return state.roleAuthorityStrings.find(r => r === role);
+            return state.roleAuthorityStrings.includes(role);
         }
     },
     mutations: {
@@ -54,10 +54,10 @@ export default {
         clearPrincipal(state) {
             state.authentication = false;
 
-            for (let key in this.defaultStatus) {
+            for (let key in defaultStatus) {
 
                 if (state[key]) {
-                    state[key] = this.defaultStatus[key];
+                    state[key] = defaultStatus[key];
                 }
 
             }

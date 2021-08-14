@@ -23,15 +23,15 @@ const ignoreErrorStatus = [404];
  */
 function httpError(error) {
 
-    if (error.response && ignoreErrorStatus.filter(s => s === error.response.status).length === 0) {
+    if (error.response && !ignoreErrorStatus.includes(error.response.status)) {
 
         let serverMessage = error.response.data[process.env.VUE_APP_SERVER_ERROR_MESSAGE_FIELD];
 
-        if (serverMessage === undefined) {
+        if (!serverMessage) {
             serverMessage = errorMessage[error.response.status]
         }
 
-        if (serverMessage === undefined) {
+        if (!serverMessage) {
             serverMessage = process.env.VUE_APP_HTTP_ERROR_MESSAGE;
         }
 
@@ -41,10 +41,10 @@ function httpError(error) {
 
         let serverCode = error.response.data[process.env.VUE_APP_SERVER_ERROR_CODE_FIELD];
 
-        if (serverCode !== undefined) {
-            serverCode = "[" + serverCode + "] ";
+        if (serverCode) {
+            serverCode = "[executeCode:" + serverCode + "] ";
         } else {
-            serverCode = "";
+            serverCode = "[responseStatus:" + error.response.status + "]";
         }
 
         message.error(serverCode + serverMessage);

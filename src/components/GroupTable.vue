@@ -45,17 +45,20 @@ export default {
           title: "名称",
           dataIndex: "name",
           ellipsis: true,
+          width: 150
         },
         {
           title: "权限名",
           dataIndex: "authority",
           ellipsis: true,
+          width: 130
         },
         {
           title: "来源",
           dataIndex: "sourceName",
           ellipsis: true,
           slots: { customRender: 'sourceName' },
+          width: 320
         },{
           title: "状态",
           dataIndex: "statusName",

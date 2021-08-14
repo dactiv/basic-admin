@@ -7,6 +7,7 @@ import store from '@/store'
 import NProgress from 'nprogress'
 import 'nprogress/nprogress.css';
 import RecursionMenu from "@/components/RecursionMenu";
+import {PRINCIPAL_MUTATION_TYPE} from '@/store/principal'
 
 const routes = [
   {
@@ -78,7 +79,7 @@ router.beforeEach((to, from, next) => {
 
   if (to.path === "/login") {
 
-    store.commit("principal/clearPrincipal");
+    store.commit(PRINCIPAL_MUTATION_TYPE.ClearPrincipal);
 
     next();
 
