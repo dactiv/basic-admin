@@ -51,6 +51,19 @@ const app = createApp(App);
 
 app.config.globalProperties.$moment = moment;
 
+app.config.globalProperties.timestampFormat = function (timestamp) {
+    return moment(timestamp).format(process.env.VUE_APP_TIMESTAMP_FORMAT);
+}
+
+app.config.globalProperties.convertFormUrlencoded = function (val) {
+
+    if (this.$moment.isMoment(val)) {
+        return val.format(process.env.VUE_APP_POST_DATE_FORMAT);
+    }
+
+    return val;
+}
+
 app.config.globalProperties.formUrlencoded = function(json, ignoreProperties, valueConvert) {
 
     let param = new URLSearchParams();
@@ -76,13 +89,13 @@ app.config.globalProperties.formUrlencoded = function(json, ignoreProperties, va
         }
 
         if (valueConvert) {
-            val = valueConvert(val);
+            val = valueConvert(j, val);
         }
 
         if(Array.isArray(val)) {
-            val.forEach(v => param.append(j, v))
+            val.forEach(v => param.append(j, this.convertFormUrlencoded(v)))
         } else {
-            param.append(j, val);
+            param.append(j, this.convertFormUrlencoded(val));
         }
 
     }
@@ -95,7 +108,7 @@ app.config.globalProperties.loadConfig = function(params, callback) {
 }
 
 const IconFont = createFromIconfontCN({
-    scriptUrl: "//at.alicdn.com/t/font_2732722_6vo8w3427g3.js"
+    scriptUrl: "//at.alicdn.com/t/font_2732722_zoa8iienfqg.js"
 });
 
 app.component('IconFont', IconFont);

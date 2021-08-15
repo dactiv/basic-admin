@@ -1,11 +1,11 @@
 body {
   background-color: #eff2f5;
   color: #5e5873;
-  margin: 0
+  margin: 0;
 }
 
 .main-container {
-  margin: 0 15px 0 275px;
+  margin-right: 15px;
   transition: 0.2s;
 }
 
@@ -21,6 +21,7 @@ body {
   z-index: 999;
   width: calc(100% - 290px);
   margin-top: 10px;
+  margin-left: 275px;
 }
 
 .header-navbar.toggle {
@@ -53,15 +54,15 @@ body {
   padding: 20px;
 }
 
-.logo img {
-  height: 40px;
-  width: 40px;
+.logo span.anticon {
+  font-size: 2.04rem;
+  margin-left: 0;
 }
 
 .logo span{
   line-height: 36px;
   vertical-align: middle;
-  color: #40b883!important;
+  color: #1196da!important;;
   font-weight: 600;
   font-size: 1.714rem;
   margin-left: 10px;
@@ -80,6 +81,7 @@ body {
   color: #6e6b7b;
   line-height: 60px;
   padding: 0;
+  margin-left: 257px;
 }
 
 .main-menu {
@@ -123,4 +125,7 @@ body {
 
 .main-content {
   padding-top: 75px;
+  position: relative;
+  min-height: calc(100% - 60px);
+  margin-left: 275px;
 }

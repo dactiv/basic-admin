@@ -34,6 +34,10 @@
           </div>
         </template>
 
+        <template #registrationTime="{ text:registrationTime }">
+          {{ this.timestampFormat(registrationTime)}}
+        </template>
+
       </a-table>
 
       <div class="margin-top-15 text-right" >
@@ -92,7 +96,11 @@
       <a-row>
         <a-col :span="24">
           <a-form-item label="注册时间:">
-            <a-range-picker class="width-100-percent" v-model:value="form['filter_[registrationTime_between]']" />
+            <a-range-picker show-time class="width-100-percent" v-model:value="form['filter_[registration_time_between]']">
+              <template #suffixIcon>
+                <icon-font type="icon-calendar" />
+              </template>
+            </a-range-picker>
           </a-form-item>
         </a-col>
       </a-row>
@@ -113,7 +121,8 @@ export default {
           title: "注册时间",
           dataIndex: "registrationTime",
           ellipsis: true,
-          width: 200
+          width: 200,
+          slots: { customRender: "registrationTime" }
         },
         {
           title: "登陆账号",
@@ -141,7 +150,7 @@ export default {
           title: "操作",
           fixed: "right",
           width: 80,
-          slots: { customRender: "action" },
+          slots: { customRender: "action" }
         }
       ],
       selectedIds:[],
@@ -149,7 +158,8 @@ export default {
         "filter_[username_like]":"",
         "filter_[phone_like]":"",
         "filter_[email_like]":"",
-        "filter_[status_eq]":""
+        "filter_[status_eq]":"",
+        "filter_[registration_time_between]":[]
       },
       page: {
         content:[],
@@ -185,6 +195,8 @@ export default {
     },
     search:function() {
       let _this = this;
+
+      console.log(this.form["filter_[registration_time_between]"]);
 
       this.spinning = true;
 

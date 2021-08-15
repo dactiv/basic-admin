@@ -9,7 +9,9 @@ module.exports = {
                     modifyVars: {
                         "menu-inline-submenu-bg":"#ffffff",
                         "menu-item-height":"42px",
-                        "card-padding-base": "20px"
+                        "card-padding-base": "20px",
+                        "primary-color":"#1196da",
+                        "link-color":"#1196da",
                     },
                     javascriptEnabled: true
                 },
