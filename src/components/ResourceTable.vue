@@ -173,14 +173,14 @@ export default {
       this.$router.push(to);
 
     },
-    search:function(from) {
+    search:function(form) {
       let _this = this;
 
       this.spinning = true;
 
       _this
           .$http
-          .post("/authentication/resource/find",_this.formUrlencoded(from))
+          .post("/authentication/resource/find",_this.formUrlencoded(form))
           .then(r => {
             _this.data = r;
             _this.spinning = false;

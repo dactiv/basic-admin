@@ -167,17 +167,16 @@ export default {
         last:false,
         number:1
       },
-      spinning:true,
+      spinning:false,
       statusOptions:[],
       searchDialogVisible: false
     }
   },
   created() {
-    this.search();
     this.loadConfig({service:"config", enumerateName:"UserStatus"}, r=> this.statusOptions = r);
   },
   methods:{
-    detail:function (record) {
+    detail(record) {
 
       let to = {
         name: "member_user_detail"
@@ -190,13 +189,11 @@ export default {
       this.$router.push(to);
 
     },
-    selectChange:function(selectedIds) {
+    selectChange(selectedIds) {
       this.selectedIds = selectedIds;
     },
-    search:function() {
+    search() {
       let _this = this;
-
-      console.log(this.form["filter_[registration_time_between]"]);
 
       this.spinning = true;
 

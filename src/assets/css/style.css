@@ -81,6 +81,12 @@ body {
   line-height: 60px;
   padding: 0;
   margin-left: 257px;
+  transition: 0.2s;
+}
+
+.main-footer.toggle {
+  margin-left: 95px;
+  transition: 0.3s;
 }
 
 .main-menu {

@@ -64,9 +64,6 @@ export default {
           .catch(() => _this.spinning = false);
 
     }
-  },
-  mounted() {
-    this.$refs['resource-table'].search(this.form);
   }
 }
 

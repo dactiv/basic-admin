@@ -136,7 +136,7 @@ export default {
         status: "1"
       },
       rules: {
-        /*username: [
+        username: [
           { required: true, message: "请输入登陆账户", trigger: "blur" },
           { validator:this.validateRemoteUsername, trigger: "blur"}
         ],
@@ -149,7 +149,7 @@ export default {
         confirmPassword: [
           { required: true, message: "请输入确认密码", trigger: "blur" },
           { validator:this.validatePass, trigger: "blur"}
-        ]*/
+        ]
       }
     }
   },
@@ -190,7 +190,7 @@ export default {
 
       let _this = this;
 
-      /*_this.$refs['edit-form'].validate().then(() => {
+      _this.$refs['edit-form'].validate().then(() => {
 
         _this.spinning = true;
 
@@ -203,13 +203,8 @@ export default {
             .then(() => _this.$router.push({name: "console_user"}))
             .catch(() => _this.spinning = false);
 
-      });*/
+      });
 
-      _this
-          .$http
-          .post("/authentication/console/user/save",_this.formUrlencoded(_this.form))
-          .then(() => _this.$router.push({name: "console_user"}))
-          .catch(() => _this.spinning = false);
     },
     setResourceAndGroup: function(id) {
       this

@@ -53,7 +53,7 @@
 
     </a-layout>
 
-    <a-layout-footer class="main-footer text-center">COPYRIGHT © 2021 Dactiv, All rights ReservedHand-crafted & Made with </a-layout-footer>
+    <a-layout-footer :class="menu.collapsed ? 'main-footer toggle text-center' : 'main-footer text-center'">COPYRIGHT © 2021 Dactiv, All rights ReservedHand-crafted & Made with </a-layout-footer>
 
   </a-layout>
 
@@ -72,7 +72,7 @@ export default {
 
     window.onresize = () => {
       return (() => {
-        if (document.body.clientWidth <= 768) {
+        if (document.body.clientWidth < 768) {
           this.menu.collapsed = true;
         } else {
           let collapsed = localStorage.getItem("menu-collapsed");

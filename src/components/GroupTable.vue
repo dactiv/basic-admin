@@ -127,14 +127,14 @@ export default {
       });
 
     },
-    search:function(from) {
+    search:function(form) {
       let _this = this;
 
       this.spinning = true;
 
       _this
           .$http
-          .post("/authentication/group/find",_this.formUrlencoded(from))
+          .post("/authentication/group/find",_this.formUrlencoded(form))
           .then(r => {
             _this.data = r;
             _this.spinning = false;

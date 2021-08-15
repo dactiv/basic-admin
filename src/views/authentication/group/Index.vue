@@ -52,9 +52,6 @@ export default {
       }
     }
   },
-  mounted() {
-    this.$refs['group-table'].search(this.form);
-  }
 }
 
 </script>
