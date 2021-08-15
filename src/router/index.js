@@ -72,6 +72,14 @@ export function reload() {
   }
 
   setRouter(store.state.principal.menus);
+
+  router.addRoute({
+    path: "/:pathMatch(.*)*",
+    name: 'NotFound',
+    //component: NotFound
+    redirect: process.env.VUE_APP_SITE_ROOT + "/404"
+  });
+
 }
 
 const setRouter = function(menus) {
