@@ -132,19 +132,47 @@ export default {
         remark: "",
       },
       rules: {
-        name: [{ required: true, message: "请输入组名称", trigger: "blur" }],
-        authority: [{ required: true, message: "请输入权限名称", trigger: "blur" }],
+        name: [
+          { required: true, message: "请输入组名称", trigger: "blur" },
+          { validator:this.validateRemoteName, trigger: "blur"}
+        ],
+        authority: [
+          { required: true, message: "请输入权限名称", trigger: "blur" },
+          { validator:this.validateRemoteAuthority, trigger: "blur"}
+        ],
         source: [{validator:this.validateSource, trigger: "blur"}]
       }
     }
   },
   methods: {
-    sourceChange:function(value) {
+    sourceChange:function (value) {
       if(value.length === 0) {
         this.$refs['resource-table'].data = [];
       } else {
         this.$refs['resource-table'].search({"mergeTree":true, "filter_[status_eq]": 1, "filter_[source_in]":value});
       }
+    },
+    validateRemoteName:function () {
+      if (this.form.name === "") {
+        return Promise.resolve();
+      }
+
+      return new Promise((resolve, reject) => {
+        this.$http.get("/authentication/group/isNameUnique?name=" + this.form.name).then(r => {
+          return r ? resolve() : reject("组名称已存在");
+        });
+      });
+    },
+    validateRemoteAuthority:function () {
+      if (this.form.name === "") {
+        return Promise.resolve();
+      }
+
+      return new Promise((resolve, reject) => {
+        this.$http.get("/authentication/group/isAuthorityUnique?authority=" + this.form.authority).then(r => {
+          return r ? resolve() : reject("权限名称已存在");
+        });
+      });
     },
     validateSource:async function (){
       if (this.form.source.length <= 0) {
@@ -165,7 +193,7 @@ export default {
         _this
             .$http
             .post("/authentication/group/save",_this.formUrlencoded(_this.form))
-            .then(() => _this.$router.push("/index/group"))
+            .then(() => _this.$router.push({name: "group"}))
             .catch(() => _this.spinning = false);
 
       });

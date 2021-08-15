@@ -14,6 +14,6 @@ export const router = [{
     meta: {
         title: "查看会员用户",
         parent: "system",
-        selectMenu: "/index/member/user"
+        selectMenu: process.env.VUE_APP_SITE_ROOT + "/authentication/member/user"
     }
 }]

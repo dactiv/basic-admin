@@ -3,9 +3,7 @@
   <a-layout>
 
     <a-layout class="authentication-inner">
-      <a-layout-header class="logo">
-        <a-image :src="require('../assets/logo.png')" />
-        <span> Dactiv </span>
+      <a-layout-header class="logo ">
       </a-layout-header>
       <a-layout-content class="display-flex align-items-center justify-content-center">
         <a-image :src="require('../assets/login.svg')" />
@@ -16,7 +14,9 @@
     <a-layout-sider width="500" class="authentication-aside">
       <a-spin :spinning="spinning" tip="正在登陆，请稍等片刻。。。">
         <div class="authentication-aside-main">
-          <h2 class="text-center"> Dactiv 后台管理系统 </h2>
+          <h2 class="text-center">
+            <span> Dactiv 管理后台 </span>
+          </h2>
           <p class="text-center"> 请登陆您的账户 </p>
 
           <a-form ref="login-form" :model="form" :rules="rules" layout="vertical">
@@ -41,6 +41,9 @@
               <icon-font type="icon-security"></icon-font>
               登陆
             </a-button>
+
+            <a-divider class="logo"><icon-font type="icon-vue"></icon-font></a-divider>
+
 
           </a-form>
         </div>

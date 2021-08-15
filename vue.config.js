@@ -12,6 +12,10 @@ module.exports = {
                         "card-padding-base": "20px",
                         "primary-color":"#1196da",
                         "link-color":"#1196da",
+                        "heading-color": "rgba(94, 88, 115, 1)",
+                        "text-color": "rgba(94, 88, 115, 0.8)",
+                        "text-color-secondary": "rgba(94, 88, 115, 0.6)",
+                        "disabled-color":"rgba(94, 88, 115, 0.4)"
                     },
                     javascriptEnabled: true
                 },

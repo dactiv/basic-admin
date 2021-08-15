@@ -37,6 +37,14 @@ function httpError(error) {
 
         if (error.response.status === 401) {
             router.push(process.env.VUE_APP_LOGIN_PAGE);
+        } else {
+
+            let status = error.response.status.toString();
+
+            if(router.getRoutes().find(r => r.name === status)) {
+                sessionStorage.setItem(status, JSON.stringify(error.response.data));
+                router.push({name: status});
+            }
         }
 
         let serverCode = error.response.data[process.env.VUE_APP_SERVER_ERROR_CODE_FIELD];
@@ -64,7 +72,7 @@ function httpError(error) {
 function responseInterceptor(response) {
 
     if (response.status === 200 && response.data.executeCode === "200" ) {
-        if (response.data.data) {
+        if (response.data.data !== undefined) {
             return response.data.data;
         } else {
             return response.data;

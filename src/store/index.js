@@ -5,10 +5,10 @@ import locale, {LOCALE_MUTATION_TYPE} from '@/store/locale'
 
 const storeSubscribeMethod = {
   [PRINCIPAL_MUTATION_TYPE.SetPrincipal](mutation) {
-    sessionStorage.setItem(process.env.VUE_APP_SESSION_STORAGE_PRINCIPAL_NAME, JSON.stringify(mutation.payload));
+    localStorage.setItem(process.env.VUE_APP_SESSION_STORAGE_PRINCIPAL_NAME, JSON.stringify(mutation.payload));
   },
   [PRINCIPAL_MUTATION_TYPE.ClearPrincipal]() {
-    sessionStorage.removeItem(process.env.VUE_APP_SESSION_STORAGE_PRINCIPAL_NAME);
+    localStorage.removeItem(process.env.VUE_APP_SESSION_STORAGE_PRINCIPAL_NAME);
   },
   [LOCALE_MUTATION_TYPE.SetLocal](mutation) {
     localStorage.setItem(process.env.VUE_APP_LOCAL_STORAGE_LOCALE_NAME, mutation.payload.id);
@@ -19,7 +19,7 @@ const storagePlugin = (store) => {
 
   store.subscribe((mutation) => storeSubscribeMethod[mutation.type](mutation));
 
-  let principal = JSON.parse(sessionStorage.getItem(process.env.VUE_APP_SESSION_STORAGE_PRINCIPAL_NAME));
+  let principal = JSON.parse(localStorage.getItem(process.env.VUE_APP_SESSION_STORAGE_PRINCIPAL_NAME));
 
   if (principal) {
     store.commit(PRINCIPAL_MUTATION_TYPE.SetPrincipal, principal);

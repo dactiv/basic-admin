@@ -14,6 +14,6 @@ export const router = [{
     meta: {
         title: "查看資源",
         parent: "system",
-        selectMenu: "/index/resource"
+        selectMenu: process.env.VUE_APP_SITE_ROOT + "/authentication/resource"
     }
 }]

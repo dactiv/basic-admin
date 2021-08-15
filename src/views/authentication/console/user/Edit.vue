@@ -136,23 +136,51 @@ export default {
         status: "1"
       },
       rules: {
-        username: [{ required: true, message: "请输入登陆账户", trigger: "blur" }],
-        realName: [{ required: true, message: "请输入真实姓名", trigger: "blur" }],
-        password: [
-          { required: true, message: "请输入登陆密码", trigger: "blur" },
-          { validator:this.validatePass, trigger: "blur"}
+        /*username: [
+          { required: true, message: "请输入登陆账户", trigger: "blur" },
+          { validator:this.validateRemoteUsername, trigger: "blur"}
         ],
-        email: [{type: "email",trigger: "blur", message:"邮箱格式不正确"}],
+        realName: [{ required: true, message: "请输入真实姓名", trigger: "blur" }],
+        password: [{ required: true, message: "请输入登陆密码", trigger: "blur" }],
+        email: [
+          {type: "email",trigger: "blur", message:"电子邮箱格式不正确"},
+          {validator:this.validateRemoteEmail, trigger: "blur"}
+        ],
         confirmPassword: [
           { required: true, message: "请输入确认密码", trigger: "blur" },
           { validator:this.validatePass, trigger: "blur"}
-        ]
+        ]*/
       }
     }
   },
   methods: {
-    validatePass: async function (rule, value){
-      if (value !== this.form.password) {
+    validateRemoteUsername:async function () {
+
+      if (this.form.username === "") {
+        return Promise.resolve();
+      }
+
+      return new Promise((resolve, reject) => {
+        this.$http.get("/authentication/console/user/isUsernameUnique?username=" + this.form.username).then(r => {
+          return r ? resolve() : reject("登陆账户已存在");
+        });
+      });
+
+    },
+    validateRemoteEmail:async function () {
+
+      if (this.form.email === "") {
+        return Promise.resolve();
+      }
+
+      return new Promise((resolve, reject) => {
+        this.$http.get("/authentication/console/user/isEmailUnique?email=" + this.form.email).then(r => {
+          return r ? resolve() : reject("电子邮箱已存在");
+        });
+      });
+    },
+    validatePass: async function () {
+      if (this.form.confirmPassword !== this.form.password) {
         return Promise.reject('登陆密码与确认密码不一致');
       } else {
         return Promise.resolve();
@@ -162,7 +190,7 @@ export default {
 
       let _this = this;
 
-      _this.$refs['edit-form'].validate().then(() => {
+      /*_this.$refs['edit-form'].validate().then(() => {
 
         _this.spinning = true;
 
@@ -172,10 +200,16 @@ export default {
         _this
             .$http
             .post("/authentication/console/user/save",_this.formUrlencoded(_this.form))
-            .then(() => _this.$router.push("/index/console/user"))
+            .then(() => _this.$router.push({name: "console_user"}))
             .catch(() => _this.spinning = false);
 
-      });
+      });*/
+
+      _this
+          .$http
+          .post("/authentication/console/user/save",_this.formUrlencoded(_this.form))
+          .then(() => _this.$router.push({name: "console_user"}))
+          .catch(() => _this.spinning = false);
     },
     setResourceAndGroup: function(id) {
       this

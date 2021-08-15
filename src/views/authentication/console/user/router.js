@@ -14,6 +14,6 @@ export const router = [{
     meta: {
         title: "编辑后台用户",
         parent: "system",
-        selectMenu: "/index/console/user"
+        selectMenu: process.env.VUE_APP_SITE_ROOT + "/authentication/console/user"
     }
 }]

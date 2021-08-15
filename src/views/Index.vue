@@ -1,5 +1,5 @@
 <template>
-  <a-layout class="height-100-percent">
+  <a-layout>
 
     <a-layout-header :class="menu.collapsed ? 'header-navbar basic-box-shadow basic-border-radius toggle' : 'header-navbar basic-box-shadow basic-border-radius'">
       <a-row>
@@ -28,12 +28,14 @@
       </a-row>
     </a-layout-header>
 
-    <a-layout :class="menu.collapsed ? 'main-container toggle' : 'main-container'">
+    <a-layout>
 
       <a-layout-sider class="main-aside" width="260" v-model:collapsed="menu.collapsed" :trigger="null" collapsible>
-        <div class="logo display-flex">
-          <icon-font type="icon-vue"></icon-font>
-          <span class="display-block" v-if="!menu.collapsed"> Dactiv </span>
+        <div class="logo">
+          <router-link to='/' class="display-flex">
+            <icon-font type="icon-vue"></icon-font>
+            <span class="display-block" v-if="!menu.collapsed"> Dactiv </span>
+          </router-link>
         </div>
         <div class="main-menu">
           <a-spin :spinning="spinning" tip="初始化导航...">
@@ -44,7 +46,7 @@
         </div>
       </a-layout-sider>
 
-      <a-layout-content class="main-content">
+      <a-layout-content :class="menu.collapsed ? 'main-content toggle' : 'main-content'">
         <div class="header-navbar-shadow"></div>
         <router-view />
       </a-layout-content>
@@ -95,8 +97,7 @@ export default {
       localStorage.setItem("menu-collapsed", this.menu.collapsed);
     },
     logout:function() {
-      let _this = this;
-      this.$store.dispatch(PRINCIPAL_ACTION_TYPE.Logout).then(() => _this.$router.push(process.env.VUE_APP_LOGIN_PAGE));
+      this.$store.dispatch(PRINCIPAL_ACTION_TYPE.Logout).then(() => this.$router.push(process.env.VUE_APP_LOGIN_PAGE));
     },
     setMenus:function (response) {
 
@@ -129,7 +130,7 @@ export default {
       screenWidth: document.body.clientWidth,
       spinning: false,
       menu: {
-        collapsed: false,
+        collapsed: document.body.clientWidth <= 768,
         selectedKeys:[this.$route.meta.selectMenu ? this.$route.meta.selectMenu : this.$route.path],
         openKeys:[this.$route.meta.parent]
       }

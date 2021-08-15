@@ -2,6 +2,11 @@ import { createRouter, createWebHistory} from 'vue-router' ;
 
 import Login from '@/views/Login'
 import Index from '@/views/Index'
+
+import NotFound from '@/views/error/404'
+import Forbidden from '@/views/error/403'
+import BadRequest from '@/views/error/400'
+
 import store from '@/store'
 
 import NProgress from 'nprogress'
@@ -9,12 +14,34 @@ import 'nprogress/nprogress.css';
 import RecursionMenu from "@/components/RecursionMenu";
 import {PRINCIPAL_MUTATION_TYPE} from '@/store/principal'
 
+const childrenRoutes = [
+  {
+    path: '404',
+    name: '404',
+    component: NotFound
+  },{
+    path: '403',
+    name: '403',
+    component: Forbidden
+  },{
+    path: '400',
+    name: '400',
+    component: BadRequest
+  }
+]
+
 const routes = [
   {
     path: "/",
     name: "root",
-    redirect: "/dactiv"
+    redirect: process.env.VUE_APP_SITE_ROOT
   },
+  /*{
+    path: "/:pathMatch(.*)*",
+    name: 'NotFound',
+    component: NotFound
+    //redirect: process.env.VUE_APP_SITE_ROOT + "/404"
+  },*/
   {
     path: process.env.VUE_APP_LOGIN_PAGE,
     name: process.env.VUE_APP_LOGIN_PAGE.replace("/",""),
@@ -29,7 +56,8 @@ const routes = [
     component: Index,
     meta: {
       title: "首页"
-    }
+    },
+    children:childrenRoutes
   }
 ];
 
@@ -88,7 +116,7 @@ router.beforeEach((to, from, next) => {
       next(process.env.VUE_APP_LOGIN_PAGE);
     } else {
 
-      if (router.getRoutes().length === routes.length) {
+      if (router.getRoutes().length === routes.length + childrenRoutes.length) {
 
         reload();
 
