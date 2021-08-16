@@ -100,16 +100,14 @@ export default {
 
       let ids = [];
 
-      let confirmMessage, deleteMessage;
+      let confirmMessage;
 
       if (record) {
         ids.push(record.id);
         confirmMessage = "确定要删除 [" + record.name + "] 组吗?"
-        deleteMessage = "删除 [" + record.name + "] 组成功";
       } else {
         ids = this.selectedIds;
         confirmMessage = "确定要删除" + ids.length + "条记录吗?"
-        deleteMessage = "删除 " + ids.length + " 条记录成功"
       }
 
       let _this = this;
@@ -118,8 +116,8 @@ export default {
         _this.spinning = true;
         _this
             .$http
-            .post("/authentication/group/delete",_this.formUrlencoded({ids:ids})).then(() => {
-              this.$message.success(deleteMessage);
+            .post("/authentication/group/delete",_this.formUrlencoded({ids:ids})).then((r) => {
+              this.$message.success(r.data.message);
               _this.selectedIds = [];
               _this.search();
             })

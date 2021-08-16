@@ -19,7 +19,7 @@
         <a-row :gutter="[24]">
           <a-col :span="12">
             <a-form-item label="代码:" name="code">
-              <a-input v-model:value="form.code" :disabled="form.id !== null"></a-input>
+              <a-input :addon-before="parentCode" v-model:value="form.code"></a-input>
             </a-form-item>
           </a-col>
           <a-col :span="12">
@@ -32,8 +32,9 @@
         <a-row>
           <a-col :span="24">
             <a-form-item label="上级:" name="parentId">
-              <a-select class="width-100-percent" v-model:value="form.parentId">
-                <a-select-option v-for="p in parentOptions" :key="p.id + ''" :value="p.id + ''">
+              <a-select show-search class="width-100-percent" v-model:value="form.parentId" @change="parentChange" optionFilterProp="key">
+                <a-select-option key="" value="">无</a-select-option>
+                <a-select-option v-for="p in parentOptions" :key="p.name" :value="p.id + ''">
                   {{p.name}}
                 </a-select-option>
               </a-select>
@@ -170,6 +171,7 @@ export default {
           typeId:0
         }
       },
+      parentCode:"",
       spinning:true,
       parentOptions:[],
       form: {
@@ -184,7 +186,24 @@ export default {
       }
     }
   },
+  watch: {
+    parentCode() {
+      this.form.code = this.form.code.replace(this.parentCode, "");
+    }
+  },
   methods: {
+    parentChange(v) {
+
+      let code = "";
+
+      if (v !== "") {
+        let parent = this.parentOptions.find(o => o.id === v * 1);
+        code = parent.code + ".";
+      }
+
+      this.parentCode = code;
+
+    },
     searchDataDictionary() {
 
       let _this = this;
@@ -199,7 +218,6 @@ export default {
       if (_this.form.id) {
         param["filter_[type_id_eq]"] = _this.form.id;
       }
-
 
       _this
           .$http
@@ -232,30 +250,28 @@ export default {
     removeDataDictionary(record) {
       let ids = [];
 
-      let confirmMessage, deleteMessage;
+      let confirmMessage;
 
       if (record) {
         ids.push(record.id);
-        confirmMessage = "确定要删除 [" + record.username + "] 数据字典吗?"
-        deleteMessage = "删除 [" + record.username + "] 数据字典成功";
+        confirmMessage = "确定要删除 [" + record.name + "] 数据字典吗?"
       } else {
         ids = this.selectedIds;
         confirmMessage = "确定要删除" + ids.length + "条记录吗?"
-        deleteMessage = "删除 " + ids.length + " 条记录成功"
       }
 
       let _this = this;
 
       this.confirm(confirmMessage, () => {
-        _this.spinning = true;
+        _this.dataDictionary.spinning = true;
         _this
             .$http
-            .post("/config/dictionary/deleteDataDictionary",_this.formUrlencoded({ids:ids})).then(() => {
-              _this.$message.success(deleteMessage);
-              _this.selectedIds = [];
-              _this.search();
+            .post("/config/dictionary/deleteDataDictionary",_this.formUrlencoded({ids:ids})).then((r) => {
+              _this.$message.success(r.data.message);
+              _this.dataDictionary.selectedIds = [];
+              _this.searchDataDictionary();
             })
-            .catch(() => _this.spinning = false);
+            .catch(() => _this.dataDictionary.spinning = false);
       });
     },
     selectDataDictionaryChange(values) {
@@ -280,7 +296,7 @@ export default {
 
               if (id !== _this.form.id) {
                 _this.$router.push({name:"dictionary_type_edit", query:{id}});
-                _this.form.id = r.data;
+                _this.form.id = r.data.data;
               }
 
               _this.spinning = false;
@@ -303,19 +319,6 @@ export default {
 
     if (this.$route.query.id !== undefined) {
 
-      _this
-          .$http
-          .get("/config/dictionary/getDictionaryType?id=" + this.$route.query.id)
-          .then(r => {
-
-            _this.form = r.data.data;
-            _this.form.parentId = r.parentId ? r.parentId + "" : "";
-            _this.spinning = false;
-
-            _this.searchDataDictionary();
-          })
-          .catch(() => _this.spinning = false);
-
       findParentParam["filter_[id_ne]"] = this.$route.query.id;
 
     } else {
@@ -325,7 +328,29 @@ export default {
     _this
         .$http
         .post("/config/dictionary/findDictionaryType",_this.formUrlencoded(findParentParam))
-        .then(r => _this.parentOptions = r.data.data);
+        .then(r => {
+
+          _this.parentOptions = r.data.data;
+
+          if (this.$route.query.id !== undefined) {
+            _this
+                .$http
+                .get("/config/dictionary/getDictionaryType?id=" + this.$route.query.id)
+                .then(r => {
+
+                  _this.form = r.data.data;
+                  _this.form.parentId = _this.form.parentId ? _this.form.parentId + "" : "";
+
+                  _this.parentChange(_this.form.parentId);
+
+                  _this.spinning = false;
+
+                  _this.searchDataDictionary();
+                })
+                .catch(() => _this.spinning = false);
+          }
+
+        });
   }
 }
 </script>

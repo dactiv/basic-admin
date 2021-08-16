@@ -18,13 +18,13 @@
 
         <a-row :gutter="[24]">
           <a-col :span="12">
-            <a-form-item label="名称:" name="name">
-              <a-input v-model:value="form.name"></a-input>
+            <a-form-item label="代码:" name="code">
+              <a-input :addon-before="parentCode" v-model:value="form.code"></a-input>
             </a-form-item>
           </a-col>
           <a-col :span="12">
-            <a-form-item label="代码:" name="code">
-              <a-input v-model:value="form.code" :disabled="form.id !== null"></a-input>
+            <a-form-item label="名称:" name="name">
+              <a-input v-model:value="form.name"></a-input>
             </a-form-item>
           </a-col>
         </a-row>
@@ -58,9 +58,9 @@
           </a-col>
 
           <a-col :span="12">
-            <a-form-item label="上级:" name="parentId">
+            <a-form-item show-search label="上级:" name="parentId">
               <a-select class="width-100-percent" v-model:value="form.parentId">
-                <a-select-option v-for="p in parentOptions" :key="p.id + ''" :value="p.id + ''">
+                <a-select-option v-for="p in parentOptions" :key="p.name" :value="p.id + ''" @change="parentChange" optionFilterProp="key">
                   {{p.name}}
                 </a-select-option>
               </a-select>
@@ -106,6 +106,10 @@ export default {
       spinning:true,
       parentOptions:[],
       statusOptions:[],
+      parentCode:"",
+      typeEntity: {
+        code:""
+      },
       form: {
         id: null,
         code: "",
@@ -122,6 +126,20 @@ export default {
     }
   },
   methods: {
+    parentChange(v) {
+
+      let code = "";
+
+      if (v !== "") {
+        let parent = this.parentOptions.find(o => o.id === v * 1);
+        code = this.typeEntity.code + "." + parent.code + ".";
+      } else {
+        code = this.typeEntity.code + ".";
+      }
+
+      this.parentCode = code;
+
+    },
     submitForm() {
 
       let _this = this;
@@ -132,11 +150,16 @@ export default {
 
         _this
             .$http
-            .post("/config/dictionary/save",_this.formUrlencoded(_this.form))
-            .then(() => _this.$router.push({name: "dictionary"}))
+            .post("/config/dictionary/saveDataDictionary",_this.formUrlencoded(_this.form))
+            .then(() => _this.$router.push({name: "dictionary_type_edit", query:{id:_this.form.typeId}}))
             .catch(() => _this.spinning = false);
 
       });
+    }
+  },
+  watch: {
+    parentCode() {
+      this.form.code = this.form.code.replace(this.parentCode, "");
     }
   },
   created() {
@@ -145,27 +168,57 @@ export default {
 
     this.form.typeId = this.$route.query.typeId;
 
+    let findParentParam = {
+      "mergeTree":false,
+      "filter_[type_id_eq]":this.form.typeId
+    };
+
     _this.loadConfig({service:"config", enumerateName:"DisabledOrEnabled"}, r => _this.statusOptions = r.data.data);
 
-    _this
-        .$http
-        .post("/config/dictionary/findDataDictionary",_this.formUrlencoded({"mergeTree": false, "filter_[type_id_eq]": this.form.typeId}))
-        .then(r => _this.parentOptions = r.data.data);
-
     if (this.$route.query.id !== undefined) {
-
-      this
-          .$http
-          .get("/config/dictionary/getDataDictionary?id=" + this.$route.query.id)
-          .then(r => {
-            _this.form = r.data.data;
-            _this.spinning = false;
-          })
-          .catch(() => _this.spinning = false);
-
+      findParentParam["filter_[id_ne]"] = this.$route.query.id;
     } else {
       this.spinning = false
     }
+
+    _this
+        .$http
+        .get("/config/dictionary/getDictionaryType?id=" + this.form.typeId)
+        .then(r => {
+
+          _this.typeEntity = r.data.data;
+
+          _this
+              .$http
+              .post("/config/dictionary/findDataDictionary",_this.formUrlencoded(findParentParam))
+              .then(r => {
+
+                _this.parentOptions = r.data.data;
+
+                if (this.$route.query.id !== undefined) {
+
+                  this
+                      .$http
+                      .get("/config/dictionary/getDataDictionary?id=" + this.$route.query.id)
+                      .then(r => {
+
+                        _this.form = r.data.data;
+
+                        _this.form.parentId = _this.form.parentId ? _this.form.parentId + "" : "";
+
+                        _this.form.status = _this.form.status ? _this.form.status + "" : "";
+
+                        _this.parentChange(_this.form.parentId);
+
+                        _this.spinning = false;
+
+                      })
+                      .catch(() => _this.spinning = false);
+
+                }
+
+              });
+        });
   }
 }
 </script>
