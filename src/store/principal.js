@@ -69,7 +69,7 @@ export default {
                 axios
                     .post("/authentication/login", payload, {headers: {"X-AUTHENTICATION-TYPE": "Console"}})
                     .then(response => {
-                        context.commit("setPrincipal", response);
+                        context.commit("setPrincipal", response.data.data);
                         resolve(response)
                     })
                     .catch(e => reject(e));
@@ -81,7 +81,7 @@ export default {
                     .post("/authentication/logout")
                     .then(r => {
                         context.commit("clearPrincipal", defaultStatus);
-                        resolve(r);
+                        resolve(r.data.data);
                     })
                     .catch(e => reject(e));
             });

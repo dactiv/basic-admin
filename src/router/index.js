@@ -36,12 +36,6 @@ const routes = [
     name: "root",
     redirect: process.env.VUE_APP_SITE_ROOT
   },
-  /*{
-    path: "/:pathMatch(.*)*",
-    name: 'NotFound',
-    component: NotFound
-    //redirect: process.env.VUE_APP_SITE_ROOT + "/404"
-  },*/
   {
     path: process.env.VUE_APP_LOGIN_PAGE,
     name: process.env.VUE_APP_LOGIN_PAGE.replace("/",""),
@@ -61,13 +55,11 @@ const routes = [
   }
 ];
 
-export function reload() {
+export function reloadRoute() {
 
-  if (router.getRoutes().length !== routes.length) {
+  if (router.getRoutes().length !== routes.length + childrenRoutes.length) {
 
-    router.getRoutes().forEach(r => router.removeRoute(r.name));
-
-    routes.forEach(r => router.addRoute(r));
+    clearRoute();
 
   }
 
@@ -80,6 +72,12 @@ export function reload() {
     redirect: process.env.VUE_APP_SITE_ROOT + "/404"
   });
 
+}
+
+const clearRoute = function() {
+  router.getRoutes().forEach(r => router.removeRoute(r.name));
+
+  routes.forEach(r => router.addRoute(r));
 }
 
 const setRouter = function(menus) {
@@ -116,6 +114,8 @@ router.beforeEach((to, from, next) => {
 
     store.commit(PRINCIPAL_MUTATION_TYPE.ClearPrincipal);
 
+    clearRoute();
+
     next();
 
   } else {
@@ -124,9 +124,9 @@ router.beforeEach((to, from, next) => {
       next(process.env.VUE_APP_LOGIN_PAGE);
     } else {
 
-      if (router.getRoutes().length === routes.length + childrenRoutes.length) {
+      if (router.getRoutes().length === routes.length + childrenRoutes.length && store.state.principal.menus.length > 0) {
 
-        reload();
+        reloadRoute();
 
         if (routes.find(r => r.path === to.path)) {
           next();

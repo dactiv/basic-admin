@@ -15,13 +15,21 @@ const errorMessage = {"403":"您没有权限访问", "401":"请重新认证账�
  */
 const ignoreErrorStatus = [404];
 
+/**
+ * http 请求拦截器
+ */
+function requestInterceptor(config) {
+    config.headers["X-FILTER-RESULT-ID"] = process.env.VUE_APP_X_FILTER_RESULT_ID;
+    config.headers["X-DATA-VERSION"] = process.env.VUE_APP_X_DATA_VERSION;
+    return config;
+}
 
 /**
  * 异常管理
  *
  * @param error 错误信息
  */
-function httpError(error) {
+function responseError(error) {
 
     if (error.response && !ignoreErrorStatus.includes(error.response.status)) {
 
@@ -63,42 +71,13 @@ function httpError(error) {
 }
 
 /**
- * http 响应拦截器
- *
- * @param response 响应信息
- *
- * @returns {*} 拦截信息
- */
-function responseInterceptor(response) {
-
-    if (response.status === 200 && response.data.executeCode === "200" ) {
-        if (response.data.data !== undefined) {
-            return response.data.data;
-        } else {
-            return response.data;
-        }
-    }
-
-    return response
-}
-
-/**
- * 添加 http 响应拦截器
- */
-axios.interceptors.response.use(responseInterceptor, httpError);
-
-/**
- * http 请求拦截器
- */
-function requestInterceptor(config) {
-    config.headers["X-FILTER-RESULT-ID"] = process.env.VUE_APP_X_FILTER_RESULT_ID;
-    config.headers["X-DATA-VERSION"] = process.env.VUE_APP_X_DATA_VERSION;
-    return config;
-}
-
-/**
  * 添加 http 请求拦截器
  */
-axios.interceptors.request.use(requestInterceptor, httpError);
+axios.interceptors.request.use(requestInterceptor);
+
+/**
+ * 添加 http 详情拦截器
+ */
+axios.interceptors.response.use(r => r, responseError)
 
 export default axios;

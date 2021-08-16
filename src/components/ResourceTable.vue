@@ -80,7 +80,7 @@ export default {
     }
   },
   methods:{
-    select:function(record, selected) {
+    select(record, selected) {
 
       if (selected) {
 
@@ -100,7 +100,7 @@ export default {
       }
 
     },
-    getRecordById:function(id, data) {
+    getRecordById(id, data) {
 
       for (let i = 0; i < data.length; i++) {
         let r = data[i];
@@ -119,7 +119,7 @@ export default {
       }
 
     },
-    getParentIds:function(record) {
+    getParentIds(record) {
 
       let result = [];
 
@@ -138,7 +138,7 @@ export default {
 
       return result;
     },
-    getChildrenIds:function(record) {
+    getChildrenIds(record) {
 
       let result = [];
 
@@ -157,10 +157,10 @@ export default {
       return result;
 
     },
-    selectChange:function(selectedIds) {
+    selectChange(selectedIds) {
       this.selectedIds = selectedIds;
     },
-    detail:function (record) {
+    detail(record) {
 
       let to = {
         name: "resource_detail"
@@ -173,7 +173,7 @@ export default {
       this.$router.push(to);
 
     },
-    search:function(form) {
+    search(form) {
       let _this = this;
 
       this.spinning = true;
@@ -182,7 +182,7 @@ export default {
           .$http
           .post("/authentication/resource/find",_this.formUrlencoded(form))
           .then(r => {
-            _this.data = r;
+            _this.data = r.data.data;
             _this.spinning = false;
           })
           .catch(() => _this.spinning = false);

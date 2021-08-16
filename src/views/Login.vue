@@ -20,13 +20,13 @@
           <p class="text-center"> 请登陆您的账户 </p>
 
           <a-form ref="login-form" :model="form" :rules="rules" layout="vertical">
-            <a-form-item label="登陆账户:" name="username">
+            <a-form-item label="登陆账户:" has-feedback name="username">
               <a-input v-model:value="form.username"></a-input>
             </a-form-item>
-            <a-form-item label="登陆密码:" name="password">
+            <a-form-item label="登陆密码:" has-feedback name="password">
               <a-input-password v-model:value="form.password"></a-input-password>
             </a-form-item>
-            <a-form-item label="验证码:" name="captcha" class="picture-captcha" v-if="captcha.data.type === 'picture'">
+            <a-form-item label="验证码:" has-feedback name="captcha" class="picture-captcha" v-if="captcha.data.type === 'picture'">
               <a-input v-model:value="form.captcha">
                 <template #addonAfter>
                   <a-image :width="100" :height="30" :src="this.captcha.pictureCaptchaUrl" @click="generatePictureCaptcha()"/>
@@ -94,7 +94,7 @@ export default {
 
   },
   methods: {
-    validCaptcha:function(error) {
+    validCaptcha(error) {
 
       this.spinning = false;
 
@@ -106,14 +106,14 @@ export default {
       }
 
     },
-    getPictureCaptchaField:function() {
+    getPictureCaptchaField() {
       this.form["_pictureCaptcha"] = this.form.captcha;
       this.form[this.captcha.data.paramName] = this.captcha.data.token.name;
     },
-    generatePictureCaptcha:function() {
+    generatePictureCaptcha() {
       this.captcha.pictureCaptchaUrl = "/captcha/generateCaptcha?" + this.captcha.data.paramName + "=" + this.captcha.data.token.name + "&height=30&time=" + new Date().getTime();
     },
-    submitForm:function(form) {
+    submitForm(form) {
       let _this = this;
       _this.$refs[form].validate().then(() => {
 

@@ -77,7 +77,7 @@ export default {
     }
   },
   methods:{
-    edit:function (record) {
+    edit(record) {
 
       let to = {
         name: "group_edit"
@@ -90,13 +90,13 @@ export default {
       this.$router.push(to);
 
     },
-    disabledCheckbox:function(r) {
+    disabledCheckbox(r) {
       return {disabled: r.removable !== 1 && this.enableDisabledCheckbox}
     },
-    selectChange:function(selectedIds) {
+    selectChange(selectedIds) {
       this.selectedIds = selectedIds;
     },
-    remove:function(record) {
+    remove(record) {
 
       let ids = [];
 
@@ -119,15 +119,15 @@ export default {
         _this
             .$http
             .post("/authentication/group/delete",_this.formUrlencoded({ids:ids})).then(() => {
-          this.$message.success(deleteMessage);
-          _this.selectedIds = [];
-          _this.search();
-        })
+              this.$message.success(deleteMessage);
+              _this.selectedIds = [];
+              _this.search();
+            })
             .catch(() => _this.spinning = false);
       });
 
     },
-    search:function(form) {
+    search(form) {
       let _this = this;
 
       this.spinning = true;
@@ -136,7 +136,7 @@ export default {
           .$http
           .post("/authentication/group/find",_this.formUrlencoded(form))
           .then(r => {
-            _this.data = r;
+            _this.data = r.data.data;
             _this.spinning = false;
           })
           .catch(() => _this.spinning = false);

@@ -49,7 +49,7 @@ export default {
     }
   },
   methods:{
-    syncResource:function() {
+    syncResource() {
       let _this = this;
 
       _this.spinning = true;
@@ -59,7 +59,7 @@ export default {
           .post("/authentication/resource/syncPluginResource")
           .then(r => {
             _this.spinning = false;
-            _this.$message.success(r.message);
+            _this.$message.success(r.data.message);
           })
           .catch(() => _this.spinning = false);
 

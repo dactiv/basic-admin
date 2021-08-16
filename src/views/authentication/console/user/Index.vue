@@ -167,7 +167,7 @@ export default {
     }
   },
   created() {
-    this.loadConfig({service:"config", enumerateName:"UserStatus"}, r=> this.statusOptions = r);
+    this.loadConfig({service:"config", enumerateName:"UserStatus"}, r=> this.statusOptions = r.data.data);
   },
   methods:{
     edit(record) {
@@ -224,16 +224,16 @@ export default {
 
       _this.searchDialogVisible = false;
 
-      let data = this.form;
+      let param = _this.form;
 
-      data.size = this.page.size || 10;
-      data.number = this.page.number || 1;
+      param.size = _this.page.size || 10;
+      param.number = _this.page.number || 1;
 
       _this
           .$http
-          .post("/authentication/console/user/page",_this.formUrlencoded(data))
+          .post("/authentication/console/user/page",_this.formUrlencoded(param))
           .then(r => {
-            _this.page = r;
+            _this.page = r.data.data;
             _this.spinning = false;
           })
           .catch(() => _this.spinning = false);

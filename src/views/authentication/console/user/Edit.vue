@@ -18,12 +18,12 @@
 
         <a-row :gutter="[24]">
           <a-col :span="12">
-            <a-form-item label="登陆账户:" name="username">
-              <a-input v-model:value="form.username" :disabled="form.id !== null"></a-input>
+            <a-form-item has-feedback label="登陆账户:" name="username">
+              <a-input ref="username" v-model:value="form.username" :default-value="form.username" :disabled="form.id !== null"></a-input>
             </a-form-item>
           </a-col>
           <a-col :span="12">
-            <a-form-item label="真是姓名:" name="realName">
+            <a-form-item has-feedback label="真是姓名:" name="realName">
               <a-input v-model:value="form.realName"></a-input>
             </a-form-item>
           </a-col>
@@ -31,12 +31,12 @@
 
         <a-row v-if="form.id === null" :gutter="[24]">
           <a-col :span="12">
-            <a-form-item label="登陆密码:" name="password">
+            <a-form-item has-feedback label="登陆密码:" name="password">
               <a-input-password v-model:value="form.password"></a-input-password>
             </a-form-item>
           </a-col>
           <a-col :span="12">
-            <a-form-item label="确认密码:" name="confirmPassword">
+            <a-form-item has-feedback label="确认密码:" name="confirmPassword">
               <a-input-password v-model:value="form.confirmPassword"></a-input-password>
             </a-form-item>
           </a-col>
@@ -44,8 +44,8 @@
 
         <a-row :gutter="[24]">
           <a-col :span="12">
-            <a-form-item label="电子邮箱:" name="email">
-              <a-input v-model:value="form.email"></a-input>
+            <a-form-item has-feedback label="电子邮箱:" name="email">
+              <a-input ref="email" v-model:value="form.email" :default-value="form.email.toString()"></a-input>
             </a-form-item>
           </a-col>
 
@@ -124,7 +124,7 @@ export default {
       spinning:true,
       statusOptions:[],
       form: {
-        id:null,
+        id: null,
         username: "",
         realName: "",
         password: "",
@@ -138,55 +138,55 @@ export default {
       rules: {
         username: [
           { required: true, message: "请输入登陆账户", trigger: "blur" },
-          { validator:this.validateRemoteUsername, trigger: "blur"}
+          { validator:this.validateRemoteUsername, trigger: "change"}
         ],
         realName: [{ required: true, message: "请输入真实姓名", trigger: "blur" }],
         password: [{ required: true, message: "请输入登陆密码", trigger: "blur" }],
-        email: [
-          {type: "email",trigger: "blur", message:"电子邮箱格式不正确"},
-          {validator:this.validateRemoteEmail, trigger: "blur"}
-        ],
         confirmPassword: [
           { required: true, message: "请输入确认密码", trigger: "blur" },
           { validator:this.validatePass, trigger: "blur"}
+        ],
+        email: [
+          {type: "email",trigger: "blur", message:"电子邮箱格式不正确"},
+          {validator:this.validateRemoteEmail, trigger: "change"}
         ]
       }
     }
   },
   methods: {
-    validateRemoteUsername:async function () {
+    validateRemoteUsername() {
 
-      if (this.form.username === "") {
+      if (this.form.username === this.$refs.username.defaultValue) {
         return Promise.resolve();
       }
 
       return new Promise((resolve, reject) => {
         this.$http.get("/authentication/console/user/isUsernameUnique?username=" + this.form.username).then(r => {
-          return r ? resolve() : reject("登陆账户已存在");
+          return r.data.data ? resolve() : reject("登陆账户已存在");
         });
       });
 
     },
-    validateRemoteEmail:async function () {
+    validateRemoteEmail() {
 
-      if (this.form.email === "") {
+      if (this.form.email === this.$refs.username.defaultValue) {
         return Promise.resolve();
       }
 
       return new Promise((resolve, reject) => {
         this.$http.get("/authentication/console/user/isEmailUnique?email=" + this.form.email).then(r => {
-          return r ? resolve() : reject("电子邮箱已存在");
+          return r.data.data ? resolve() : reject("电子邮箱已存在");
         });
       });
     },
-    validatePass: async function () {
+    async validatePass() {
       if (this.form.confirmPassword !== this.form.password) {
         return Promise.reject('登陆密码与确认密码不一致');
       } else {
         return Promise.resolve();
       }
     },
-    submitForm:function() {
+    submitForm() {
 
       let _this = this;
 
@@ -200,22 +200,35 @@ export default {
         _this
             .$http
             .post("/authentication/console/user/save",_this.formUrlencoded(_this.form))
-            .then(() => _this.$router.push({name: "console_user"}))
+            .then((r) => {
+
+              let id = r.data.data;
+
+              _this.$message.success(r.data.message);
+
+              if (id !== _this.form.id) {
+                _this.$router.push({name:"console_user_edit", query:{id}});
+                _this.form.id = r.data;
+              }
+
+              _this.spinning = false;
+
+            })
             .catch(() => _this.spinning = false);
 
       });
 
     },
-    setResourceAndGroup: function(id) {
+    setResourceAndGroup(id) {
       this
           .$http
           .get("/authentication/resource/getUserResource?userId=" + id)
-          .then(r => this.$refs['resource-table'].selectedIds = r);
+          .then(r => this.$refs['resource-table'].selectedIds = r.data.data);
 
       this
           .$http
           .get("/authentication/group/getConsoleUserGroups?userId=" + id)
-          .then(r => this.$refs['group-table'].selectedIds = r);
+          .then(r => this.$refs['group-table'].selectedIds = r.data.data);
     }
   },
   mounted() {
@@ -227,15 +240,15 @@ export default {
 
     let _this = this;
 
-    _this.loadConfig({service:"config", enumerateName:"UserStatus"}, r=> _this.statusOptions = r);
+    _this.loadConfig({service:"config", enumerateName:"UserStatus"}, r=> _this.statusOptions = r.data.data);
 
     if (this.$route.query.id !== undefined) {
 
-      this
+      _this
           .$http
           .get("/authentication/console/user/get?id=" + this.$route.query.id)
           .then(r => {
-            _this.form = r;
+            _this.form = r.data.data;
             _this.form.status = _this.form.status + '';
             _this.spinning = false;
             _this.setResourceAndGroup(_this.form.id);

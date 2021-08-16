@@ -173,7 +173,7 @@ export default {
     }
   },
   created() {
-    this.loadConfig({service:"config", enumerateName:"UserStatus"}, r=> this.statusOptions = r);
+    this.loadConfig({service:"config", enumerateName:"UserStatus"}, r=> this.statusOptions = r.data.data);
   },
   methods:{
     detail(record) {
@@ -208,7 +208,7 @@ export default {
           .$http
           .post("/authentication/member/user/page",_this.formUrlencoded(data))
           .then(r => {
-            _this.page = r;
+            _this.page = r.data.data;
             _this.spinning = false;
           })
           .catch(() => _this.spinning = false);

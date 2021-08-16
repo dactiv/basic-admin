@@ -92,25 +92,25 @@ export default {
 
   },
   methods: {
-    toggleCollapsed:function() {
+    toggleCollapsed() {
       this.menu.collapsed = !this.menu.collapsed;
       localStorage.setItem("menu-collapsed", this.menu.collapsed);
     },
-    logout:function() {
+    logout() {
       this.$store.dispatch(PRINCIPAL_ACTION_TYPE.Logout).then(() => this.$router.push(process.env.VUE_APP_LOGIN_PAGE));
     },
-    setMenus:function (response) {
+    setMenus(response) {
 
       let details = JSON.parse(JSON.stringify(this.principal.details));
 
-      details.menus = response;
+      details.menus = response.data.data;
 
       this.$store.commit(PRINCIPAL_MUTATION_TYPE.SetPrincipal, details);
 
       this.spinning = false;
 
     },
-    getMenus:function() {
+    getMenus() {
 
       if (this.principal.details.menus.length === 0) {
         this.spinning = true;

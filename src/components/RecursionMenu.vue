@@ -33,7 +33,7 @@ export default {
      *
      * @returns {boolean} true 是，否则 false
      */
-    hasChildren:function(d) {
+    hasChildren(d) {
       return d.children !== undefined && d.children.length > 0;
     },
     /**
@@ -43,7 +43,7 @@ export default {
      *
      * @returns {*} 替换后的值
      */
-    replaceValue:function(d) {
+    replaceValue(d) {
       return d.applicationName + "/" + d.value.replace("/**","");
     },
     /**
@@ -53,7 +53,7 @@ export default {
      *
      * @returns {string} 路由路径值
      */
-    getPath:function(v) {
+    getPath(v) {
       return process.env.VUE_APP_SITE_ROOT + "/" + this.replaceValue(v);
     }
   }

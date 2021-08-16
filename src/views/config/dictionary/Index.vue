@@ -71,25 +71,21 @@ export default {
         {
           title: "代码",
           dataIndex: "code",
-          key:"code",
           ellipsis: true,
           width: 300
         },{
           title: "名称",
           dataIndex: "name",
-          key:"name",
           ellipsis: true,
           width: 150
         },{
           title: "备注",
           dataIndex: "remark",
-          key:"remark",
           ellipsis: true,
           width: 250
         },{
           title: "操作",
           fixed: "right",
-          key: "action",
           width: 175,
           slots: { customRender: "action" },
         }
@@ -100,13 +96,13 @@ export default {
     }
   },
   methods:{
-    selectChange:function(selectedIds) {
+    selectChange(selectedIds) {
       this.selectedIds = selectedIds;
     },
-    edit:function(record) {
+    edit(record) {
 
       let to = {
-        name: "dictionary_edit"
+        name: "dictionary_type_edit"
       }
 
       if (record !== undefined) {
@@ -124,8 +120,8 @@ export default {
 
       if (record) {
         ids.push(record.id);
-        confirmMessage = "确定要删除 [" + record.username + "] 数据字典吗?"
-        deleteMessage = "删除 [" + record.username + "] 数据字典成功";
+        confirmMessage = "确定要删除 [" + record.name + "] 字典类型吗?"
+        deleteMessage = "删除 [" + record.name + "] 字典类型成功";
       } else {
         ids = this.selectedIds;
         confirmMessage = "确定要删除" + ids.length + "条记录吗?"
@@ -138,8 +134,8 @@ export default {
         _this.spinning = true;
         _this
             .$http
-            .post("/config/dictionary/delete",_this.formUrlencoded({ids:ids})).then(() => {
-              this.$message.success(deleteMessage);
+            .post("/config/dictionary/deleteDictionaryType",_this.formUrlencoded({ids:ids})).then(() => {
+              _this.$message.success(deleteMessage);
               _this.selectedIds = [];
               _this.search();
             })
@@ -147,7 +143,7 @@ export default {
       });
 
     },
-    search:function() {
+    search() {
       let _this = this;
 
       this.spinning = true;
@@ -156,7 +152,7 @@ export default {
           .$http
           .post("/config/dictionary/findDictionaryType",_this.formUrlencoded(this.form))
           .then(r => {
-            _this.data = r;
+            _this.data = r.data.data;
             _this.spinning = false;
           })
           .catch(() => _this.spinning = false);

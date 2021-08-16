@@ -18,20 +18,20 @@
 
         <a-row :gutter="[24]">
           <a-col :span="12">
-            <a-form-item label="组名称:" name="name">
-              <a-input v-model:value="form.name"></a-input>
+            <a-form-item has-feedback label="组名称:" name="name">
+              <a-input ref="name" v-model:value="form.name" :default-value="form.name"></a-input>
             </a-form-item>
           </a-col>
           <a-col :span="12">
-            <a-form-item label="权限名:" name="authority">
-              <a-input v-model:value="form.authority"></a-input>
+            <a-form-item has-feedback label="权限名:" name="authority">
+              <a-input ref="authority" v-model:value="form.authority" :default-value="form.authority"></a-input>
             </a-form-item>
           </a-col>
         </a-row>
 
         <a-row :gutter="[24]">
           <a-col :span="12">
-            <a-form-item label="来源:" name="source">
+            <a-form-item has-feedback label="来源:" name="source">
               <a-select @change="sourceChange" class="width-100-percent" mode="multiple" v-model:value="form.source" >
                 <a-select-option v-for="(name,value ) in sourceOptions" :key="value + ''" :value="value + ''">
                   {{name}}
@@ -134,54 +134,55 @@ export default {
       rules: {
         name: [
           { required: true, message: "请输入组名称", trigger: "blur" },
-          { validator:this.validateRemoteName, trigger: "blur"}
+          { validator:this.validateRemoteName, trigger: "change"}
         ],
         authority: [
           { required: true, message: "请输入权限名称", trigger: "blur" },
-          { validator:this.validateRemoteAuthority, trigger: "blur"}
+          { validator:this.validateRemoteAuthority, trigger: "change"}
         ],
-        source: [{validator:this.validateSource, trigger: "blur"}]
+        source: [{validator:this.validateSource, trigger: "change"}]
       }
     }
   },
   methods: {
-    sourceChange:function (value) {
+    sourceChange(value) {
       if(value.length === 0) {
         this.$refs['resource-table'].data = [];
       } else {
         this.$refs['resource-table'].search({"mergeTree":true, "filter_[status_eq]": 1, "filter_[source_in]":value});
       }
     },
-    validateRemoteName:function () {
-      if (this.form.name === "") {
+    validateRemoteName() {
+
+      if (this.form.name === this.$refs.name.defaultValue) {
         return Promise.resolve();
       }
 
       return new Promise((resolve, reject) => {
         this.$http.get("/authentication/group/isNameUnique?name=" + this.form.name).then(r => {
-          return r ? resolve() : reject("组名称已存在");
+          return r.data.data ? resolve() : reject("组名称已存在");
         });
       });
     },
-    validateRemoteAuthority:function () {
-      if (this.form.name === "") {
+    validateRemoteAuthority() {
+      if (this.form.authority === this.$refs.authority.defaultValue) {
         return Promise.resolve();
       }
 
       return new Promise((resolve, reject) => {
         this.$http.get("/authentication/group/isAuthorityUnique?authority=" + this.form.authority).then(r => {
-          return r ? resolve() : reject("权限名称已存在");
+          return r.data.data ? resolve() : reject("权限名称已存在");
         });
       });
     },
-    validateSource:async function (){
+    async validateSource(){
       if (this.form.source.length <= 0) {
         return Promise.reject('请选择一个以上的来源');
       } else {
         return Promise.resolve();
       }
     },
-    submitForm:function() {
+    submitForm() {
 
       let _this = this;
 
@@ -193,37 +194,48 @@ export default {
         _this
             .$http
             .post("/authentication/group/save",_this.formUrlencoded(_this.form))
-            .then(() => _this.$router.push({name: "group"}))
+            .then((r) => {
+              let id = r.data.data;
+
+              _this.$message.success(r.data.message);
+
+              if (id !== _this.form.id) {
+                _this.$router.push({name:"group_edit", query:{id}});
+                _this.form.id = r.data;
+              }
+
+              _this.spinning = false;
+
+            })
             .catch(() => _this.spinning = false);
 
       });
     },
-    setGroupResource:function(id) {
+    setGroupResource(id) {
       this
           .$http
           .get("/authentication/resource/getGroupResource?groupId=" + id)
-          .then(r => this.$refs['resource-table'].selectedIds = r);
+          .then(r => this.$refs['resource-table'].selectedIds = r.data.data);
     }
   },
   created() {
 
     let _this = this;
 
-    this.loadConfig({service:"config", enumerateName:"UserStatus"}, r=> _this.statusOptions = r);
-    this.loadConfig({service:"config", enumerateName:"ResourceSource"}, r=> _this.sourceOptions = r);
+    _this.loadConfig({service:"config", enumerateName:"DisabledOrEnabled"}, r=> _this.statusOptions = r.data.data);
+    _this.loadConfig({service:"config", enumerateName:"ResourceSource"}, r=> _this.sourceOptions = r.data.data);
 
-    _this
-        .$http
-        .post("/authentication/group/find",_this.formUrlencoded({mergeTree:false}))
-        .then(r => _this.parentOptions = r);
+    let findParentParam = {
+      mergeTree:false
+    }
 
     if (this.$route.query.id !== undefined) {
 
-      this
+      _this
           .$http
           .get("/authentication/group/get?id=" + this.$route.query.id)
           .then(r => {
-            _this.form = r;
+            _this.form = r.data.data;
             _this.form.status = _this.form.status + '';
             _this.spinning = false;
 
@@ -236,9 +248,16 @@ export default {
           })
           .catch(() => _this.spinning = false);
 
+      findParentParam["filter_[id_ne]"] = this.$route.query.id;
+
     } else {
       this.spinning = false
     }
+
+    _this
+        .$http
+        .post("/authentication/group/find",_this.formUrlencoded(findParentParam))
+        .then(r => _this.parentOptions = r.data.data);
   }
 }
 </script>

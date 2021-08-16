@@ -64,7 +64,7 @@ export default {
         .$http
         .get("/authentication/member/user/get?id=" + this.$route.query.id)
         .then(r => {
-          _this.form = r;
+          _this.form = r.data.data;
           _this.spinning = false
         })
         .catch(() => _this.spinning = false);
