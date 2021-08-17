@@ -55,9 +55,7 @@ export default {
     }
   },
   created() {
-    console.log(this.$route.meta.selectMenu);
-    console.log(this.$route.meta.parent);
-    console.log(this.$route.path);
+
     let _this = this;
 
     _this.spinning = true;

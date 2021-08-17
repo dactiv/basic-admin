@@ -39,7 +39,7 @@
         </div>
         <div class="main-menu">
           <a-spin :spinning="spinning" tip="初始化导航...">
-            <a-menu mode="inline" :selectedKeys="menu.selectedKeys" :openKeys="menu.openKeys">
+            <a-menu mode="inline" :selectedKeys="menu.selectedKeys" :openKeys="menu.openKeys" @openChange="menuOpen" @select="menuSelect">
               <recursion-menu :data="this.principal.details.menus" />
             </a-menu>
           </a-spin>
@@ -92,6 +92,12 @@ export default {
 
   },
   methods: {
+    menuSelect(item) {
+      this.menu.selectedKeys = [item.key];
+    },
+    menuOpen(keys) {
+      this.menu.openKeys = keys.filter(key => this.menu.openKeys.indexOf(key) === -1);
+    },
     toggleCollapsed() {
       this.menu.collapsed = !this.menu.collapsed;
       localStorage.setItem("menu-collapsed", this.menu.collapsed);

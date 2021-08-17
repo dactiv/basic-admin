@@ -1,6 +1,8 @@
 <template>
   <a-config-provider :locale="this.$store.state.locale.app">
-    <router-view/>
+    <transition name="slide-left">
+      <router-view/>
+    </transition>
   </a-config-provider>
 </template>
 
