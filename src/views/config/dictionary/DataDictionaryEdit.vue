@@ -49,8 +49,8 @@
 
         <a-row :gutter="[24]">
           <a-col :span="12">
-            <a-form-item label="状态:" name="status">
-              <a-select class="width-100-percent" v-model:value="form.status">
+            <a-form-item label="状态:" name="enabled">
+              <a-select class="width-100-percent" v-model:value="form.enabled">
                 <a-select-option v-for="(value, name) in statusOptions" :key="value + ''" :value="value + ''">
                   {{name}}
                 </a-select-option>

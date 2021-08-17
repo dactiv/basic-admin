@@ -148,3 +148,8 @@ body {
 .ant-table-tbody td .ant-form-item {
   margin-bottom: 0;
 }
+
+.header-navbar span.anticon {
+  font-size: 20px;
+  vertical-align: middle;
+}

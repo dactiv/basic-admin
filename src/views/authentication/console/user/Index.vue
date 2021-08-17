@@ -2,8 +2,8 @@
 
   <a-breadcrumb class="hidden-xs">
     <a-breadcrumb-item><router-link to='/'><icon-font type="icon-home"></icon-font> 首页</router-link></a-breadcrumb-item>
-    <a-breadcrumb-item><icon-font type="icon-setting"></icon-font> 系统管理</a-breadcrumb-item>
-    <a-breadcrumb-item><icon-font type="icon-system-user"></icon-font> 系统用户管理</a-breadcrumb-item>
+    <a-breadcrumb-item><icon-font type="icon-setting" /> 系统管理</a-breadcrumb-item>
+    <a-breadcrumb-item><icon-font type="icon-system-user" /> 系统用户管理</a-breadcrumb-item>
   </a-breadcrumb>
 
   <a-card title="系统用户管理" class="basic-box-shadow margin-top-20">

@@ -39,8 +39,8 @@
           </a-col>
 
           <a-col :span="12">
-            <a-form-item label="状态:" name="status">
-              <a-select class="width-100-percent" v-model:value="form.status">
+            <a-form-item label="状态:" name="enabled">
+              <a-select class="width-100-percent" v-model:value="form.enabled">
                 <a-select-option v-for="(value, name) in statusOptions" :key="value + ''" :value="value + ''">
                   {{name}}
                 </a-select-option>
@@ -202,7 +202,7 @@ export default {
       form: {
         id: null,
         name: "",
-        status:"1",
+        enabled:"1",
         value: "",
         requestDecrypt: "",
         responseEncrypt: "",
@@ -233,19 +233,15 @@ export default {
 
       if (record) {
         ids.push(record.id);
-
-        let index = this.form.predicates.indexOf(p => p.id === record.id);
-        delete this.form.predicates[index];
-
       } else {
         this.predicate.selectedIds.forEach(o => ids.push(o));
       }
 
       this.form.predicates = this.form.predicates.filter(o => !ids.includes(o.id));
 
-      this.editableData = this.editableData.filter(o => !ids.includes(o.id));
-
-      this.editableData.forEach(o => {
+      ids.forEach(id => delete this.editableData[id]);
+      // FIXME 动态验证有问题.
+      /*this.editableData.forEach(o => {
         let newRule = ["name", "value"];
 
         for (let key in newRule) {
@@ -253,7 +249,7 @@ export default {
             delete this.rules[o.id + '-' + newRule[key]];
           }
         }
-      });
+      });*/
 
     },
     editPredicate(record) {
@@ -281,14 +277,13 @@ export default {
         this.editableData[id] = add;
       }
 
-      let newRule = ["name", "value"];
+      // FIXME 动态验证有问题.
+      /*let newRule = ["name", "value"];
 
       for (let key in newRule) {
         this.rules[id + '-' + newRule[key]] = [{ required: true, message: "该值不能为空", trigger: "blur" }];
-      }
+      }*/
 
-      console.log(this.rules);
-      console.log(this.editableData);
     },
     selectPredicateChange(values) {
       this.predicate.selectedIds = values;
@@ -301,6 +296,8 @@ export default {
 
         _this.spinning = true;
 
+        _this.form.predicates.forEach(o => delete o.id);
+
         _this
             .$http
             .post("/config/access/crypto/save",_this.form)
@@ -310,7 +307,7 @@ export default {
               _this.$message.success(r.data.message);
 
               if (id !== _this.form.id) {
-                _this.$router.push({name:"access_crypto_edit", query:{id}, replace:true});
+                _this.$router.push({name:"access_crypto_edit", query:{id}});
                 _this.form.id = r.data.data;
               }
 
@@ -341,7 +338,7 @@ export default {
           .then(r => {
             _this.form = r.data.data;
 
-            _this.form.status = _this.form.status + '';
+            _this.form.enabled = _this.form.enabled + '';
             _this.form.requestDecrypt = _this.form.requestDecrypt + '';
             _this.form.responseEncrypt = _this.form.responseEncrypt + '';
 
