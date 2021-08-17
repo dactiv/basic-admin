@@ -25,6 +25,21 @@ function requestInterceptor(config) {
 }
 
 /**
+ * http 响应拦截器
+ */
+function responseInterceptor(response) {
+
+    let errorCode = response.data[process.env.VUE_APP_SERVER_ERROR_CODE_FIELD];
+
+    if (errorCode && errorCode !== "200") {
+        let serverMessage = response.data[process.env.VUE_APP_SERVER_ERROR_MESSAGE_FIELD];
+        message.error("[executeCode:" + errorCode + "]" + serverMessage);
+    }
+
+    return response;
+}
+
+/**
  * 异常管理
  *
  * @param error 错误信息
@@ -78,6 +93,6 @@ axios.interceptors.request.use(requestInterceptor);
 /**
  * 添加 http 详情拦截器
  */
-axios.interceptors.response.use(r => r, responseError)
+axios.interceptors.response.use(responseInterceptor, responseError)
 
 export default axios;

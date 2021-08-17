@@ -1,15 +1,15 @@
 <template>
 
   <a-breadcrumb class="hidden-xs">
-    <a-breadcrumb-item><router-link to='/'><icon-font type="icon-home"></icon-font> 首页</router-link></a-breadcrumb-item>
-    <a-breadcrumb-item><icon-font type="icon-setting"></icon-font> 系统管理</a-breadcrumb-item>
-    <a-breadcrumb-item><icon-font type="icon-user-groups"></icon-font> 会员用户管理</a-breadcrumb-item>
+    <a-breadcrumb-item><router-link to='/'><icon-font type="icon-home" /> 首页</router-link></a-breadcrumb-item>
+    <a-breadcrumb-item><icon-font type="icon-setting" /> 系统管理</a-breadcrumb-item>
+    <a-breadcrumb-item><icon-font type="icon-user-groups" /> 会员用户管理</a-breadcrumb-item>
   </a-breadcrumb>
 
   <a-card title="会员用户管理" class="basic-box-shadow margin-top-20">
 
     <template #extra>
-      <icon-font type="icon-user-groups"></icon-font>
+      <icon-font type="icon-user-groups" />
     </template>
 
     <a-spin :spinning="spinning" tip="数据加载中...">
@@ -21,7 +21,7 @@
         </a-button>
       </a-space>
 
-      <a-table class="ant-table-striped" :row-selection="{ selectedRowKeys: selectedIds, onChange:selectChange }" :rowKey="record=>record.id" :scroll="{ x: 1170 }" :pagination="false" :data-source="page.content" :columns="columns" bordered>
+      <a-table class="ant-table-striped" :row-selection="{ selectedRowKeys: selectedIds, onChange:selectChange }" :rowKey="record=>record.id" :scroll="{ x: 960 }" :pagination="false" :data-source="page.content" :columns="columns" bordered>
 
         <template #action="{ record }">
           <div class="text-center">
@@ -63,12 +63,12 @@
       <a-row :gutter="[24]">
         <a-col :span="12">
           <a-form-item label="登陆账户:">
-            <a-input v-model:value="form['filter_[username_like]']"></a-input>
+            <a-input v-model:value="form['filter_[username_like]']" />
           </a-form-item>
         </a-col>
         <a-col :span="12">
           <a-form-item label="手机号码:">
-            <a-input v-model:value="form['filter_[real_name_like]']"></a-input>
+            <a-input v-model:value="form['filter_[real_name_like]']" />
           </a-form-item>
         </a-col>
       </a-row>
@@ -76,7 +76,7 @@
       <a-row :gutter="[24]">
         <a-col :span="12">
           <a-form-item label="电子邮箱:">
-            <a-input v-model:value="form['filter_[email_like]']"></a-input>
+            <a-input v-model:value="form['filter_[email_like]']" />
           </a-form-item>
         </a-col>
         <a-col :span="12">

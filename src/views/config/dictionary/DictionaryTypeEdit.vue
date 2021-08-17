@@ -1,16 +1,16 @@
 <template>
 
   <a-breadcrumb class="hidden-xs">
-    <a-breadcrumb-item><router-link to='/'><icon-font type="icon-home"></icon-font> 首页</router-link></a-breadcrumb-item>
-    <a-breadcrumb-item><icon-font type="icon-un-config-o"></icon-font> 配置管理</a-breadcrumb-item>
-    <a-breadcrumb-item><router-link :to="{name:'dictionary'}"> <icon-font type="icon-dictionary"></icon-font> 数据字典管理</router-link></a-breadcrumb-item>
-    <a-breadcrumb-item><icon-font type="icon-edit"></icon-font> {{ (form.id ? '编辑 [' + form.name + '] ': '添加') + '字典类型' }}</a-breadcrumb-item>
+    <a-breadcrumb-item><router-link to='/'><icon-font type="icon-home" /> 首页</router-link></a-breadcrumb-item>
+    <a-breadcrumb-item><icon-font type="icon-un-config-o" /> 配置管理</a-breadcrumb-item>
+    <a-breadcrumb-item><router-link :to="{name:'dictionary'}"> <icon-font type="icon-dictionary" /> 数据字典管理</router-link></a-breadcrumb-item>
+    <a-breadcrumb-item><icon-font type="icon-edit" /> {{ (form.id ? '编辑 [' + form.name + '] ': '添加') + '字典类型' }}</a-breadcrumb-item>
   </a-breadcrumb>
 
   <a-card :title="(form.id ? '编辑 [' + form.name + '] ': '添加') + '字典类型'" class="basic-box-shadow">
 
     <template #extra>
-      <icon-font type="icon-edit"></icon-font>
+      <icon-font type="icon-edit" />
     </template>
 
     <a-spin :spinning="spinning">
@@ -18,13 +18,13 @@
 
         <a-row :gutter="[24]">
           <a-col :span="12">
-            <a-form-item label="代码:" name="code">
-              <a-input :addon-before="parentCode" v-model:value="form.code"></a-input>
+            <a-form-item has-feedback label="代码:" name="code">
+              <a-input ref="code" :addon-before="parentCode" v-model:value="form.code" />
             </a-form-item>
           </a-col>
           <a-col :span="12">
-            <a-form-item label="名称:" name="name">
-              <a-input v-model:value="form.name"></a-input>
+            <a-form-item has-feedback label="名称:" name="name">
+              <a-input v-model:value="form.name" />
             </a-form-item>
           </a-col>
         </a-row>
@@ -54,10 +54,10 @@
         <a-card title="数据字典内容" v-if="this.form.id !== null">
 
           <template #extra>
-            <icon-font type="icon-database"></icon-font>
+            <icon-font type="icon-database" />
           </template>
 
-          <a-input v-model:value="dataDictionary.form['filter_[code_like]']" placeholder="请输入名称进行查询" size="large" class="margin-bottom-20">
+          <a-input v-model:value="dataDictionary.form['filter_[code_like]']" placeholder="请输入名称进行查询" class="margin-bottom-20">
             <template #addonAfter>
               <a-button type="text" @click="searchDataDictionary()">
                 <icon-font type="icon-search" />
@@ -77,7 +77,7 @@
           </a-input>
 
           <a-spin :spinning="dataDictionary.spinning">
-            <a-table class="ant-table-striped" :row-selection="{ selectedRowKeys: dataDictionary.selectedIds, onChange: selectDataDictionaryChange}" :rowKey="record=>record.id" :scroll="{ x: 1200 }" :pagination="false" :data-source="dataDictionary.page.content" :columns="dataDictionary.columns" bordered>
+            <a-table class="ant-table-striped" :row-selection="{ selectedRowKeys: dataDictionary.selectedIds, onChange: selectDataDictionaryChange}" :rowKey="record=>record.id" :scroll="{ x: 775 }" :pagination="false" :data-source="dataDictionary.page.content" :columns="dataDictionary.columns" bordered>
               <template #action="{ record }">
                 <div class="text-center">
                   <a-space :size="10">
@@ -182,7 +182,11 @@ export default {
         parentId: ""
       },
       rules: {
-
+        code: [
+          { required: true, message: "请输入代码", trigger: "blur" },
+          { validator:this.validateRemoteCode, trigger: "change"}
+        ],
+        name: [{ required: true, message: "请输入名称", trigger: "blur" }]
       }
     }
   },
@@ -192,6 +196,17 @@ export default {
     }
   },
   methods: {
+    validateRemoteCode() {
+      if (this.form.code === this.$refs.code.defaultValue) {
+        return Promise.resolve();
+      }
+
+      return new Promise((resolve, reject) => {
+        this.$http.get("/config/dictionary/isDictionaryTypeCodeUnique?code=" + this.parentCode + this.form.code).then(r => {
+          return r.data.data ? resolve() : reject("类型代码已存在");
+        });
+      });
+    },
     parentChange(v) {
 
       let code = "";
@@ -295,7 +310,7 @@ export default {
               _this.$message.success(r.data.message);
 
               if (id !== _this.form.id) {
-                _this.$router.push({name:"dictionary_type_edit", query:{id}});
+                _this.$router.push({name:"dictionary_type_edit", query:{id}, replace:true});
                 _this.form.id = r.data.data;
               }
 

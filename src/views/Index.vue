@@ -33,7 +33,7 @@
       <a-layout-sider class="main-aside" width="260" v-model:collapsed="menu.collapsed" :trigger="null" collapsible>
         <div class="logo">
           <router-link to='/' class="display-flex">
-            <icon-font type="icon-vue"></icon-font>
+            <icon-font type="icon-vue" />
             <span class="display-block" v-if="!menu.collapsed"> Dactiv </span>
           </router-link>
         </div>

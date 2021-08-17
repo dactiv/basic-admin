@@ -1,10 +1,10 @@
 <template>
 
   <a-breadcrumb class="hidden-xs">
-    <a-breadcrumb-item><router-link to='/'><icon-font type="icon-home"></icon-font> 首页</router-link></a-breadcrumb-item>
-    <a-breadcrumb-item><icon-font type="icon-setting"></icon-font> 系统管理</a-breadcrumb-item>
-    <a-breadcrumb-item><router-link :to="{name:'group'}"><icon-font type="icon-group"></icon-font> 组管理</router-link></a-breadcrumb-item>
-    <a-breadcrumb-item><icon-font type="icon-edit"></icon-font> {{ (form.id ? '编辑 [' + form.name + '] ': '添加') + '组' }}</a-breadcrumb-item>
+    <a-breadcrumb-item><router-link to='/'><icon-font type="icon-home" /> 首页</router-link></a-breadcrumb-item>
+    <a-breadcrumb-item><icon-font type="icon-setting" /> 系统管理</a-breadcrumb-item>
+    <a-breadcrumb-item><router-link :to="{name:'group'}"><icon-font type="icon-group" /> 组管理</router-link></a-breadcrumb-item>
+    <a-breadcrumb-item><icon-font type="icon-edit" /> {{ (form.id ? '编辑 [' + form.name + '] ': '添加') + '组' }}</a-breadcrumb-item>
   </a-breadcrumb>
 
   <a-card :title="(form.id ? '编辑 [' + form.name + '] ': '添加') + '组'" class="basic-box-shadow">
@@ -19,12 +19,12 @@
         <a-row :gutter="[24]">
           <a-col :span="12">
             <a-form-item has-feedback label="组名称:" name="name">
-              <a-input ref="name" v-model:value="form.name" :default-value="form.name"></a-input>
+              <a-input ref="name" v-model:value="form.name" :default-value="form.name" />
             </a-form-item>
           </a-col>
           <a-col :span="12">
             <a-form-item has-feedback label="权限名:" name="authority">
-              <a-input ref="authority" v-model:value="form.authority" :default-value="form.authority"></a-input>
+              <a-input ref="authority" v-model:value="form.authority" :default-value="form.authority" />
             </a-form-item>
           </a-col>
         </a-row>
@@ -89,7 +89,9 @@
 
       </a-form>
 
-      <a-space :size="10" class="margin-top-20">
+      <a-divider></a-divider>
+
+      <a-space :size="10">
         <a-button type="primary" @click="submitForm" v-if="this.principal.hasPermission('perms[console_user:save]')">
           <icon-font type="icon-select" />
           <span class="hidden-xs">保存</span>
@@ -200,8 +202,8 @@ export default {
               _this.$message.success(r.data.message);
 
               if (id !== _this.form.id) {
-                _this.$router.push({name:"group_edit", query:{id}});
-                _this.form.id = r.data;
+                _this.$router.push({name:"group_edit", query:{id}, replace:true});
+                _this.form.id = r.data.data;
               }
 
               _this.spinning = false;

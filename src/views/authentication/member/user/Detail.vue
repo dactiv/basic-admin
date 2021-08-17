@@ -1,10 +1,10 @@
 <template>
 
   <a-breadcrumb class="hidden-xs">
-    <a-breadcrumb-item><router-link to='/'><icon-font type="icon-home"></icon-font> 首页</router-link></a-breadcrumb-item>
+    <a-breadcrumb-item><router-link to='/'><icon-font type="icon-home" /> 首页</router-link></a-breadcrumb-item>
     <a-breadcrumb-item><icon-font type="icon-setting" /> 系统管理</a-breadcrumb-item>
     <a-breadcrumb-item><router-link :to="{name:'member_user'}"><icon-font type="icon-user-groups" /> 会员用户管理</router-link></a-breadcrumb-item>
-    <a-breadcrumb-item><icon-font type="icon-file"></icon-font> {{ '[' + form.username + '] ' + '会员用户明细' }}</a-breadcrumb-item>
+    <a-breadcrumb-item><icon-font type="icon-file" /> {{ '[' + form.username + '] ' + '会员用户明细' }}</a-breadcrumb-item>
   </a-breadcrumb>
 
   <a-card :title="'[' + form.username + '] ' + '会员用户明细'" class="basic-box-shadow">

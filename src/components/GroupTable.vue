@@ -2,7 +2,7 @@
 
   <a-spin :spinning="spinning">
 
-    <a-table class="ant-table-striped" :row-selection="{ selectedRowKeys: selectedIds, onChange: selectChange, getCheckboxProps: disabledCheckbox}" :rowKey="record=>record.id" :scroll="{ x: 1170 }" :pagination="false" :data-source="data" :columns="columns" bordered>
+    <a-table class="ant-table-striped" :row-selection="{ selectedRowKeys: selectedIds, onChange: selectChange, getCheckboxProps: disabledCheckbox}" :rowKey="record=>record.id" :scroll="{ x: 855 }" :pagination="false" :data-source="data" :columns="columns" bordered>
 
       <template #sourceName="{ text: sourceName }">
         <a-space :size="10">

@@ -1,18 +1,18 @@
 <template>
 
   <a-breadcrumb class="hidden-xs">
-    <a-breadcrumb-item><router-link to='/'><icon-font type="icon-home"></icon-font> 首页</router-link></a-breadcrumb-item>
-    <a-breadcrumb-item><icon-font type="icon-setting"></icon-font> 系统管理</a-breadcrumb-item>
-    <a-breadcrumb-item><icon-font type="icon-attachment"></icon-font> 資源管理</a-breadcrumb-item>
+    <a-breadcrumb-item><router-link to='/'><icon-font type="icon-home" /> 首页</router-link></a-breadcrumb-item>
+    <a-breadcrumb-item><icon-font type="icon-setting" /> 系统管理</a-breadcrumb-item>
+    <a-breadcrumb-item><icon-font type="icon-attachment" /> 資源管理</a-breadcrumb-item>
   </a-breadcrumb>
 
   <a-card title="資源管理" class="basic-box-shadow margin-top-20">
 
     <template #extra>
-      <icon-font type="icon-attachment"></icon-font>
+      <icon-font type="icon-attachment" />
     </template>
 
-    <a-input v-model:value="form['filter_[name_like]']" placeholder="请输入名称进行查询" size="large" class="margin-bottom-20">
+    <a-input v-model:value="form['filter_[name_like]']" placeholder="请输入名称进行查询" class="margin-bottom-20">
       <template #addonAfter>
         <a-button type="text" @click="$refs['resource-table'].search(this.form)">
           <icon-font type="icon-search" />

@@ -1,18 +1,18 @@
 <template>
 
   <a-breadcrumb class="hidden-xs">
-    <a-breadcrumb-item><router-link to='/'><icon-font type="icon-home"></icon-font> 首页</router-link></a-breadcrumb-item>
-    <a-breadcrumb-item><icon-font type="icon-un-config-o"></icon-font> 配置管理</a-breadcrumb-item>
-    <a-breadcrumb-item><icon-font type="icon-dictionary"></icon-font> 数据字典管理</a-breadcrumb-item>
+    <a-breadcrumb-item><router-link to='/'><icon-font type="icon-home" /> 首页</router-link></a-breadcrumb-item>
+    <a-breadcrumb-item><icon-font type="icon-un-config-o" /> 配置管理</a-breadcrumb-item>
+    <a-breadcrumb-item><icon-font type="icon-dictionary" /> 数据字典管理</a-breadcrumb-item>
   </a-breadcrumb>
 
   <a-card title="数据字典管理" class="basic-box-shadow margin-top-20">
 
     <template #extra>
-      <icon-font type="icon-dictionary"></icon-font>
+      <icon-font type="icon-dictionary" />
     </template>
 
-    <a-input v-model:value="form['filter_[code_like]']" placeholder="请输入名称进行查询" size="large" class="margin-bottom-20">
+    <a-input v-model:value="form['filter_[code_like]']" placeholder="请输入名称进行查询" class="margin-bottom-20">
       <template #addonAfter>
         <a-button type="text" @click="search()">
           <icon-font type="icon-search" />
@@ -33,7 +33,7 @@
 
     <a-spin :spinning="spinning">
 
-      <a-table class="ant-table-striped" :row-selection="{ selectedRowKeys: selectedIds, onChange: selectChange}" :rowKey="record=>record.id" :scroll="{ x: 1200 }" :pagination="false" :data-source="data" :columns="columns" bordered>
+      <a-table class="ant-table-striped" :row-selection="{ selectedRowKeys: selectedIds, onChange: selectChange}" :rowKey="record=>record.id" :scroll="{ x: 875 }" :pagination="false" :data-source="data" :columns="columns" bordered>
 
         <template #action="{ record }">
           <div class="text-center">

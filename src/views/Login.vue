@@ -2,13 +2,12 @@
 
   <a-layout>
 
-    <a-layout class="authentication-inner">
-      <a-layout-header class="logo ">
-      </a-layout-header>
+    <a-layout class="authentication-inner hidden-xs">
+      <a-layout-header class="logo" />
       <a-layout-content class="display-flex align-items-center justify-content-center">
         <a-image :src="require('../assets/login.svg')" />
       </a-layout-content>
-      <a-layout-footer class="main-footer text-center">COPYRIGHT © 2021 Dactiv, All rights ReservedHand-crafted & Made with</a-layout-footer>
+      <a-layout-footer class="no-margin main-footer text-center">COPYRIGHT © 2021 Dactiv, All rights ReservedHand-crafted & Made with</a-layout-footer>
     </a-layout>
 
     <a-layout-sider width="500" class="authentication-aside">
@@ -21,10 +20,10 @@
 
           <a-form ref="login-form" :model="form" :rules="rules" layout="vertical">
             <a-form-item label="登陆账户:" has-feedback name="username">
-              <a-input v-model:value="form.username"></a-input>
+              <a-input v-model:value="form.username" />
             </a-form-item>
             <a-form-item label="登陆密码:" has-feedback name="password">
-              <a-input-password v-model:value="form.password"></a-input-password>
+              <a-input-password v-model:value="form.password" />
             </a-form-item>
             <a-form-item label="验证码:" has-feedback name="captcha" class="picture-captcha" v-if="captcha.data.type === 'picture'">
               <a-input v-model:value="form.captcha">
@@ -38,11 +37,11 @@
             </a-form-item>
 
             <a-button type="primary" block @click="submitForm('login-form')">
-              <icon-font type="icon-security"></icon-font>
+              <icon-font type="icon-security" />
               登陆
             </a-button>
 
-            <a-divider class="logo"><icon-font type="icon-vue"></icon-font></a-divider>
+            <a-divider class="logo"><icon-font type="icon-vue" /></a-divider>
 
 
           </a-form>

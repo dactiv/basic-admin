@@ -140,3 +140,11 @@ body {
   margin-left: 100px;
   transition: 0.3s;
 }
+
+.ant-input-group-addon .ant-btn {
+  height: 30px;
+}
+
+.ant-table-tbody td .ant-form-item {
+  margin-bottom: 0;
+}

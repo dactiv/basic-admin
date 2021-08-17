@@ -1,15 +1,15 @@
 <template>
 
   <a-breadcrumb class="hidden-xs">
-    <a-breadcrumb-item><router-link to='/'><icon-font type="icon-home"></icon-font> 首页</router-link></a-breadcrumb-item>
-    <a-breadcrumb-item><icon-font type="icon-setting"></icon-font> 系统管理</a-breadcrumb-item>
-    <a-breadcrumb-item><icon-font type="icon-system-user"></icon-font> 系统用户管理</a-breadcrumb-item>
+    <a-breadcrumb-item><router-link to='/'><icon-font type="icon-home" /> 首页</router-link></a-breadcrumb-item>
+    <a-breadcrumb-item><icon-font type="icon-un-config-o" /> 配置管理</a-breadcrumb-item>
+    <a-breadcrumb-item><icon-font type="icon-crypto-currency-bitcoin-imac" /> 访问加解密</a-breadcrumb-item>
   </a-breadcrumb>
 
-  <a-card title="系统用户管理" class="basic-box-shadow margin-top-20">
+  <a-card title="访问加解密" class="basic-box-shadow margin-top-20">
 
     <template #extra>
-      <icon-font type="icon-system-user" />
+      <icon-font type="icon-crypto-currency-bitcoin-imac" />
     </template>
 
     <a-spin :spinning="spinning" tip="数据加载中...">
@@ -19,27 +19,27 @@
           <icon-font type="icon-search" />
           <span class="hidden-xs">搜索</span>
         </a-button>
-        <a-button @click="edit" v-if="this.principal.hasPermission('perms[console_user:save]')">
+        <a-button @click="edit" v-if="this.principal.hasPermission('perms[access_crypto:save]')">
           <icon-font type="icon-add" />
           <span class="hidden-xs">添加</span>
         </a-button>
 
-        <a-button type="primary" @click="remove(null)" danger v-if="this.principal.hasPermission('perms[console_user:delete]')">
+        <a-button type="primary" @click="remove(null)" danger v-if="this.principal.hasPermission('perms[access_crypto:delete]')">
           <icon-font type="icon-ashbin" />
           <span class="hidden-xs">删除选中</span>
         </a-button>
       </a-space>
 
-      <a-table class="ant-table-striped" :row-selection="{ selectedRowKeys: selectedIds, onChange:selectChange }" :rowKey="record=>record.id" :scroll="{ x: 1170 }" :pagination="false" :data-source="page.content" :columns="columns" bordered>
+      <a-table class="ant-table-striped" :row-selection="{ selectedRowKeys: selectedIds, onChange:selectChange }" :rowKey="record=>record.id" :scroll="{ x: 1120 }" :pagination="false" :data-source="page.content" :columns="columns" bordered>
 
         <template #action="{ record }">
           <div class="text-center">
             <a-space :size="10">
-              <a-button size="small" @click="edit(record)" v-if="this.principal.hasPermission('perms[console_user:get]')">
+              <a-button size="small" @click="edit(record)" v-if="this.principal.hasPermission('perms[access_crypto:get]')">
                 <icon-font type="icon-edit" />
                 <span class="hidden-xs">编辑</span>
               </a-button>
-              <a-button size="small" type="primary" danger @click="remove(record)" v-if="this.principal.hasPermission('perms[console_user:delete]')">
+              <a-button size="small" type="primary" danger @click="remove(record)" v-if="this.principal.hasPermission('perms[access_crypto:delete]')">
                 <icon-font type="icon-ashbin" />
                 <span class="hidden-xs">删除</span>
               </a-button>
@@ -71,21 +71,21 @@
 
       <a-row :gutter="[24]">
         <a-col :span="12">
-          <a-form-item label="登陆账户:">
-            <a-input v-model:value="form['filter_[username_like]']" />
+          <a-form-item label="名称:">
+            <a-input v-model:value="form['filter_[name_like]']" />
           </a-form-item>
         </a-col>
         <a-col :span="12">
-          <a-form-item label="真是姓名:">
-            <a-input v-model:value="form['filter_[real_name_like]']" />
+          <a-form-item label="类型:">
+            <a-input v-model:value="form['filter_[real_type_eq]']" />
           </a-form-item>
         </a-col>
       </a-row>
 
       <a-row :gutter="[24]">
         <a-col :span="12">
-          <a-form-item label="电子邮箱:">
-            <a-input v-model:value="form['filter_[email_like]']" />
+          <a-form-item label="值:">
+            <a-input v-model:value="form['filter_[value_like]']" />
           </a-form-item>
         </a-col>
         <a-col :span="12">
@@ -115,22 +115,32 @@ export default {
     return {
       columns:[
         {
-          title: "登陆账号",
-          dataIndex: "username",
+          title: "名称",
+          dataIndex: "name",
           ellipsis: true,
           width: 200
         },
         {
-          title: "真是姓名",
-          dataIndex: "realName",
+          title: "拦截值",
+          dataIndex: "value",
           ellipsis: true,
           width: 200
         },
         {
-          title: "电子邮箱",
-          dataIndex: "email",
+          title: "类型",
+          dataIndex: "type",
           ellipsis: true,
-          width: 200
+          width: 120
+        },{
+          title: "请求加密",
+          dataIndex: "requestDecryptName",
+          ellipsis: true,
+          width: 150
+        },{
+          title: "响应加密",
+          dataIndex: "responseEncryptName",
+          ellipsis: true,
+          width: 150
         },{
           title: "状态",
           dataIndex: "statusName",
@@ -150,9 +160,9 @@ export default {
       ],
       selectedIds:[],
       form:{
-        "filter_[username_eq]":"",
-        "filter_[real_name_like]":"",
-        "filter_[email_like]":"",
+        "filter_[name_like]":"",
+        "filter_[type_eq]":"",
+        "filter_[value_like]":"",
         "filter_[status_eq]":""
       },
       page: {
@@ -167,13 +177,13 @@ export default {
     }
   },
   created() {
-    this.loadConfig({service:"config", enumerateName:"UserStatus"}, r=> this.statusOptions = r.data.data);
+    this.loadConfig({service:"config", enumerateName:"DisabledOrEnabled"}, r=> this.statusOptions = r.data.data);
   },
   methods:{
     edit(record) {
 
       let to = {
-        name: "console_user_edit"
+        name: "access_crypto_edit"
       }
 
       if (record !== undefined) {
@@ -194,7 +204,7 @@ export default {
 
       if (record) {
         ids.push(record.id);
-        confirmMessage = "确定要删除 [" + record.username + "] 系统用户吗?"
+        confirmMessage = "确定要删除 [" + record.username + "] 访问加解密吗?"
       } else {
         ids = this.selectedIds;
         confirmMessage = "确定要删除" + ids.length + "条记录吗?"
@@ -206,7 +216,7 @@ export default {
         _this.spinning = true;
         _this
             .$http
-            .post("/authentication/console/user/delete",_this.formUrlencoded({ids:ids})).then((r) => {
+            .post("/config/access/crypto/delete",_this.formUrlencoded({ids:ids})).then((r) => {
               this.$message.success(r.data.message);
               _this.selectedIds = [];
               _this.search();
@@ -229,7 +239,7 @@ export default {
 
       _this
           .$http
-          .post("/authentication/console/user/page",_this.formUrlencoded(param))
+          .post("/config/access/crypto/page",_this.formUrlencoded(param))
           .then(r => {
             _this.page = r.data.data;
             _this.spinning = false;

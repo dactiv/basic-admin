@@ -1,16 +1,16 @@
 <template>
 
   <a-breadcrumb class="hidden-xs">
-    <a-breadcrumb-item><router-link to='/'><icon-font type="icon-home"></icon-font> 首页</router-link></a-breadcrumb-item>
-    <a-breadcrumb-item><icon-font type="icon-setting"></icon-font> 系统管理</a-breadcrumb-item>
-    <a-breadcrumb-item><router-link :to="{name:'console_user'}"> <icon-font type="icon-system-user"></icon-font> 系统用户管理</router-link></a-breadcrumb-item>
-    <a-breadcrumb-item><icon-font type="icon-edit"></icon-font> {{ (form.id ? '编辑 [' + form.username + '] ': '添加') + '系统用户' }}</a-breadcrumb-item>
+    <a-breadcrumb-item><router-link to='/'><icon-font type="icon-home" /> 首页</router-link></a-breadcrumb-item>
+    <a-breadcrumb-item><icon-font type="icon-setting" /> 系统管理</a-breadcrumb-item>
+    <a-breadcrumb-item><router-link :to="{name:'console_user'}"> <icon-font type="icon-system-user" /> 系统用户管理</router-link></a-breadcrumb-item>
+    <a-breadcrumb-item><icon-font type="icon-edit" /> {{ (form.id ? '编辑 [' + form.username + '] ': '添加') + '系统用户' }}</a-breadcrumb-item>
   </a-breadcrumb>
 
   <a-card :title="(form.id ? '编辑 [' + form.username + '] ': '添加') + '系统用户'" class="basic-box-shadow">
 
     <template #extra>
-      <icon-font type="icon-edit"></icon-font>
+      <icon-font type="icon-edit" />
     </template>
 
     <a-spin :spinning="spinning">
@@ -19,12 +19,12 @@
         <a-row :gutter="[24]">
           <a-col :span="12">
             <a-form-item has-feedback label="登陆账户:" name="username">
-              <a-input ref="username" v-model:value="form.username" :default-value="form.username" :disabled="form.id !== null"></a-input>
+              <a-input ref="username" v-model:value="form.username" :default-value="form.username" :disabled="form.id !== null" />
             </a-form-item>
           </a-col>
           <a-col :span="12">
             <a-form-item has-feedback label="真是姓名:" name="realName">
-              <a-input v-model:value="form.realName"></a-input>
+              <a-input v-model:value="form.realName" />
             </a-form-item>
           </a-col>
         </a-row>
@@ -32,12 +32,12 @@
         <a-row v-if="form.id === null" :gutter="[24]">
           <a-col :span="12">
             <a-form-item has-feedback label="登陆密码:" name="password">
-              <a-input-password v-model:value="form.password"></a-input-password>
+              <a-input-password v-model:value="form.password" />
             </a-form-item>
           </a-col>
           <a-col :span="12">
             <a-form-item has-feedback label="确认密码:" name="confirmPassword">
-              <a-input-password v-model:value="form.confirmPassword"></a-input-password>
+              <a-input-password v-model:value="form.confirmPassword" />
             </a-form-item>
           </a-col>
         </a-row>
@@ -45,7 +45,7 @@
         <a-row :gutter="[24]">
           <a-col :span="12">
             <a-form-item has-feedback label="电子邮箱:" name="email">
-              <a-input ref="email" v-model:value="form.email" :default-value="form.email.toString()"></a-input>
+              <a-input ref="email" v-model:value="form.email" :default-value="form.email.toString()" />
             </a-form-item>
           </a-col>
 
@@ -93,7 +93,9 @@
 
       </a-tabs>
 
-      <a-space :size="10" class="margin-top-20">
+      <a-divider></a-divider>
+
+      <a-space :size="10">
         <a-button type="primary" @click="submitForm" v-if="this.principal.hasPermission('perms[console_user:save]')">
           <icon-font type="icon-select" />
           <span class="hidden-xs">保存</span>
@@ -207,8 +209,8 @@ export default {
               _this.$message.success(r.data.message);
 
               if (id !== _this.form.id) {
-                _this.$router.push({name:"console_user_edit", query:{id}});
-                _this.form.id = r.data;
+                _this.$router.push({name:"console_user_edit", query:{id}, replace:true});
+                _this.form.id = r.data.data;
               }
 
               _this.spinning = false;
