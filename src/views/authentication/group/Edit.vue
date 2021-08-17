@@ -33,7 +33,7 @@
           <a-col :span="12">
             <a-form-item has-feedback label="来源:" name="source">
               <a-select @change="sourceChange" class="width-100-percent" mode="multiple" v-model:value="form.source" >
-                <a-select-option v-for="(name,value ) in sourceOptions" :key="value + ''" :value="value + ''">
+                <a-select-option v-for="(name,value ) of sourceOptions" :key="value + ''" :value="value + ''">
                   {{name}}
                 </a-select-option>
               </a-select>
@@ -44,7 +44,7 @@
 
             <a-form-item label="状态:" name="status">
               <a-select class="width-100-percent" v-model:value="form.status">
-                <a-select-option v-for="(value, name) in statusOptions" :key="value + ''" :value="value + ''">
+                <a-select-option v-for="(value, name) of statusOptions" :key="value + ''" :value="value + ''">
                   {{name}}
                 </a-select-option>
               </a-select>
@@ -57,7 +57,7 @@
           <a-col :span="24">
             <a-form-item label="上级组:" name="parentId">
               <a-select class="width-100-percent" v-model:value="form.parentId">
-                <a-select-option v-for="p in parentOptions" :key="p.id + ''" :value="p.id + ''">
+                <a-select-option v-for="p of parentOptions" :key="p.id + ''" :value="p.id + ''">
                   {{p.name}}
                 </a-select-option>
               </a-select>
@@ -75,17 +75,14 @@
 
         </a-row>
 
-        <a-tabs>
+        <a-row>
+          <a-col :span="24">
+            <a-form-item label="拥有权限:" name="remark">
+              <resource-table ref="resource-table" :selection="true"/>
+            </a-form-item>
+          </a-col>
 
-          <a-tab-pane key="group-table">
-            <template #tab>
-              <icon-font type="icon-attachment" />
-              <span class="hidden-xs">拥有权限</span>
-            </template>
-            <resource-table ref="resource-table" :selection="true"/>
-          </a-tab-pane>
-
-        </a-tabs>
+        </a-row>
 
       </a-form>
 

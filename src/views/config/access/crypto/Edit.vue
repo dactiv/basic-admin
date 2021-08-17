@@ -41,7 +41,7 @@
           <a-col :span="12">
             <a-form-item label="状态:" name="enabled">
               <a-select class="width-100-percent" v-model:value="form.enabled">
-                <a-select-option v-for="(value, name) in statusOptions" :key="value + ''" :value="value + ''">
+                <a-select-option v-for="(value, name) of statusOptions" :key="value + ''" :value="value + ''">
                   {{name}}
                 </a-select-option>
               </a-select>
@@ -54,7 +54,7 @@
           <a-col :span="12">
             <a-form-item label="是否请求解密:" name="requestDecrypt">
               <a-select class="width-100-percent" v-model:value="form.requestDecrypt">
-                <a-select-option v-for="(value, name) in yesOrNoOptions" :key="value + ''" :value="value + ''">
+                <a-select-option v-for="(value, name) of yesOrNoOptions" :key="value + ''" :value="value + ''">
                   {{name}}
                 </a-select-option>
               </a-select>
@@ -64,7 +64,7 @@
           <a-col :span="12">
             <a-form-item show-search label="是否响应解密:" name="responseEncrypt">
               <a-select class="width-100-percent" v-model:value="form.responseEncrypt">
-                <a-select-option v-for="(value, name) in yesOrNoOptions" :key="value + ''" :value="value + ''">
+                <a-select-option v-for="(value, name) of yesOrNoOptions" :key="value + ''" :value="value + ''">
                   {{name}}
                 </a-select-option>
               </a-select>
@@ -97,7 +97,7 @@
 
           <template #title>断言规则</template>
 
-          <template v-for="col in ['name', 'value', 'remark']" #[col]="{ text, record }" :key="col">
+          <template v-for="col of ['name', 'value', 'remark']" #[col]="{ text, record }" :key="col">
             <div>
               <a-form-item v-if="editableData[record.id]" has-feedback :name="record.id + '-' + col">
                 <a-input v-model:value="editableData[record.id][col]"/>
@@ -161,7 +161,7 @@
 <script>
 
 export default {
-  name:"DataDictionaryEdit",
+  name:"CryptoEdit",
   data() {
     return {
       spinning:true,

@@ -34,7 +34,7 @@
             <a-form-item label="上级:" name="parentId">
               <a-select show-search class="width-100-percent" v-model:value="form.parentId" @change="parentChange" optionFilterProp="key">
                 <a-select-option key="" value="">无</a-select-option>
-                <a-select-option v-for="p in parentOptions" :key="p.name" :value="p.id + ''">
+                <a-select-option v-for="p of parentOptions" :key="p.name" :value="p.id + ''">
                   {{p.name}}
                 </a-select-option>
               </a-select>
@@ -114,7 +114,9 @@
 
       </a-form>
 
-      <a-space :size="10" class="margin-top-20">
+      <a-divider></a-divider>
+
+      <a-space :size="10">
         <a-button type="primary" @click="submitForm" v-if="this.principal.hasPermission('perms[dictionary_type:save]')">
           <icon-font type="icon-select" />
           <span class="hidden-xs">保存</span>

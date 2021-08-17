@@ -44,7 +44,12 @@ export default {
      * @returns {*} 替换后的值
      */
     replaceValue(d) {
-      return d.applicationName + "/" + d.value.replace("/**","");
+
+      if (d.value.indexOf("/**") > 0) {
+        return d.applicationName + "/" + d.value.replace("/**","");
+      }
+
+      return d.applicationName + "/" + d.code;
     },
     /**
      * 获取路由路径

@@ -43,6 +43,8 @@ import {
     Divider,
     Badge,
     Descriptions,
+    Collapse,
+    Empty,
     notification,
     message
 } from "ant-design-vue";
@@ -108,7 +110,7 @@ app.config.globalProperties.loadConfig = function(params, callback) {
 }
 
 const IconFont = createFromIconfontCN({
-    scriptUrl: "//at.alicdn.com/t/font_2732722_4b7tejylk9p.js"
+    scriptUrl: "//at.alicdn.com/t/font_2732722_bdx55k3pq8c.js"
 });
 
 app.component('IconFont', IconFont);
@@ -173,4 +175,6 @@ app.use(router)
     .use(Divider)
     .use(Descriptions)
     .use(Badge)
+    .use(Collapse)
+    .use(Empty)
     .mount('#app');

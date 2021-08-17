@@ -20,8 +20,8 @@
         </a-button>
       </template>
       <template #addonBefore>
-        <a-button type="text" @click="syncResource" v-if="this.principal.hasPermission('perms[group:save]')">
-          <icon-font type="icon-history"/>
+        <a-button type="text" :loading="sync" @click="syncResource" v-if="this.principal.hasPermission('perms[group:save]')">
+          <icon-font v-if="!sync" type="icon-history"/>
           <span class="hidden-xs">同步資源</span>
         </a-button>
       </template>
@@ -42,6 +42,7 @@ export default {
   components: {ResourceTable},
   data() {
     return {
+      sync:false,
       form:{
         "mergeTree":true,
         "filter_[name_like]":""
@@ -51,14 +52,13 @@ export default {
   methods:{
     syncResource() {
       let _this = this;
-
-      _this.spinning = true;
+      _this.sync = true;
 
       _this
           .$http
           .post("/authentication/resource/syncPluginResource")
           .then(r => {
-            _this.spinning = false;
+            _this.sync = false;
             _this.$message.success(r.data.message);
           })
           .catch(() => _this.spinning = false);

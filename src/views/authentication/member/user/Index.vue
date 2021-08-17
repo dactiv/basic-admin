@@ -85,7 +85,7 @@
               <a-select-option value="">
                 全部
               </a-select-option>
-              <a-select-option v-for="(value, name) in statusOptions" :key="value" :value="value">
+              <a-select-option v-for="(value, name) of statusOptions" :key="value" :value="value">
                 {{name}}
               </a-select-option>
             </a-select>

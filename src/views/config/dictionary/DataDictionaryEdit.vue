@@ -51,7 +51,7 @@
           <a-col :span="12">
             <a-form-item label="状态:" name="enabled">
               <a-select class="width-100-percent" v-model:value="form.enabled">
-                <a-select-option v-for="(value, name) in statusOptions" :key="value + ''" :value="value + ''">
+                <a-select-option v-for="(value, name) of statusOptions" :key="value + ''" :value="value + ''">
                   {{name}}
                 </a-select-option>
               </a-select>
@@ -61,7 +61,7 @@
           <a-col :span="12">
             <a-form-item show-search label="上级:" name="parentId">
               <a-select class="width-100-percent" v-model:value="form.parentId">
-                <a-select-option v-for="p in parentOptions" :key="p.name" :value="p.id + ''" @change="parentChange" optionFilterProp="key">
+                <a-select-option v-for="p of parentOptions" :key="p.name" :value="p.id + ''" @change="parentChange" optionFilterProp="key">
                   {{p.name}}
                 </a-select-option>
               </a-select>
@@ -81,7 +81,9 @@
 
       </a-form>
 
-      <a-space :size="10" class="margin-top-20">
+      <a-divider></a-divider>
+
+      <a-space :size="10">
         <a-button type="primary" @click="submitForm" v-if="this.principal.hasPermission('perms[data_dictionary:save]')">
           <icon-font type="icon-select" />
           <span class="hidden-xs">保存</span>

@@ -6,7 +6,7 @@
 
       <template #sourceName="{ text: sourceName }">
         <a-space :size="10">
-          <a-tag v-for="name in sourceName" :key="name" color="success">
+          <a-tag v-for="name of sourceName" :key="name" color="success">
             {{ name }}
           </a-tag>
         </a-space>

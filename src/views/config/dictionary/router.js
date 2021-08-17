@@ -5,7 +5,6 @@ export const router = [{
     meta: {
         title: "数据字典管理",
         parent: "config"
-
     }
 },{
     path: "config/dictionary/edit",
@@ -13,7 +12,7 @@ export const router = [{
     name: "dictionary_type_edit",
     meta: {
         title: "编辑字典类型",
-        parent: "cofnig",
+        parent: "config",
         selectMenu: process.env.VUE_APP_SITE_ROOT + "/config/dictionary"
     }
 },{
@@ -22,7 +21,7 @@ export const router = [{
     name: "data_dictionary_edit",
     meta: {
         title: "编辑数据字典",
-        parent: "cofnig",
+        parent: "config",
         selectMenu: process.env.VUE_APP_SITE_ROOT + "/config/dictionary"
     }
 }]
