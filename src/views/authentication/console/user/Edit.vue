@@ -45,7 +45,7 @@
         <a-row :gutter="[24]">
           <a-col :span="12">
             <a-form-item has-feedback label="电子邮箱:" name="email">
-              <a-input ref="email" v-model:value="form.email" :default-value="form.email.toString()" />
+              <a-input ref="email" v-model:value="form.email" :default-value="form.email" />
             </a-form-item>
           </a-col>
 
@@ -171,7 +171,7 @@ export default {
     },
     validateRemoteEmail() {
 
-      if (this.form.email === this.$refs.username.defaultValue) {
+      if (this.form.email === this.$refs.email.defaultValue) {
         return Promise.resolve();
       }
 
