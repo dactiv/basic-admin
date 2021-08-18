@@ -221,7 +221,7 @@ export default {
       this.parentCode = code;
 
     },
-    searchDataDictionary() {
+    searchDataDictionary(number) {
 
       let _this = this;
 
@@ -230,7 +230,7 @@ export default {
       let param = _this.dataDictionary.form;
 
       param.size = this.dataDictionary.page.size || 10;
-      param.number = this.dataDictionary.page.number || 1;
+      param.number = number || this.dataDictionary.page.number;
 
       if (_this.form.id) {
         param["filter_[type_id_eq]"] = _this.form.id;
@@ -362,7 +362,7 @@ export default {
 
                   _this.spinning = false;
 
-                  _this.searchDataDictionary();
+                  _this.searchDataDictionary(null);
                 })
                 .catch(() => _this.spinning = false);
           }

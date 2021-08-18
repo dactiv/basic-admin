@@ -57,7 +57,7 @@
     </a-spin>
   </a-card>
 
-  <a-modal v-model:visible="searchDialogVisible" width="600px" title="查询会员用户" @ok="search" layout="vertical">
+  <a-modal v-model:visible="searchDialogVisible" width="600px" title="查询会员用户" @ok="search(null)" layout="vertical">
     <a-form ref="search-form" :model="form" layout="vertical">
 
       <a-row :gutter="[24]">
@@ -192,7 +192,7 @@ export default {
     selectChange(selectedIds) {
       this.selectedIds = selectedIds;
     },
-    search() {
+    search(number) {
       let _this = this;
 
       this.spinning = true;
@@ -202,7 +202,7 @@ export default {
       let data = this.form;
 
       data.size = this.page.size || 10;
-      data.number = this.page.number || 1;
+      data.number = number || _this.page.number;
 
       _this
           .$http

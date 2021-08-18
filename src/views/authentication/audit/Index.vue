@@ -15,13 +15,17 @@
     <a-spin :spinning="spinning" tip="数据加载中...">
 
       <a-space :size="10" class="margin-bottom-20">
-        <a-button @click="this.searchDialogVisible=true;">
+        <a-button @click="this.searchDialogVisible=true">
           <icon-font type="icon-search" />
           <span class="hidden-xs">搜索</span>
         </a-button>
       </a-space>
 
       <a-table class="ant-table-striped" :rowKey="record=>record.id" :scroll="{ x: 775 }" :pagination="false" :data-source="page.content" :columns="columns" bordered>
+
+        <template #timestamp="{ text:timestamp }">
+          {{ this.timestampFormat(timestamp.toString().replace(".","") * 1)}}
+        </template>
 
         <template #action="{ record }">
           <div class="text-center">
@@ -53,33 +57,36 @@
     </a-spin>
   </a-card>
 
-  <a-modal v-model:visible="searchDialogVisible" width="600px" title="查询操作审计" @ok="search" layout="vertical">
-    <a-form ref="search-form" :model="form" layout="vertical">
+  <a-modal v-model:visible="searchDialogVisible" width="400px" title="查询操作审计" @ok="search(null)" layout="vertical">
+    <a-form ref="search-form" :rules="rules" :model="form" layout="vertical">
 
-      <a-row :gutter="[24]">
-        <a-col :span="12">
-          <a-form-item label="操作人:">
+      <a-row>
+
+        <a-col :span="24">
+          <a-form-item label="操作人:" name="principal">
             <a-input v-model:value="form.principal" />
           </a-form-item>
         </a-col>
-        <a-col :span="12">
-          <a-form-item label="操作模块:">
+
+      </a-row>
+
+      <a-row>
+
+        <a-col :span="24">
+          <a-form-item label="操作模块:" name="type">
             <a-input v-model:value="form.type" />
           </a-form-item>
         </a-col>
+
       </a-row>
 
-<!--      <a-row>
+      <a-row>
         <a-col :span="24">
-          <a-form-item label="操作时间:">
-            <a-picker show-time class="width-100-percent" v-model:value="form.after">
-              <template #suffixIcon>
-                <icon-font type="icon-calendar" />
-              </template>
-            </a-picker>
+          <a-form-item label="操作时间:" name="after">
+            <a-date-picker class="width-100-percent" show-time v-model:value="form.after" />
           </a-form-item>
         </a-col>
-      </a-row>-->
+      </a-row>
 
     </a-form>
   </a-modal>
@@ -97,7 +104,8 @@ export default {
           title: "操作时间",
           dataIndex: "timestamp",
           ellipsis: true,
-          width: 200
+          width: 200,
+          slots: { customRender: "timestamp" }
         },
         {
           title: "操作人",
@@ -117,10 +125,13 @@ export default {
           slots: { customRender: "action" },
         }
       ],
+      rules:{
+        after: [{ required: true, message: "请选择操作时间", trigger: "blur" }]
+      },
       form:{
         principal:"",
         type:"",
-        after:[]
+        after:""
       },
       page: {
         content:[],
@@ -140,32 +151,38 @@ export default {
       }
 
       if (record !== undefined) {
-        to["query"] = {id:record.id};
+        to["query"] = { id:record.id, after:record.timestamp.toString().replace(".","") };
       }
 
       this.$router.push(to);
 
     },
-    search() {
+    search(number) {
       let _this = this;
 
-      this.spinning = true;
+      console.log(this.form.after);
 
-      _this.searchDialogVisible = false;
+      _this.$refs['search-form'].validate().then(() => {
 
-      let param = _this.form;
+        this.spinning = true;
 
-      param.size = _this.page.size || 10;
-      param.number = _this.page.number || 1;
+        _this.searchDialogVisible = false;
 
-      _this
-          .$http
-          .post("/authentication/audit",_this.formUrlencoded(param))
-          .then(r => {
-            _this.page = r.data.data;
-            _this.spinning = false;
-          })
-          .catch(() => _this.spinning = false);
+        let param = _this.form;
+
+        param.size = _this.page.size || 10;
+        param.number = number || _this.page.number;
+
+        _this
+            .$http
+            .post("/authentication/audit", _this.formUrlencoded(param))
+            .then(r => {
+              _this.page = r.data.data;
+              _this.spinning = false;
+            })
+            .catch(() => _this.spinning = false);
+      });
+
     }
   }
 }
