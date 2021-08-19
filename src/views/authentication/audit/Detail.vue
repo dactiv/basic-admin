@@ -15,7 +15,6 @@
 
     <a-spin :spinning="spinning">
       <a-descriptions
-          title="详情信息"
           bordered
           :column="{ xxl: 2, xl: 2, lg: 2, md: 2, sm: 2, xs: 1 }"
       >
@@ -23,7 +22,9 @@
         <a-descriptions-item label="操作人">{{ form.principal}} </a-descriptions-item>
         <a-descriptions-item label="操作模块">{{ form.type}}</a-descriptions-item>
         <a-descriptions-item label="操作时间" :span="2">{{ this.timestampFormat(form.timestamp.toString().replace(".","") * 1) }}</a-descriptions-item>
-        <a-descriptions-item label="参数信息" :span="2">{{ form.data }}</a-descriptions-item>
+        <a-descriptions-item label="参数信息" :span="2">
+          <pre>{{ JSON.stringify(form.data,null,2)}}</pre>
+        </a-descriptions-item>
 
       </a-descriptions>
     </a-spin>
@@ -42,7 +43,7 @@ export default {
       form: {
         principal: "",
         type: "",
-        timestamp: null,
+        timestamp: "",
         data: ""
       }
     }
@@ -51,9 +52,14 @@ export default {
 
     let _this = this;
 
-    this
+    let param = {
+      id:this.$route.query.id,
+      after: this.convertFormUrlencoded(this.$moment(this.$route.query.after * 1))
+    };
+
+    _this
         .$http
-        .get("/authentication/getAudit?id=" + this.$route.query.id + "&timestamp=" + this.$route.query.timestamp)
+        .get("/authentication/getAudit?id=" + param.id + "&after=" + param.after)
         .then(r => {
           _this.form = r.data.data;
           _this.spinning = false

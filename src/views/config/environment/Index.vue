@@ -62,7 +62,7 @@ export default {
 
     _this
         .$http
-        .get("/config/getAllServiceVariable")
+        .get("/config/environment")
         .then(r => {
           _this.variableData = r.data.data;
           _this.spinning = false;

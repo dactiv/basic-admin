@@ -20,7 +20,7 @@
         </a-button>
       </template>
       <template #addonBefore>
-        <a-button type="text" :loading="sync" @click="syncResource" v-if="this.principal.hasPermission('perms[group:save]')">
+        <a-button type="text" :loading="sync" @click="syncResource" v-if="this.principal.hasPermission('perms[resource:sync_plugin_resource]')">
           <icon-font v-if="!sync" type="icon-history"/>
           <span class="hidden-xs">同步資源</span>
         </a-button>

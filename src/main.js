@@ -86,7 +86,7 @@ app.config.globalProperties.formUrlencoded = function(json, ignoreProperties, va
 
         let val = json[j];
 
-        if (!val) {
+        if (val === undefined || val === null) {
             continue;
         }
 

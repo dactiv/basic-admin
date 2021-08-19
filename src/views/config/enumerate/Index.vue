@@ -12,6 +12,13 @@
       <icon-font type="icon-enum-major-o" />
     </template>
 
+    <a-space :size="10" class="margin-bottom-20">
+      <a-button type="text" :loading="sync" @click="syncEnumerate" v-if="this.principal.hasPermission('perms[enumerate:sync]')">
+        <icon-font v-if="!sync" type="icon-history"/>
+        <span class="hidden-xs">同步枚举</span>
+      </a-button>
+    </a-space>
+
     <a-spin :spinning="spinning">
 
       <a-tabs>
@@ -42,8 +49,25 @@ export default {
   name:"EnumerateIndex",
   data() {
     return {
+      sync:false,
       spinning:false,
       enumData:{}
+    }
+  },
+  methods:{
+    syncEnumerate() {
+      let _this = this;
+      _this.sync = true;
+
+      _this
+          .$http
+          .post("/config/syncEnumerate")
+          .then(r => {
+            _this.sync = false;
+            _this.$message.success(r.data.message);
+          })
+          .catch(() => _this.spinning = false);
+
     }
   },
   created() {
@@ -53,7 +77,7 @@ export default {
 
     _this
         .$http
-        .get("/config/getAllServiceEnumerate")
+        .get("/config/enumerate")
         .then(r => {
           _this.enumData = r.data.data;
           _this.spinning = false;

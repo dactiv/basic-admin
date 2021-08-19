@@ -126,7 +126,7 @@ export default {
         }
       ],
       rules:{
-        after: [{ required: true, message: "请选择操作时间", trigger: "blur" }]
+        after: [{ required: true, message: "请选择操作时间", trigger: 'change', type: 'object' }]
       },
       form:{
         principal:"",
@@ -159,8 +159,6 @@ export default {
     },
     search(number) {
       let _this = this;
-
-      console.log(this.form.after);
 
       _this.$refs['search-form'].validate().then(() => {
 
