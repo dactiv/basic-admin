@@ -16,7 +16,7 @@
 
   <div class="text-center margin-top-20">
     <a-button onclick="this.$router.back();">
-      <icon-font type="icon-arrow-left-circle" />
+      <icon-font class="icon"  type="icon-arrow-left-circle" />
       <span>返回</span>
     </a-button>
   </div>

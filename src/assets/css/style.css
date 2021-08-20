@@ -54,8 +54,9 @@ body {
 }
 
 .logo span.anticon {
-  font-size: 1.95rem;
+  font-size: 1.95rem!important;
   margin-left: 0;
+  margin-bottom: 0;
 }
 
 .logo span{
@@ -150,7 +151,16 @@ body {
   margin-bottom: 0;
 }
 
-.header-navbar span.anticon {
-  font-size: 20px;
+.icon {
+  font-size: 16px!important;
   vertical-align: middle;
+  margin-bottom: 3px;
+}
+
+.ant-btn .icon {
+  margin-bottom: 0;
+}
+
+.header-navbar .icon {
+  font-size: 20px!important;
 }

@@ -1,16 +1,16 @@
 <template>
 
   <a-breadcrumb class="hidden-xs">
-    <a-breadcrumb-item><router-link to='/'><icon-font type="icon-home" /> 首页</router-link></a-breadcrumb-item>
-    <a-breadcrumb-item><icon-font type="icon-un-config-o" /> 配置管理</a-breadcrumb-item>
-    <a-breadcrumb-item><router-link :to="{name:'dictionary'}"> <icon-font type="icon-dictionary" /> 数据字典管理</router-link></a-breadcrumb-item>
-    <a-breadcrumb-item><icon-font type="icon-edit" /> {{ (form.id ? '编辑 [' + form.name + '] ': '添加') + '字典类型' }}</a-breadcrumb-item>
+    <a-breadcrumb-item><router-link to='/'><icon-font class="icon"  type="icon-home" /> 首页</router-link></a-breadcrumb-item>
+    <a-breadcrumb-item><icon-font class="icon"  type="icon-un-config-o" /> 配置管理</a-breadcrumb-item>
+    <a-breadcrumb-item><router-link :to="{name:'dictionary'}"> <icon-font class="icon"  type="icon-dictionary" /> 数据字典管理</router-link></a-breadcrumb-item>
+    <a-breadcrumb-item><icon-font class="icon"  type="icon-edit" /> {{ (form.id ? '编辑 [' + form.name + '] ': '添加') + '字典类型' }}</a-breadcrumb-item>
   </a-breadcrumb>
 
   <a-card :title="(form.id ? '编辑 [' + form.name + '] ': '添加') + '字典类型'" class="basic-box-shadow">
 
     <template #extra>
-      <icon-font type="icon-edit" />
+      <icon-font class="icon"  type="icon-edit" />
     </template>
 
     <a-spin :spinning="spinning">
@@ -54,23 +54,23 @@
         <a-card title="数据字典内容" v-if="this.form.id !== null">
 
           <template #extra>
-            <icon-font type="icon-database" />
+            <icon-font class="icon"  type="icon-database" />
           </template>
 
           <a-input v-model:value="dataDictionary.form['filter_[code_like]']" placeholder="请输入名称进行查询" class="margin-bottom-20">
             <template #addonAfter>
               <a-button type="text" @click="searchDataDictionary()">
-                <icon-font type="icon-search" />
+                <icon-font class="icon"  type="icon-search" />
                 <span class="hidden-xs">搜索</span>
               </a-button>
             </template>
             <template #addonBefore>
               <a-button type="text" @click="editDataDictionary()" v-if="this.principal.hasPermission('perms[dictionary_type:save]')">
-                <icon-font type="icon-add"/>
+                <icon-font class="icon"  type="icon-add"/>
                 <span class="hidden-xs">添加</span>
               </a-button>
               <a-button type="text" danger @click="removeDataDictionary(null)" v-if="this.principal.hasPermission('perms[dictionary_type:delete]')">
-                <icon-font type="icon-ashbin" />
+                <icon-font class="icon"  type="icon-ashbin" />
                 <span class="hidden-xs">删除选中</span>
               </a-button>
             </template>
@@ -82,11 +82,11 @@
                 <div class="text-center">
                   <a-space :size="10">
                     <a-button size="small" @click="editDataDictionary(record)" v-if="this.principal.hasPermission('perms[data_dictionary:get]')">
-                      <icon-font type="icon-edit" />
+                      <icon-font class="icon"  type="icon-edit" />
                       <span class="hidden-xs">编辑</span>
                     </a-button>
                     <a-button size="small" type="primary" danger @click="removeDataDictionary(record)" v-if="this.principal.hasPermission('perms[data_dictionary:delete]')">
-                      <icon-font type="icon-ashbin" />
+                      <icon-font class="icon"  type="icon-ashbin" />
                       <span class="hidden-xs">删除</span>
                     </a-button>
                   </a-space>
@@ -100,9 +100,9 @@
                 <span class="hidden-xs">每页</span>
                 <a-input v-model:value="dataDictionary.page.size" size="small" @pressEnter="searchDataDictionary" :maxlength="4" class="text-center hidden-xs" style="width: 50px" />
                 <span class="hidden-xs">条 / 第 1 页</span>
-                <a-button size="small" @click="searchDataDictionary(dataDictionary.page.number - 1)" :disabled="dataDictionary.page.first"><icon-font type="icon-arrow-left-bold" /></a-button>
+                <a-button size="small" @click="searchDataDictionary(dataDictionary.page.number - 1)" :disabled="dataDictionary.page.first"><icon-font class="icon"  type="icon-arrow-left-bold" /></a-button>
                 {{dataDictionary.page.number}}
-                <a-button size="small" @click="searchDataDictionary(dataDictionary.page.number + 1)" :disabled="dataDictionary.page.last"><icon-font type="icon-arrow-right-bold" /></a-button>
+                <a-button size="small" @click="searchDataDictionary(dataDictionary.page.number + 1)" :disabled="dataDictionary.page.last"><icon-font class="icon"  type="icon-arrow-right-bold" /></a-button>
 
               </a-space>
 
@@ -118,11 +118,11 @@
 
       <a-space :size="10">
         <a-button type="primary" @click="submitForm" v-if="this.principal.hasPermission('perms[dictionary_type:save]')">
-          <icon-font type="icon-select" />
+          <icon-font class="icon"  type="icon-select" />
           <span class="hidden-xs">保存</span>
         </a-button>
         <a-button @click="this.refs['edit-form'].resetFields();">
-          <icon-font type="icon-ashbin" />
+          <icon-font class="icon"  type="icon-ashbin" />
           <span class="hidden-xs">重置</span>
         </a-button>
       </a-space>

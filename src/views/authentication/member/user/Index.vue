@@ -1,22 +1,22 @@
 <template>
 
   <a-breadcrumb class="hidden-xs">
-    <a-breadcrumb-item><router-link to='/'><icon-font type="icon-home" /> 首页</router-link></a-breadcrumb-item>
-    <a-breadcrumb-item><icon-font type="icon-setting" /> 系统管理</a-breadcrumb-item>
-    <a-breadcrumb-item><icon-font type="icon-user-groups" /> 会员用户管理</a-breadcrumb-item>
+    <a-breadcrumb-item><router-link to='/'><icon-font class="icon"  type="icon-home" /> 首页</router-link></a-breadcrumb-item>
+    <a-breadcrumb-item><icon-font class="icon"  type="icon-setting" /> 系统管理</a-breadcrumb-item>
+    <a-breadcrumb-item><icon-font class="icon"  type="icon-user-groups" /> 会员用户管理</a-breadcrumb-item>
   </a-breadcrumb>
 
   <a-card title="会员用户管理" class="basic-box-shadow margin-top-20">
 
     <template #extra>
-      <icon-font type="icon-user-groups" />
+      <icon-font class="icon"  type="icon-user-groups" />
     </template>
 
     <a-spin :spinning="spinning" tip="数据加载中...">
 
       <a-space :size="10" class="margin-bottom-20">
         <a-button @click="this.searchDialogVisible=true;">
-          <icon-font type="icon-search" />
+          <icon-font class="icon"  type="icon-search" />
           <span class="hidden-xs">搜索</span>
         </a-button>
       </a-space>
@@ -27,7 +27,7 @@
           <div class="text-center">
             <a-space :size="10">
               <a-button size="small" @click="detail(record)">
-                <icon-font type="icon-file" />
+                <icon-font class="icon"  type="icon-file" />
                 <span class="hidden-xs">详情</span>
               </a-button>
             </a-space>
@@ -46,9 +46,9 @@
           <span class="hidden-xs">每页</span>
           <a-input v-model:value="page.size" size="small" @pressEnter="search" :maxlength="4" class="text-center hidden-xs" style="width: 50px" />
           <span class="hidden-xs">条 / 第 1 页</span>
-          <a-button size="small" @click="search(page.number - 1)" :disabled="page.first"><icon-font type="icon-arrow-left-bold" /></a-button>
+          <a-button size="small" @click="search(page.number - 1)" :disabled="page.first"><icon-font class="icon"  type="icon-arrow-left-bold" /></a-button>
           {{page.number}}
-          <a-button size="small" @click="search(page.number + 1)" :disabled="page.last"><icon-font type="icon-arrow-right-bold" /></a-button>
+          <a-button size="small" @click="search(page.number + 1)" :disabled="page.last"><icon-font class="icon"  type="icon-arrow-right-bold" /></a-button>
 
         </a-space>
 
@@ -98,7 +98,7 @@
           <a-form-item label="注册时间:">
             <a-range-picker show-time class="width-100-percent" v-model:value="form['filter_[registration_time_between]']">
               <template #suffixIcon>
-                <icon-font type="icon-calendar" />
+                <icon-font class="icon"  type="icon-calendar" />
               </template>
             </a-range-picker>
           </a-form-item>
