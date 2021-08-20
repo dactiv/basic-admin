@@ -5,15 +5,15 @@
       <a-row>
         <a-col :span="16">
           <a-menu mode="horizontal" class="left">
-            <a-menu-item key="1" @click="toggleCollapsed" class="hidden-xs"><icon-font class="icon"  :type="this.menu.collapsed ? 'icon-arrow-right-circle' : 'icon-arrow-left-circle'" /></a-menu-item>
+            <a-menu-item key="1" @click="toggleCollapsed" class="hidden-xs"><icon-font class="icon" :type="this.menu.collapsed ? 'icon-arrow-right-circle' : 'icon-arrow-left-circle'" /></a-menu-item>
             <a-menu-item key="2">
               <a-badge :count="badge.calendar">
-                <icon-font class="icon"  type="icon-calendar" />
+                <icon-font class="icon" type="icon-calendar" />
               </a-badge>
             </a-menu-item>
             <a-menu-item key="3">
               <a-badge :count="badge.message" >
-                <icon-font class="icon"  type="icon-comment" />
+                <icon-font class="icon" type="icon-comment" />
               </a-badge>
             </a-menu-item>
           </a-menu>
@@ -21,14 +21,14 @@
         <a-col :span="8">
 
           <a-menu mode="horizontal" class="float-right right">
-            <a-menu-item key="1"><icon-font class="icon"  type="icon-moon" /></a-menu-item>
+            <a-menu-item key="1"><icon-font class="icon" type="icon-moon" /></a-menu-item>
             <a-sub-menu key="2">
               <template #title>
                 <a-avatar :src="require('../assets/avatar/男生-紫.png')" ></a-avatar>
               </template>
-              <a-menu-item key="2-1"><a-button type="text"><icon-font class="icon"  type="icon-profile" /> {{ this.principal.details.username }}</a-button></a-menu-item>
-              <a-menu-item key="2-2"><a-button type="text"><icon-font class="icon"  type="icon-setting" /> 系统设置</a-button> </a-menu-item>
-              <a-menu-item key="2-4"><a-button type="text" @click="logout()"><icon-font class="icon"  type="icon-sign-out" /> 注销账户</a-button></a-menu-item>
+              <a-menu-item key="2-1"><a-button type="text"><icon-font class="icon" type="icon-profile" /> {{ this.principal.details.username }}</a-button></a-menu-item>
+              <a-menu-item key="2-2"><a-button type="text"><icon-font class="icon" type="icon-setting" /> 系统设置</a-button> </a-menu-item>
+              <a-menu-item key="2-4"><a-button type="text" @click="logout()"><icon-font class="icon" type="icon-sign-out" /> 注销账户</a-button></a-menu-item>
             </a-sub-menu>
           </a-menu>
 
@@ -40,9 +40,11 @@
 
       <a-layout-sider class="main-aside" width="260" v-model:collapsed="menu.collapsed" :trigger="null" collapsible>
         <div class="logo">
-          <router-link to='/' :class=" menu.collapsed ? 'display-flex justify-content-center' : 'display-flex'">
-            <icon-font class="icon"  type="icon-vue" />
-            <span class="display-block" v-if="!menu.collapsed"> Dactiv </span>
+          <router-link to='/'>
+            <a-space>
+            <icon-font type="icon-vue" />
+            <span v-if="!menu.collapsed"> Dactiv </span>
+            </a-space>
           </router-link>
         </div>
         <div class="main-menu">

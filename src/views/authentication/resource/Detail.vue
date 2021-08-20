@@ -1,16 +1,16 @@
 <template>
 
   <a-breadcrumb class="hidden-xs">
-    <a-breadcrumb-item><router-link to='/'><icon-font class="icon"  type="icon-home" /> 首页</router-link></a-breadcrumb-item>
-    <a-breadcrumb-item><icon-font class="icon"  type="icon-setting" /> 系统管理</a-breadcrumb-item>
-    <a-breadcrumb-item><router-link :to="{name:'resource'}"><icon-font class="icon"  type="icon-attachment" /> 資源管理</router-link></a-breadcrumb-item>
-    <a-breadcrumb-item><icon-font class="icon"  type="icon-file" /> {{ '[' + form.name + ']' + '資源明细' }}</a-breadcrumb-item>
+    <a-breadcrumb-item><router-link to='/'><icon-font class="icon" type="icon-home" /> 首页</router-link></a-breadcrumb-item>
+    <a-breadcrumb-item><icon-font class="icon" type="icon-setting" /> 系统管理</a-breadcrumb-item>
+    <a-breadcrumb-item><router-link :to="{name:'resource'}"><icon-font class="icon" type="icon-attachment" /> 資源管理</router-link></a-breadcrumb-item>
+    <a-breadcrumb-item><icon-font class="icon" type="icon-file" /> {{ '[' + form.name + ']' + '資源明细' }}</a-breadcrumb-item>
   </a-breadcrumb>
 
   <a-card :title="'[' + form.name + ']' + '資源明细'" class="basic-box-shadow">
 
     <template #extra>
-      <icon-font class="icon"  type="icon-file" />
+      <icon-font class="icon" type="icon-file" />
     </template>
 
     <a-spin :spinning="spinning">
@@ -20,7 +20,7 @@
           :column="{ xxl: 3, xl: 3, lg: 3, md: 3, sm: 2, xs: 1 }"
       >
 
-        <a-descriptions-item label="名称"><icon-font class="icon"  v-if="form.icon" :type="form.icon" /> {{form.name}} </a-descriptions-item>
+        <a-descriptions-item label="名称"><icon-font class="icon" v-if="form.icon" :type="form.icon" /> {{form.name}} </a-descriptions-item>
         <a-descriptions-item label="来源">{{ form.sourceName}}</a-descriptions-item>
         <a-descriptions-item label="代码">{{ form.code }}</a-descriptions-item>
         <a-descriptions-item label="資源值">{{ form.value ? form.value : ""}}</a-descriptions-item>

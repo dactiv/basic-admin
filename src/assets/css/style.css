@@ -50,13 +50,11 @@ body {
 .logo {
   background-color: #ffffff;
   padding: 20px;
-  text-align: center;
 }
 
 .logo span.anticon {
   font-size: 1.95rem!important;
-  margin-left: 0;
-  margin-bottom: 0;
+  margin-left: 2px;
 }
 
 .logo span{
@@ -65,7 +63,6 @@ body {
   color: #1196da!important;;
   font-weight: 600;
   font-size: 1.55rem;
-  margin-left: 10px;
 }
 
 .main-aside {

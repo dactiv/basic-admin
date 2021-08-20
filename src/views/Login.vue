@@ -37,11 +37,11 @@
             </a-form-item>
 
             <a-button type="primary" block @click="submitForm('login-form')">
-              <icon-font class="icon"  type="icon-security" />
+              <icon-font class="icon" type="icon-security" />
               登陆
             </a-button>
 
-            <a-divider class="logo"><icon-font class="icon"  type="icon-vue" /></a-divider>
+            <a-divider class="logo"><icon-font class="icon" type="icon-vue" /></a-divider>
 
 
           </a-form>

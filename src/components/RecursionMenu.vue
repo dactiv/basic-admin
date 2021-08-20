@@ -2,13 +2,13 @@
   <template v-for="d of data" :key="d.id">
     <a-menu-item :key="getPath(d)" v-if="!hasChildren(d)">
       <router-link :to='getPath(d)'>
-        <icon-font class="icon"  :type="d.icon" v-if="d.icon ? d.icon : 'icon-file'" />
+        <icon-font class="icon" :type="d.icon" v-if="d.icon ? d.icon : 'icon-file'" />
         <span>{{d.name}}</span>
       </router-link>
     </a-menu-item>
     <a-sub-menu v-else :key="d.code">
       <template #title>
-        <icon-font class="icon"  :type="d.icon" v-if="d.icon ? d.icon : 'icon-file'" />
+        <icon-font class="icon" :type="d.icon" v-if="d.icon ? d.icon : 'icon-file'" />
         <span>{{ d.name }}</span>
       </template>
       <!-- 调用自身递归数据 -->

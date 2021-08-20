@@ -1,31 +1,31 @@
 <template>
 
   <a-breadcrumb class="hidden-xs">
-    <a-breadcrumb-item><router-link to='/'><icon-font class="icon"  type="icon-home"></icon-font> 首页</router-link></a-breadcrumb-item>
-    <a-breadcrumb-item><icon-font class="icon"  type="icon-setting" /> 系统管理</a-breadcrumb-item>
-    <a-breadcrumb-item><icon-font class="icon"  type="icon-system-user" /> 系统用户管理</a-breadcrumb-item>
+    <a-breadcrumb-item><router-link to='/'><icon-font class="icon" type="icon-home"></icon-font> 首页</router-link></a-breadcrumb-item>
+    <a-breadcrumb-item><icon-font class="icon" type="icon-setting" /> 系统管理</a-breadcrumb-item>
+    <a-breadcrumb-item><icon-font class="icon" type="icon-system-user" /> 系统用户管理</a-breadcrumb-item>
   </a-breadcrumb>
 
   <a-card title="系统用户管理" class="basic-box-shadow margin-top-20">
 
     <template #extra>
-      <icon-font class="icon"  type="icon-system-user" />
+      <icon-font class="icon" type="icon-system-user" />
     </template>
 
     <a-spin :spinning="spinning" tip="数据加载中...">
 
       <a-space :size="10" class="margin-bottom-20">
         <a-button @click="this.searchDialogVisible=true;">
-          <icon-font class="icon"  type="icon-search" />
+          <icon-font class="icon" type="icon-search" />
           <span class="hidden-xs">搜索</span>
         </a-button>
         <a-button @click="edit" v-if="this.principal.hasPermission('perms[console_user:save]')">
-          <icon-font class="icon"  type="icon-add" />
+          <icon-font class="icon" type="icon-add" />
           <span class="hidden-xs">添加</span>
         </a-button>
 
         <a-button type="primary" @click="remove(null)" danger v-if="this.principal.hasPermission('perms[console_user:delete]')">
-          <icon-font class="icon"  type="icon-ashbin" />
+          <icon-font class="icon" type="icon-ashbin" />
           <span class="hidden-xs">删除选中</span>
         </a-button>
       </a-space>
@@ -36,11 +36,11 @@
           <div class="text-center">
             <a-space :size="10">
               <a-button size="small" @click="edit(record)" v-if="this.principal.hasPermission('perms[console_user:get]')">
-                <icon-font class="icon"  type="icon-edit" />
+                <icon-font class="icon" type="icon-edit" />
                 <span class="hidden-xs">编辑</span>
               </a-button>
               <a-button size="small" type="primary" danger @click="remove(record)" v-if="this.principal.hasPermission('perms[console_user:delete]')">
-                <icon-font class="icon"  type="icon-ashbin" />
+                <icon-font class="icon" type="icon-ashbin" />
                 <span class="hidden-xs">删除</span>
               </a-button>
             </a-space>
@@ -55,9 +55,9 @@
           <span class="hidden-xs">每页</span>
           <a-input v-model:value="page.size" size="small" @pressEnter="search" :maxlength="4" class="text-center hidden-xs" style="width: 50px" />
           <span class="hidden-xs">条 / 第 1 页</span>
-          <a-button size="small" @click="search(page.number - 1)" :disabled="page.first"><icon-font class="icon"  type="icon-arrow-left-bold" /></a-button>
+          <a-button size="small" @click="search(page.number - 1)" :disabled="page.first"><icon-font class="icon" type="icon-arrow-left-bold" /></a-button>
           {{page.number}}
-          <a-button size="small" @click="search(page.number + 1)" :disabled="page.last"><icon-font class="icon"  type="icon-arrow-right-bold" /></a-button>
+          <a-button size="small" @click="search(page.number + 1)" :disabled="page.last"><icon-font class="icon" type="icon-arrow-right-bold" /></a-button>
 
         </a-space>
 

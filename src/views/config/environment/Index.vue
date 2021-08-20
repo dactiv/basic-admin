@@ -1,15 +1,15 @@
 <template>
 
   <a-breadcrumb class="hidden-xs">
-    <a-breadcrumb-item><router-link to='/'><icon-font class="icon"  type="icon-home" /> 首页</router-link></a-breadcrumb-item>
-    <a-breadcrumb-item><icon-font class="icon"  type="icon-un-config-o" /> 配置管理</a-breadcrumb-item>
-    <a-breadcrumb-item><icon-font class="icon"  type="icon-variable" /> 环境变量查询</a-breadcrumb-item>
+    <a-breadcrumb-item><router-link to='/'><icon-font class="icon" type="icon-home" /> 首页</router-link></a-breadcrumb-item>
+    <a-breadcrumb-item><icon-font class="icon" type="icon-un-config-o" /> 配置管理</a-breadcrumb-item>
+    <a-breadcrumb-item><icon-font class="icon" type="icon-variable" /> 环境变量查询</a-breadcrumb-item>
   </a-breadcrumb>
 
   <a-card title="环境变量查询" class="basic-box-shadow margin-top-20">
 
     <template #extra>
-      <icon-font class="icon"  type="icon-variable" />
+      <icon-font class="icon" type="icon-variable" />
     </template>
 
     <a-spin :spinning="spinning">

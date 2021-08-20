@@ -1,17 +1,17 @@
 <template>
 
   <a-breadcrumb class="hidden-xs">
-    <a-breadcrumb-item><router-link to='/'><icon-font class="icon"  type="icon-home" /> 首页</router-link></a-breadcrumb-item>
-    <a-breadcrumb-item><icon-font class="icon"  type="icon-un-config-o" /> 配置管理</a-breadcrumb-item>
-    <a-breadcrumb-item><router-link :to="{name:'dictionary'}"> <icon-font class="icon"  type="icon-dictionary" /> 数据字典管理</router-link></a-breadcrumb-item>
-    <a-breadcrumb-item><router-link :to="{name:'dictionary_type_edit', query:{id:typeEntity.id}}"><icon-font class="icon"  type="icon-dictionary" /> {{ '编辑 [' + typeEntity.name + '] ' + '字典类型' }}</router-link></a-breadcrumb-item>
-    <a-breadcrumb-item><icon-font class="icon"  type="icon-edit" /> {{ (form.id ? '编辑 [' + form.name + '] ': '添加') + '数据字典' }}</a-breadcrumb-item>
+    <a-breadcrumb-item><router-link to='/'><icon-font class="icon" type="icon-home" /> 首页</router-link></a-breadcrumb-item>
+    <a-breadcrumb-item><icon-font class="icon" type="icon-un-config-o" /> 配置管理</a-breadcrumb-item>
+    <a-breadcrumb-item><router-link :to="{name:'dictionary'}"> <icon-font class="icon" type="icon-dictionary" /> 数据字典管理</router-link></a-breadcrumb-item>
+    <a-breadcrumb-item><router-link :to="{name:'dictionary_type_edit', query:{id:typeEntity.id}}"><icon-font class="icon" type="icon-dictionary" /> {{ '编辑 [' + typeEntity.name + '] ' + '字典类型' }}</router-link></a-breadcrumb-item>
+    <a-breadcrumb-item><icon-font class="icon" type="icon-edit" /> {{ (form.id ? '编辑 [' + form.name + '] ': '添加') + '数据字典' }}</a-breadcrumb-item>
   </a-breadcrumb>
 
   <a-card :title="(form.id ? '编辑 [' + form.name + '] ': '添加') + '数据字典'" class="basic-box-shadow">
 
     <template #extra>
-      <icon-font class="icon"  type="icon-edit" />
+      <icon-font class="icon" type="icon-edit" />
     </template>
 
     <a-spin :spinning="spinning">
@@ -85,11 +85,11 @@
 
       <a-space :size="10">
         <a-button type="primary" @click="submitForm" v-if="this.principal.hasPermission('perms[data_dictionary:save]')">
-          <icon-font class="icon"  type="icon-select" />
+          <icon-font class="icon" type="icon-select" />
           <span class="hidden-xs">保存</span>
         </a-button>
         <a-button @click="this.refs['edit-form'].resetFields();">
-          <icon-font class="icon"  type="icon-ashbin" />
+          <icon-font class="icon" type="icon-ashbin" />
           <span class="hidden-xs">重置</span>
         </a-button>
       </a-space>

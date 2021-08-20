@@ -5,7 +5,7 @@
   <h1 class="text-center margin-top-20 margin-bottom-20">找不到你想访问的页面.</h1>
   <div class="text-center">
     <a-button onclick="this.$router.back();">
-      <icon-font class="icon"  type="icon-arrow-left-circle" />
+      <icon-font class="icon" type="icon-arrow-left-circle" />
       <span>返回</span>
     </a-button>
   </div>

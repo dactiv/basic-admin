@@ -6,7 +6,7 @@
 
       <template #name="{ record }">
         <a-button type="text">
-          <icon-font class="icon"  v-if="record.icon" :type="record.icon"></icon-font>
+          <icon-font class="icon" v-if="record.icon" :type="record.icon"></icon-font>
           <span>{{record.name}} </span>
         </a-button>
       </template>
@@ -23,7 +23,7 @@
         <div class="text-center">
           <a-space :size="10">
             <a-button size="small" @click="detail(record)" v-if="this.principal.hasPermission('perms[resource:get]')">
-              <icon-font class="icon"  type="icon-file"/>
+              <icon-font class="icon" type="icon-file"/>
               <span class="hidden-xs">详情</span>
             </a-button>
           </a-space>

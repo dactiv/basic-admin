@@ -1,20 +1,20 @@
 <template>
 
   <a-breadcrumb class="hidden-xs">
-    <a-breadcrumb-item><router-link to='/'><icon-font class="icon"  type="icon-home" /> 首页</router-link></a-breadcrumb-item>
-    <a-breadcrumb-item><icon-font class="icon"  type="icon-un-config-o" /> 配置管理</a-breadcrumb-item>
-    <a-breadcrumb-item><icon-font class="icon"  type="icon-enum-major-o" /> 系统枚举查询</a-breadcrumb-item>
+    <a-breadcrumb-item><router-link to='/'><icon-font class="icon" type="icon-home" /> 首页</router-link></a-breadcrumb-item>
+    <a-breadcrumb-item><icon-font class="icon" type="icon-un-config-o" /> 配置管理</a-breadcrumb-item>
+    <a-breadcrumb-item><icon-font class="icon" type="icon-enum-major-o" /> 系统枚举查询</a-breadcrumb-item>
   </a-breadcrumb>
 
   <a-card title="系统枚举查询" class="basic-box-shadow margin-top-20">
 
     <template #extra>
-      <icon-font class="icon"  type="icon-enum-major-o" />
+      <icon-font class="icon" type="icon-enum-major-o" />
     </template>
 
     <a-space :size="10">
       <a-button :loading="sync" @click="syncEnumerate" v-if="this.principal.hasPermission('perms[enumerate:sync]')">
-        <icon-font class="icon"  v-if="!sync" type="icon-history"/>
+        <icon-font class="icon" v-if="!sync" type="icon-history"/>
         <span class="hidden-xs">同步枚举</span>
       </a-button>
     </a-space>

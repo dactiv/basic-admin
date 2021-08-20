@@ -7,12 +7,12 @@
 
     <a-space :size="10">
       <a-button @click="this.$router.back();">
-        <icon-font class="icon"  type="icon-arrow-left-circle" />
+        <icon-font class="icon" type="icon-arrow-left-circle" />
         <span>返回</span>
       </a-button>
 
       <a-button type="primary" @click="logout">
-        <icon-font class="icon"  type="icon-sign-out" />
+        <icon-font class="icon" type="icon-sign-out" />
         <span>重新登陆</span>
       </a-button>
     </a-space>
