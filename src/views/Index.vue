@@ -1,7 +1,7 @@
 <template>
   <a-layout>
 
-    <a-layout-header :class="menu.collapsed ? 'header-navbar basic-box-shadow basic-border-radius toggle' : 'header-navbar basic-box-shadow basic-border-radius'">
+    <a-layout-header :class="menu.collapsed ? 'header-navbar basic-box-shadow toggle' : 'header-navbar basic-box-shadow'">
       <a-row>
         <a-col :span="16">
           <a-menu mode="horizontal" class="left">

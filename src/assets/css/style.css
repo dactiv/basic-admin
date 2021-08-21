@@ -13,11 +13,12 @@ body {
   background-color: #ffffff;
   padding:0 10px;
   position: fixed;
-  z-index: 999;
+  z-index: 100;
   width: calc(100% - 290px);
   margin-top: 10px;
   margin-left: 275px;
   transition: 0.2s;
+  border-radius: 10px;
 }
 
 .header-navbar.toggle {

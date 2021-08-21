@@ -46,6 +46,14 @@
         </a-col>
       </a-row>
 
+      <a-row>
+        <a-col :span="24">
+          <a-form-item label="内容:" name="content">
+
+          </a-form-item>
+        </a-col>
+      </a-row>
+
       <a-divider></a-divider>
 
       <a-space :size="10">
@@ -67,13 +75,15 @@
 
 
 <script>
+
+
 export default {
   methods:{
     searchUser(value) {
       console.log(value);
     },
     submitForm() {
-
+      console.log(this.form);
     },
     addAttachment() {
 
@@ -84,7 +94,9 @@ export default {
       data:[],
       searching:false,
       form: {
-        toEmail:[]
+        toEmail:[],
+        content:"",
+        title:""
       },
       rules: {
 
