@@ -45,6 +45,7 @@ import {
     Descriptions,
     Collapse,
     Empty,
+    Upload,
     notification,
     message
 } from "ant-design-vue";
@@ -177,4 +178,5 @@ app.use(router)
     .use(Badge)
     .use(Collapse)
     .use(Empty)
+    .use(Upload)
     .mount('#app');
