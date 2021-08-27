@@ -65,6 +65,7 @@ export default {
           .then(r => {
             _this.sync = false;
             _this.$message.success(r.data.message);
+            _this.enumData = r.data.data;
           })
           .catch(() => _this.spinning = false);
 

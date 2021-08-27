@@ -10,7 +10,7 @@
   <a-card title="审计详情" class="basic-box-shadow">
 
     <template #extra>
-      <icon-font class="icon" type="icon-file"></icon-font>
+      <icon-font class="icon" type="icon-file" />
     </template>
 
     <a-spin :spinning="spinning">

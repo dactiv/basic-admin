@@ -10,7 +10,7 @@
   <a-card :title="(form.id ? '编辑 [' + form.name + '] ': '添加') + '组'" class="basic-box-shadow">
 
     <template #extra>
-      <icon-font class="icon" type="icon-edit"></icon-font>
+      <icon-font class="icon" type="icon-edit"/>
     </template>
 
     <a-spin :spinning="spinning">
@@ -19,7 +19,7 @@
         <a-row :gutter="[24]">
           <a-col :span="12">
             <a-form-item has-feedback label="组名称:" name="name">
-              <a-input ref="name" v-model:value="form.name" :default-value="form.name" />
+              <a-input ref="name" v-model:value="form.name" :default-value="form.name.replace('','')" />
             </a-form-item>
           </a-col>
           <a-col :span="12">
@@ -164,6 +164,7 @@ export default {
       });
     },
     validateRemoteAuthority() {
+
       if (this.form.authority === this.$refs.authority.defaultValue) {
         return Promise.resolve();
       }

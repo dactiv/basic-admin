@@ -46,6 +46,7 @@ import {
     Collapse,
     Empty,
     Upload,
+    Tooltip,
     notification,
     message
 } from "ant-design-vue";
@@ -179,4 +180,5 @@ app.use(router)
     .use(Collapse)
     .use(Empty)
     .use(Upload)
+    .use(Tooltip)
     .mount('#app');

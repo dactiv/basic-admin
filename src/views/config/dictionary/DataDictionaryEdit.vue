@@ -138,6 +138,7 @@ export default {
   },
   methods: {
     validateRemoteCode() {
+
       if (this.form.code === this.$refs.code.defaultValue) {
         return Promise.resolve();
       }

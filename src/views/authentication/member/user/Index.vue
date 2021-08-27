@@ -68,7 +68,7 @@
         </a-col>
         <a-col :span="12">
           <a-form-item label="手机号码:">
-            <a-input v-model:value="form['filter_[real_name_like]']" />
+            <a-input v-model:value="form['filter_[phone_like]']" />
           </a-form-item>
         </a-col>
       </a-row>
