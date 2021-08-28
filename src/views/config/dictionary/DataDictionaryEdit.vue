@@ -17,15 +17,10 @@
     <a-spin :spinning="spinning">
       <a-form ref="edit-form" :model="form" :rules="rules" layout="vertical">
 
-        <a-row :gutter="[24]">
-          <a-col :span="12">
+        <a-row>
+          <a-col :span="24">
             <a-form-item has-feedback label="代码:" name="code">
               <a-input ref="code" :addon-before="parentCode" v-model:value="form.code"></a-input>
-            </a-form-item>
-          </a-col>
-          <a-col :span="12">
-            <a-form-item has-feedback label="名称:" name="name">
-              <a-input v-model:value="form.name" />
             </a-form-item>
           </a-col>
         </a-row>
@@ -34,8 +29,8 @@
         <a-row :gutter="[24]">
 
           <a-col :span="12">
-            <a-form-item has-feedback label="值:" name="value">
-              <a-input v-model:value="form.value" />
+            <a-form-item has-feedback label="名称:" name="name">
+              <a-input v-model:value="form.name" />
             </a-form-item>
           </a-col>
 
@@ -68,6 +63,14 @@
             </a-form-item>
           </a-col>
 
+        </a-row>
+
+        <a-row>
+          <a-col :span="24">
+            <a-form-item has-feedback label="值:" name="value">
+              <a-textarea v-model:value="form.value" :auto-size="{ minRows: 5, maxRows: 5 }"/>
+            </a-form-item>
+          </a-col>
         </a-row>
 
         <a-row>
@@ -239,14 +242,12 @@ export default {
                       .then(r => {
 
                         _this.form = r.data.data;
-
                         _this.form.parentId = _this.form.parentId ? _this.form.parentId + "" : "";
-
                         _this.form.enabled = _this.form.enabled ? _this.form.enabled + "" : "";
 
-                        _this.parentChange(_this.form.parentId);
-
                         _this.spinning = false;
+
+                        _this.parentChange(_this.form.parentId);
 
                       })
                       .catch(() => _this.spinning = false);

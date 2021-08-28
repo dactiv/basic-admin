@@ -27,19 +27,19 @@
 
       <a-row >
         <a-col :span="24">
-          <a-form-item has-feedback label="发送给:" name="toEmail">
+          <a-form-item label="发送给:" name="toEmails">
             <a-row type="flex">
               <a-col flex="auto" class="margin-right-10">
-                <a-select class="width-100-percent" :max-tag-count="2" :disabled="form.toEmail.includes('ALL_USER')" ref="select-tags" mode="tags" :token-separators="[',']" v-model:value="form.toEmail" :filter-option="false" :not-found-content="searching ? undefined : null" :options="data" @search="searchSelectUser">
+                <a-select class="width-100-percent" :max-tag-count="2" :disabled="form.toEmails.includes('ALL_USER')" ref="select-tags" mode="tags" :token-separators="[',']" v-model:value="form.toEmails" :filter-option="false" :not-found-content="searching ? undefined : null" :options="data" @search="searchSelectUser">
                 </a-select>
               </a-col>
               <a-col>
                 <a-space :size="10">
                   <a-button ref="btn-all-user" @click="sendAll">
-                    <icon-font class="icon" :type="form.toEmail.includes('ALL_USER') ? 'icon-ashbin' : 'icon-all'" />
-                    <span class="hidden-xs">{{form.toEmail.includes('ALL_USER') ? '取消选择' : '全网邮件'}}</span>
+                    <icon-font class="icon" :type="form.toEmails.includes('ALL_USER') ? 'icon-ashbin' : 'icon-all'" />
+                    <span class="hidden-xs">{{form.toEmails.includes('ALL_USER') ? '取消选择' : '全网邮件'}}</span>
                   </a-button>
-                  <a-button :disabled="form.toEmail.includes('ALL_USER')" ref="btn-search-user" @click="search.dialogVisible = true">
+                  <a-button :disabled="form.toEmails.includes('ALL_USER')" ref="btn-search-user" @click="search.dialogVisible = true">
                     <icon-font class="icon" type="icon-filter"/>
                     <span class="hidden-xs">条件搜索邮件</span>
                   </a-button>
@@ -58,21 +58,12 @@
         </a-col>
       </a-row>
 
-      <a-row>
+      <a-row >
         <a-col :span="24">
           <a-form-item label="内容:" name="content">
-            <a-textarea v-model:value="form.content" :auto-size="{ minRows: 2, maxRows: 5 }"/>
+            <QuillEditor :modules="editor.modules" toolbar="full" theme="snow" v-model:content="form.content" content-type="html" />
           </a-form-item>
         </a-col>
-      </a-row>
-
-      <a-row>
-        <a-col :span="24">
-          <a-form-item label="备注:" name="remark">
-            <a-textarea v-model:value="form.remark" :auto-size="{ minRows: 2, maxRows: 5 }"/>
-          </a-form-item>
-        </a-col>
-
       </a-row>
 
       <a-upload-dragger v-if="this.principal.hasPermission('perms[file_manager:upload]')" :multiple="true" :remove="removeAttachment" v-model:file-list="fileList" action="/file-manager/upload/email-attachment" @change="fileListChange">
@@ -86,14 +77,9 @@
 
       <a-space :size="10">
 
-        <a-button type="primary" v-if="this.principal.hasPermission('perms[email:save]')">
+        <a-button type="primary" @click="submitForm" v-if="this.principal.hasPermission('perms[email:save]')">
           <icon-font class="icon" type="icon-send" />
           <span class="hidden-xs">发送</span>
-        </a-button>
-
-        <a-button @click="submitForm" v-if="this.principal.hasPermission('perms[email:save]')">
-          <icon-font class="icon" type="icon-select" />
-          <span class="hidden-xs">保存</span>
         </a-button>
 
       </a-space>
@@ -157,8 +143,13 @@
 
 </template>
 
-
 <script>
+
+import { QuillEditor } from '@vueup/vue-quill'
+import BlotFormatter from 'quill-blot-formatter'
+
+import '@vueup/vue-quill/dist/vue-quill.snow.css';
+import '@/assets/css/quill.css'
 
 const defaultData = {
   value: 'ALL_USER',
@@ -166,6 +157,10 @@ const defaultData = {
 }
 
 export default {
+  name:"SendMail",
+  components:{
+    QuillEditor
+  },
   methods:{
     sendAll() {
 
@@ -222,10 +217,30 @@ export default {
           .catch(() => _this.search.spinning = false);
     },
     submitForm() {
+      console.log(this.form);
       let _this = this;
 
       _this.$refs['edit-form'].validate().then(() => {
+        _this
+            .$http
+            .post("/message/send", this.form)
+            .then((r) => {
 
+              _this.$message.success(r.data.message);
+
+              let to = {};
+
+              if (r.data.data.batchId) {
+                to["name"] = "batch_detail";
+                to["query"] = {id:r.data.data.batchId};
+              } else {
+                to["name"] = "email_detail";
+                to["query"] = {id:r.data.data.id[0]};
+              }
+
+              _this.$router.push(to);
+
+            })
       });
     },
     removeAttachment(file) {
@@ -277,25 +292,29 @@ export default {
           name: info.file.name,
           contentType: info.file.type,
           uid: info.file.uid,
-          like: info.file.response.data.url
+          mete: {
+            like:info.file.response.data.url,
+            bucket:info.file.response.data.bucket
+          }
         };
 
         this.form.attachmentList.push(attachment);
 
       }
 
-      console.log(this.form)
-
     }
-  },
-  mounted() {
-
   },
   created() {
     this.loadConfig({service:"message", enumerateName:"MessageType"}, r=> this.typeOptions = r.data.data);
   },
   data() {
     return {
+      editor: {
+        modules:[{
+          name: 'blotFormatter',
+          module: BlotFormatter
+        }]
+      },
       searching: false,
       fileList:[],
       typeOptions:[],
@@ -342,7 +361,7 @@ export default {
         ]
       },
       form: {
-        toEmail:[],
+        toEmails:[],
         type:"",
         content:"",
         title:"",
@@ -351,7 +370,8 @@ export default {
       },
       rules: {
         title: [{ required: true, message: "请输入标题", trigger: "blur" }],
-        toEmail: [{ required: true, message: "请输入对方邮件", trigger: "blur" }],
+        toEmails: [{ required: true, message: "请输入对方邮件", trigger: "blur" }],
+        /*content: [{ required: true, message: "请输入内容", trigger: "blur" }],*/
         type: [{ required: true, message: "请选择类型", trigger: "change" }]
       }
     }
