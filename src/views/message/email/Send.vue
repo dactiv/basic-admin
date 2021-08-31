@@ -294,7 +294,8 @@ export default {
           name: info.file.name,
           contentType: info.file.type,
           uid: info.file.uid,
-          mete: {
+          type: 20,
+          meta: {
             like:info.file.response.data.url,
             bucket:info.file.response.data.bucket
           }

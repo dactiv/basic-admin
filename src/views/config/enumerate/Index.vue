@@ -67,7 +67,7 @@ export default {
             _this.$message.success(r.data.message);
             _this.enumData = r.data.data;
           })
-          .catch(() => _this.spinning = false);
+          .catch(() => _this.sync = false);
 
     }
   },
