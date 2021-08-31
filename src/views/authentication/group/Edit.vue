@@ -133,13 +133,13 @@ export default {
       rules: {
         name: [
           { required: true, message: "请输入组名称", trigger: "blur" },
-          { validator:this.validateRemoteName, trigger: "change"}
+          { validator:this.validateRemoteName, trigger: "change" }
         ],
         authority: [
           { required: true, message: "请输入权限名称", trigger: "blur" },
-          { validator:this.validateRemoteAuthority, trigger: "change"}
+          { validator:this.validateRemoteAuthority, trigger: "change" }
         ],
-        source: [{validator:this.validateSource, trigger: "change"}]
+        source: [{ required: true, message: "请输入组名称", trigger: "change", type: "array" }]
       }
     }
   },

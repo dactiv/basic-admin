@@ -112,7 +112,7 @@ app.config.globalProperties.loadConfig = function(params, callback) {
 }
 
 const IconFont = createFromIconfontCN({
-    scriptUrl: "//at.alicdn.com/t/font_2732722_2btwhl1fltb.js"
+    scriptUrl: "//at.alicdn.com/t/font_2732722_vkp558htpb.js"
 });
 
 app.component('IconFont', IconFont);

@@ -56,6 +56,11 @@ body {
 .logo span.anticon {
   font-size: 1.95rem!important;
   margin-left: 2px;
+  vertical-align: middle;
+}
+
+.logo span.anticon svg {
+  display: flex;
 }
 
 .logo span{

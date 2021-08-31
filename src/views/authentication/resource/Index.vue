@@ -61,7 +61,7 @@ export default {
             _this.sync = false;
             _this.$message.success(r.data.message);
           })
-          .catch(() => _this.spinning = false);
+          .catch(() => _this.sync = false);
 
     }
   }

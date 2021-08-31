@@ -30,7 +30,7 @@
           <a-form-item label="发送给:" name="toEmails">
             <a-row type="flex">
               <a-col flex="auto" class="margin-right-10">
-                <a-select class="width-100-percent" :max-tag-count="2" :disabled="form.toEmails.includes('ALL_USER')" ref="select-tags" mode="tags" :token-separators="[',']" v-model:value="form.toEmails" :filter-option="false" :not-found-content="searching ? undefined : null" :options="data" @search="searchSelectUser">
+                <a-select class="width-100-percent" :max-tag-count="2" ref="select-tags" :disabled="form.toEmails.includes('ALL_USER')" mode="tags" :token-separators="[',']" v-model:value="form.toEmails" :filter-option="false" :not-found-content="searching ? undefined : null" :options="data" @search="searchSelectUser">
                 </a-select>
               </a-col>
               <a-col>
@@ -77,8 +77,8 @@
 
       <a-space :size="10">
 
-        <a-button type="primary" @click="submitForm" v-if="this.principal.hasPermission('perms[email:save]')">
-          <icon-font class="icon" type="icon-send" />
+        <a-button type="primary" :loading="sending" @click="submitForm" v-if="this.principal.hasPermission('perms[message:send]')">
+          <icon-font class="icon" v-if="!sending" type="icon-send" />
           <span class="hidden-xs">发送</span>
         </a-button>
 
@@ -164,16 +164,16 @@ export default {
   methods:{
     sendAll() {
 
-      if (this.form.toEmail.includes("ALL_USER")) {
-        this.form.toEmail = this.getSelectedEmails();
+      if (this.form.toEmails.includes("ALL_USER")) {
+        this.form.toEmails = this.getSelectedEmails();
       } else {
-        this.form.toEmail = ["ALL_USER"];
+        this.form.toEmails = ["ALL_USER"];
       }
 
     },
     userTableSelectChange(selectedIds) {
       this.search.selectedIds = selectedIds;
-      this.form.toEmail = this.getSelectedEmails();
+      this.form.toEmails = this.getSelectedEmails();
     },
     getSelectedEmails() {
       return this.search.data.filter(d => this.search.selectedIds.includes(d.id)).map(value => value.email);
@@ -217,7 +217,9 @@ export default {
           .catch(() => _this.search.spinning = false);
     },
     submitForm() {
+
       console.log(this.form);
+
       let _this = this;
 
       _this.$refs['edit-form'].validate().then(() => {
@@ -315,6 +317,7 @@ export default {
           module: BlotFormatter
         }]
       },
+      sending:false,
       searching: false,
       fileList:[],
       typeOptions:[],
@@ -361,6 +364,7 @@ export default {
         ]
       },
       form: {
+        messageType:"email",
         toEmails:[],
         type:"",
         content:"",
@@ -370,8 +374,7 @@ export default {
       },
       rules: {
         title: [{ required: true, message: "请输入标题", trigger: "blur" }],
-        toEmails: [{ required: true, message: "请输入对方邮件", trigger: "blur" }],
-        /*content: [{ required: true, message: "请输入内容", trigger: "blur" }],*/
+        toEmails: [{ required: true, message: "请输入对方邮件", trigger: "blur", type: "array"}],
         type: [{ required: true, message: "请选择类型", trigger: "change" }]
       }
     }

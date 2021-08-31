@@ -19,7 +19,7 @@
           <icon-font class="icon" type="icon-search" />
           <span class="hidden-xs">搜索</span>
         </a-button>
-        <a-button @click="send" v-if="this.principal.hasPermission('perms[email:save]')">
+        <a-button @click="send" v-if="this.principal.hasPermission('perms[message:send]')">
           <icon-font class="icon" type="icon-send" />
           <span class="hidden-xs">发送</span>
         </a-button>
