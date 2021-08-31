@@ -78,17 +78,18 @@ export default {
   name: "Index",
   components:{RecursionMenu},
   created() {
-    this.getMenus();
+
+    let _this = this;
 
     window.onresize = () => {
       return (() => {
         if (document.body.clientWidth < 768) {
-          this.menu.collapsed = true;
+          _this.menu.collapsed = true;
         } else {
           let collapsed = localStorage.getItem("menu-collapsed");
 
           if (collapsed !== "true") {
-            this.menu.collapsed = false;
+            _this.menu.collapsed = false;
           }
         }
       })()
@@ -97,8 +98,18 @@ export default {
     let collapsed = localStorage.getItem("menu-collapsed");
 
     if (collapsed === "true") {
-      this.menu.collapsed = true;
+      _this.menu.collapsed = true;
     }
+
+    _this.$http
+        .get("/authentication/prepare")
+        .then(r => {
+          if (r.data.data.authentication === true) {
+            _this.getMenus();
+          } else {
+            _this.$router.push("/login");
+          }
+        }).catch(() => _this.$router.push("/login"))
 
   },
   methods: {
