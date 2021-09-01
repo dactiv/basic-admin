@@ -19,7 +19,7 @@
         <a-row :gutter="[24]">
           <a-col :span="12">
             <a-form-item has-feedback label="代码:" name="code">
-              <a-input ref="code" :addon-before="parentCode" v-model:value="form.code" />
+              <a-input ref="code" :addon-before="parentCode" :disabled="form.id !== null" v-model:value="form.code" />
             </a-form-item>
           </a-col>
           <a-col :span="12">
@@ -199,10 +199,6 @@ export default {
   },
   methods: {
     validateRemoteCode() {
-      if (this.form.code === this.$refs.code.defaultValue) {
-        return Promise.resolve();
-      }
-
       return new Promise((resolve, reject) => {
         this.$http.get("/config/dictionary/isDictionaryTypeCodeUnique?code=" + this.parentCode + this.form.code).then(r => {
           return r.data.data ? resolve() : reject("类型代码已存在");

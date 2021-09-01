@@ -31,14 +31,14 @@
           <a-form-item label="发送给:" name="phoneNumbers">
             <a-row type="flex">
               <a-col flex="auto" class="margin-right-10">
-                <a-select class="width-100-percent" :max-tag-count="2" ref="select-tags" :disabled="form.phoneNumbers.includes('ALL_USER')" mode="tags" :token-separators="[',']" v-model:value="form.phoneNumbers" :filter-option="false" :not-found-content="searching ? undefined : null" :options="data" @search="searchSelectUser">
+                <a-select class="width-100-percent" :max-tag-count="2" ref="select-tags" :disabled="form.phoneNumbers.includes(13000000000)" mode="tags" :token-separators="[',']" v-model:value="form.phoneNumbers" :filter-option="false" :not-found-content="searching ? undefined : null" :options="data" @search="searchSelectUser">
                 </a-select>
               </a-col>
               <a-col>
                 <a-space :size="10">
                   <a-button ref="btn-all-user" @click="sendAll">
-                    <icon-font class="icon" :type="form.phoneNumbers.includes('ALL_USER') ? 'icon-ashbin' : 'icon-all'" />
-                    <span class="hidden-xs">{{form.phoneNumbers.includes('ALL_USER') ? '取消选择' : '全网站内信'}}</span>
+                    <icon-font class="icon" :type="form.phoneNumbers.includes(13000000000) ? 'icon-ashbin' : 'icon-all'" />
+                    <span class="hidden-xs">{{form.phoneNumbers.includes(13000000000) ? '取消选择' : '全网站内信'}}</span>
                   </a-button>
                   <a-button :disabled="form.phoneNumbers.includes('ALL_USER')" ref="btn-search-user" @click="search.dialogVisible = true">
                     <icon-font class="icon" type="icon-filter"/>
@@ -53,7 +53,7 @@
 
       <a-row >
         <a-col :span="24">
-          <a-form-item has-feedback label="内容:" name="content">
+          <a-form-item label="内容:" name="content">
             <a-textarea v-model:value="form.content" :auto-size="{ minRows: 3, maxRows: 6 }"/>
           </a-form-item>
         </a-col>
@@ -129,7 +129,7 @@
 <script>
 
 const defaultData = {
-  value: 'ALL_USER',
+  value: 13000000000,
   label: '全网用户',
 }
 
@@ -200,6 +200,10 @@ export default {
       _this.$refs['edit-form'].validate().then(() => {
 
         _this.sending = true;
+
+        if (_this.form.phoneNumbers.length === 1 && _this.form.phoneNumbers.includes(defaultData.value)) {
+          _this.form.phoneNumbers = ["ALL_USER"]
+        }
 
         _this
             .$http
@@ -282,8 +286,8 @@ export default {
         content:""
       },
       rules: {
-        content: [{ required: true, message: "请输入内容", trigger: "blur" }],
-        phoneNumbers: [{ required: true, message: "请输入手机号码", trigger: "blur", type: "array"}],
+        content: [{ required: true, message: "请输入内容", trigger: "change" }],
+        phoneNumbers: [{ required: true, message: "请输入手机号码", trigger: "change", type: "array", defaultField:{type:"integer", pattern: /^1[3|4|5|8][0-9]\d{4,8}$/, message:"手机号码格式不正确"}}],
         type: [{ required: true, message: "请选择类型", trigger: "change" }]
       }
     }

@@ -210,9 +210,9 @@ export default {
         remark: ""
       },
       rules: {
-        name: [{ required: true, message: "请输入名称", trigger: "blur" }],
-        value: [{ required: true, message: "请输入拦截值", trigger: "blur" }],
-        type: [{ required: true, message: "请输入类型", trigger: "blur" }]
+        name: [{ required: true, message: "请输入名称", trigger: "change" }],
+        value: [{ required: true, message: "请输入拦截值", trigger: "change" }],
+        type: [{ required: true, message: "请输入类型", trigger: "change" }]
       }
     }
   },

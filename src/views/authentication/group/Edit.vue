@@ -19,12 +19,12 @@
         <a-row :gutter="[24]">
           <a-col :span="12">
             <a-form-item has-feedback label="组名称:" name="name">
-              <a-input ref="name" v-model:value="form.name" :default-value="form.name.replace('','')" />
+              <a-input ref="name" v-model:value="form.name" :disabled="form.id !== null" />
             </a-form-item>
           </a-col>
           <a-col :span="12">
             <a-form-item has-feedback label="权限名:" name="authority">
-              <a-input ref="authority" v-model:value="form.authority" :default-value="form.authority" />
+              <a-input ref="authority" v-model:value="form.authority" :disabled="form.id !== null" />
             </a-form-item>
           </a-col>
         </a-row>
@@ -132,11 +132,11 @@ export default {
       },
       rules: {
         name: [
-          { required: true, message: "请输入组名称", trigger: "blur" },
+          { required: true, message: "请输入组名称", trigger: "change" },
           { validator:this.validateRemoteName, trigger: "change" }
         ],
         authority: [
-          { required: true, message: "请输入权限名称", trigger: "blur" },
+          { required: true, message: "请输入权限名称", trigger: "change" },
           { validator:this.validateRemoteAuthority, trigger: "change" }
         ],
         source: [{ required: true, message: "请输入组名称", trigger: "change", type: "array" }]
@@ -153,10 +153,6 @@ export default {
     },
     validateRemoteName() {
 
-      if (this.form.name === this.$refs.name.defaultValue) {
-        return Promise.resolve();
-      }
-
       return new Promise((resolve, reject) => {
         this.$http.get("/authentication/group/isNameUnique?name=" + this.form.name).then(r => {
           return r.data.data ? resolve() : reject("组名称已存在");
@@ -164,10 +160,6 @@ export default {
       });
     },
     validateRemoteAuthority() {
-
-      if (this.form.authority === this.$refs.authority.defaultValue) {
-        return Promise.resolve();
-      }
 
       return new Promise((resolve, reject) => {
         this.$http.get("/authentication/group/isAuthorityUnique?authority=" + this.form.authority).then(r => {

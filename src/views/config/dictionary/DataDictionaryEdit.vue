@@ -20,7 +20,7 @@
         <a-row>
           <a-col :span="24">
             <a-form-item has-feedback label="代码:" name="code">
-              <a-input ref="code" :addon-before="parentCode" v-model:value="form.code"></a-input>
+              <a-input ref="code" :addon-before="parentCode" :disabled="form.id !== null" v-model:value="form.code"></a-input>
             </a-form-item>
           </a-col>
         </a-row>
@@ -129,23 +129,16 @@ export default {
       },
       rules: {
         code: [
-          { required: true, message: "请输入代码", trigger: "blur" },
+          { required: true, message: "请输入代码", trigger: "change" },
           { validator:this.validateRemoteCode, trigger: "change"}
         ],
-        value: [
-          { required: true, message: "请输入值", trigger: "blur" }
-        ],
-        name: [{ required: true, message: "请输入名称", trigger: "blur" }]
+        value: [{ required: true, message: "请输入值", trigger: "blur" }],
+        name: [{ required: true, message: "请输入名称", trigger: "change" }]
       }
     }
   },
   methods: {
     validateRemoteCode() {
-
-      if (this.form.code === this.$refs.code.defaultValue) {
-        return Promise.resolve();
-      }
-
       return new Promise((resolve, reject) => {
         this.$http.get("/config/dictionary/isDataDictionaryCodeUnique?code=" + this.parentCode + this.form.code).then(r => {
           return r.data.data ? resolve() : reject("类型代码已存在");

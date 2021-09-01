@@ -31,16 +31,16 @@
           <a-form-item label="发送给:" name="toEmails">
             <a-row type="flex">
               <a-col flex="auto" class="margin-right-10">
-                <a-select class="width-100-percent" :max-tag-count="2" ref="select-tags" :disabled="form.toEmails.includes('ALL_USER')" mode="tags" :token-separators="[',']" v-model:value="form.toEmails" :filter-option="false" :not-found-content="searching ? undefined : null" :options="data" @search="searchSelectUser">
+                <a-select class="width-100-percent" :max-tag-count="2" ref="select-tags" :disabled="form.toEmails.includes('ALL_USER@domain.com')" mode="tags" :token-separators="[',']" v-model:value="form.toEmails" :filter-option="false" :not-found-content="searching ? undefined : null" :options="data" @search="searchSelectUser">
                 </a-select>
               </a-col>
               <a-col>
                 <a-space :size="10">
                   <a-button ref="btn-all-user" @click="sendAll">
-                    <icon-font class="icon" :type="form.toEmails.includes('ALL_USER') ? 'icon-ashbin' : 'icon-all'" />
-                    <span class="hidden-xs">{{form.toEmails.includes('ALL_USER') ? '取消选择' : '全网邮件'}}</span>
+                    <icon-font class="icon" :type="form.toEmails.includes('ALL_USER@domain.com') ? 'icon-ashbin' : 'icon-all'" />
+                    <span class="hidden-xs">{{form.toEmails.includes('ALL_USER@domain.com') ? '取消选择' : '全网邮件'}}</span>
                   </a-button>
-                  <a-button :disabled="form.toEmails.includes('ALL_USER')" ref="btn-search-user" @click="search.dialogVisible = true">
+                  <a-button :disabled="form.toEmails.includes('ALL_USER@domain.com')" ref="btn-search-user" @click="search.dialogVisible = true">
                     <icon-font class="icon" type="icon-filter"/>
                     <span class="hidden-xs">条件搜索邮件</span>
                   </a-button>
@@ -178,7 +178,7 @@ import '@vueup/vue-quill/dist/vue-quill.snow.css';
 import '@/assets/css/quill.css'
 
 const defaultData = {
-  value: 'ALL_USER',
+  value: 'ALL_USER@domain.com',
   label: '全网用户',
 }
 
@@ -190,10 +190,10 @@ export default {
   methods:{
     sendAll() {
 
-      if (this.form.toEmails.includes("ALL_USER")) {
+      if (this.form.toEmails.includes(defaultData.value)) {
         this.form.toEmails = this.getSelectedEmails();
       } else {
-        this.form.toEmails = ["ALL_USER"];
+        this.form.toEmails = [defaultData.value];
       }
 
     },
@@ -251,6 +251,10 @@ export default {
       _this.$refs['edit-form'].validate().then(() => {
 
         _this.sending = true;
+
+        if (_this.form.toEmails.length === 1 && _this.form.toEmails.includes(defaultData.value)) {
+          _this.form.toEmails = [_this.form.toEmails[0].substring(0, _this.form.toEmails[0].indexOf("@"))]
+        }
 
         _this
             .$http
@@ -386,11 +390,9 @@ export default {
         attachmentList:[]
       },
       rules: {
-        title: [{ required: true, message: "请输入标题", trigger: "blur" }],
-        toEmails: [
-          { required: true, message: "请输入对方邮件", trigger: "blur", type: "array"},
-          {type: "email",trigger: "blur", message:"电子邮箱格式不正确"}
-        ],
+        title: [{ required: true, message: "请输入标题", trigger: "change" }],
+        content: [{ required: true, message: "请输入内容", trigger: "change" }],
+        toEmails: [{ required: true, message: "请输入对方邮件", trigger: "change", type: "array", defaultField:{type:"email", message: "邮件格式不正确"}}],
         type: [{ required: true, message: "请选择类型", trigger: "change" }]
       }
     }

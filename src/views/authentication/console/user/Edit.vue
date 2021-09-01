@@ -19,7 +19,7 @@
         <a-row :gutter="[24]">
           <a-col :span="12">
             <a-form-item has-feedback label="登陆账户:" name="username">
-              <a-input ref="username" v-model:value="form.username" :default-value="form.username" :disabled="form.id !== null" />
+              <a-input ref="username" v-model:value="form.username" :disabled="form.id !== null" />
             </a-form-item>
           </a-col>
           <a-col :span="12">
@@ -45,7 +45,7 @@
         <a-row :gutter="[24]">
           <a-col :span="12">
             <a-form-item has-feedback label="电子邮箱:" name="email">
-              <a-input ref="email" v-model:value="form.email" :default-value="form.email" />
+              <a-input ref="email" v-model:value="form.email" :disabled="form.id !== null" />
             </a-form-item>
           </a-col>
 
@@ -139,42 +139,34 @@ export default {
       },
       rules: {
         username: [
-          { required: true, message: "请输入登陆账户", trigger: "blur" },
+          { required: true, message: "请输入登陆账户", trigger: "change"},
           { validator:this.validateRemoteUsername, trigger: "change"}
         ],
-        realName: [{ required: true, message: "请输入真实姓名", trigger: "blur" }],
-        password: [{ required: true, message: "请输入登陆密码", trigger: "blur" }],
+        realName: [{ required: true, message: "请输入真实姓名", trigger: "change" }],
+        password: [
+          { required: true, message: "请输入登陆密码", trigger: "change"},
+          {type:"string", pattern: /^(?!^[0-9a-z]+$)(?!^[0-9A-Z]+$)(?!^[0-9\x21-\x2f\x3a-\x40\x5b-\x60\x7B-\x7F]+$)(?!^[a-zA-Z]+$)(?!^[a-z\x21-\x2f\x3a-\x40\x5b-\x60\x7B-\x7F]+$)(?!^[A-Z\x21-\x2f\x3a-\x40\x5b-\x60\x7B-\x7F]+$)(?!^[A-Z\x21-\x2f\x3a-\x40\x5b-\x60\x7B-\x7F]+$)[a-z0-9A-Z\x21-\x2f\x3a-\x40\x5b-\x60\x7B-\x7F]+$/, message:"密码段中在要求的四种(大写字母，小写字母，数字，标点符号)类型中至少存在三种"}
+        ],
         confirmPassword: [
-          { required: true, message: "请输入确认密码", trigger: "blur" },
-          { validator:this.validatePass, trigger: "blur"}
+          { required: true, message: "请输入确认密码", trigger: "change" },
+          { validator:this.validatePass, trigger: "change"}
         ],
         email: [
-          {type: "email",trigger: "blur", message:"电子邮箱格式不正确"},
+          {type: "email", message:"电子邮箱格式不正确",trigger: "change"},
           {validator:this.validateRemoteEmail, trigger: "change"}
         ]
       }
     }
   },
   methods: {
-    validateRemoteUsername() {
-
-      if (this.form.username === this.$refs.username.defaultValue) {
-        return Promise.resolve();
-      }
-
+    validateRemoteUsername(value, s) {
       return new Promise((resolve, reject) => {
-        this.$http.get("/authentication/console/user/isUsernameUnique?username=" + this.form.username).then(r => {
+        this.$http.get("/authentication/console/user/isUsernameUnique?username=" + s).then(r => {
           return r.data.data ? resolve() : reject("登陆账户已存在");
         });
       });
-
     },
     validateRemoteEmail() {
-
-      if (this.form.email === this.$refs.email.defaultValue) {
-        return Promise.resolve();
-      }
-
       return new Promise((resolve, reject) => {
         this.$http.get("/authentication/console/user/isEmailUnique?email=" + this.form.email).then(r => {
           return r.data.data ? resolve() : reject("电子邮箱已存在");

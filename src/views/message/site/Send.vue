@@ -31,15 +31,15 @@
           <a-form-item label="发送给:" name="toUserIds">
             <a-row type="flex">
               <a-col flex="auto" class="margin-right-10">
-                <a-select class="width-100-percent" :max-tag-count="2" ref="select-multiple" :disabled="form.toUserIds.includes('ALL_USER')" mode="multiple" :token-separators="[',']" v-model:value="form.toUserIds" :filter-option="false" :not-found-content="searching ? undefined : null" :options="data" @search="searchSelectUser">
+                <a-select class="width-100-percent" :max-tag-count="2" ref="select-multiple" :disabled="form.toUserIds.includes(0)" mode="multiple" :token-separators="[',']" v-model:value="form.toUserIds" :filter-option="false" :not-found-content="searching ? undefined : null" :options="data" @search="searchSelectUser">
                 </a-select>
               </a-col>
               <a-col>
                 <a-space :size="10">
                   <a-switch checked-children="推送 APP" un-checked-children="不推送 APP" v-model:checked="form.isPush" />
                   <a-button ref="btn-all-user" @click="sendAll">
-                    <icon-font class="icon" :type="form.toUserIds.includes('ALL_USER') ? 'icon-ashbin' : 'icon-all'" />
-                    <span class="hidden-xs">{{form.toUserIds.includes('ALL_USER') ? '取消选择' : '全网站内信'}}</span>
+                    <icon-font class="icon" :type="form.toUserIds.includes(0) ? 'icon-ashbin' : 'icon-all'" />
+                    <span class="hidden-xs">{{form.toUserIds.includes(0) ? '取消选择' : '全网站内信'}}</span>
                   </a-button>
                   <a-button :disabled="form.toUserIds.includes('ALL_USER')" ref="btn-search-user" @click="search.dialogVisible = true">
                     <icon-font class="icon" type="icon-filter"/>
@@ -179,7 +179,7 @@ import '@vueup/vue-quill/dist/vue-quill.snow.css';
 import '@/assets/css/quill.css'
 
 const defaultData = {
-  value: 'ALL_USER',
+  value: 0,
   label: '全网用户',
 }
 
@@ -191,10 +191,10 @@ export default {
   methods:{
     sendAll() {
 
-      if (this.form.toUserIds.includes("ALL_USER")) {
+      if (this.form.toUserIds.includes(defaultData.value)) {
         this.form.toUserIds = this.getSelectedUserIds();
       } else {
-        this.form.toUserIds = ["ALL_USER"];
+        this.form.toUserIds = [defaultData.value];
       }
 
     },
@@ -258,6 +258,10 @@ export default {
           _this.form.isPush = 1;
         } else {
           _this.form.isPush = 0;
+        }
+
+        if (_this.form.toUserIds.length === 1 && _this.form.toUserIds.includes(defaultData.value)) {
+          _this.form.toUserIds = ["ALL_USER"]
         }
 
         _this
@@ -394,8 +398,9 @@ export default {
         attachmentList:[]
       },
       rules: {
-        title: [{ required: true, message: "请输入标题", trigger: "blur" }],
-        toUserIds: [{ required: true, message: "请输入用户", trigger: "blur", type: "array"}],
+        title: [{ required: true, message: "请输入标题", trigger: "change" }],
+        content: [{ required: true, message: "请输入内容", trigger: "change" }],
+        toUserIds: [{ required: true, message: "请输入用户", trigger: "change", type: "array", defaultField:{type:"integer", message: "用户格式不正确"}}],
         type: [{ required: true, message: "请选择类型", trigger: "change" }]
       }
     }
