@@ -214,7 +214,7 @@ export default {
       _this.data = [JSON.parse(JSON.stringify(defaultData))];
 
       let searchFrom = {
-        "filter_[email_like]":value,
+        "filter_[email_rlike]":value,
         "size":10,
         "number":1
       }

@@ -162,7 +162,7 @@ export default {
       _this.data = [JSON.parse(JSON.stringify(defaultData))];
 
       let searchFrom = {
-        "filter_[phone_like]":value,
+        "filter_[phone_rlike]":value,
         "size":10,
         "number":1
       }

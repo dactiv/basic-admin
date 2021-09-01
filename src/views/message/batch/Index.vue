@@ -9,7 +9,7 @@
   <a-card title="批量消息管理" class="basic-box-shadow margin-top-20">
 
     <template #extra>
-      <icon-font class="icon" type="icon-icon" />
+      <icon-font class="icon" type="icon-batch" />
     </template>
 
     <a-spin :spinning="spinning" tip="数据加载中...">
