@@ -6,7 +6,7 @@
     <a-breadcrumb-item><icon-font class="icon" type="icon-audit" /> 操作审计</a-breadcrumb-item>
   </a-breadcrumb>
 
-  <a-card title="系统用户管理" class="basic-box-shadow margin-top-20">
+  <a-card title="操作审计管理" class="basic-box-shadow margin-top-20">
 
     <template #extra>
       <icon-font class="icon" type="icon-audit" />

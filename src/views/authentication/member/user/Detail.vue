@@ -15,7 +15,6 @@
 
     <a-spin :spinning="spinning">
       <a-descriptions
-          title="详情信息"
           bordered
           :column="{ xxl: 2, xl: 2, lg: 2, md: 2, sm: 2, xs: 1 }"
       >

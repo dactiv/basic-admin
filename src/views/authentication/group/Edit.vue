@@ -152,7 +152,6 @@ export default {
       }
     },
     validateRemoteName() {
-
       return new Promise((resolve, reject) => {
         this.$http.get("/authentication/group/isNameUnique?name=" + this.form.name).then(r => {
           return r.data.data ? resolve() : reject("组名称已存在");
@@ -160,19 +159,11 @@ export default {
       });
     },
     validateRemoteAuthority() {
-
       return new Promise((resolve, reject) => {
         this.$http.get("/authentication/group/isAuthorityUnique?authority=" + this.form.authority).then(r => {
           return r.data.data ? resolve() : reject("权限名称已存在");
         });
       });
-    },
-    async validateSource(){
-      if (this.form.source.length <= 0) {
-        return Promise.reject('请选择一个以上的来源');
-      } else {
-        return Promise.resolve();
-      }
     },
     submitForm() {
 

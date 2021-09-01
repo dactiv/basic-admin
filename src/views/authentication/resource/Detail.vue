@@ -15,9 +15,8 @@
 
     <a-spin :spinning="spinning">
       <a-descriptions
-          title="详情信息"
           bordered
-          :column="{ xxl: 3, xl: 3, lg: 3, md: 3, sm: 2, xs: 1 }"
+          :column="{ xxl: 2, xl: 2, lg: 2, md: 2, sm: 2, xs: 1 }"
       >
 
         <a-descriptions-item label="名称"><icon-font class="icon" v-if="form.icon" :type="form.icon" /> {{form.name}} </a-descriptions-item>
@@ -27,10 +26,10 @@
         <a-descriptions-item label="权限值">{{ form.authority ? form.authority : ""}}</a-descriptions-item>
         <a-descriptions-item label="所属应用">{{ form.applicationName }}</a-descriptions-item>
         <a-descriptions-item label="类型">{{ form.typeName }}</a-descriptions-item>
-        <a-descriptions-item label="状态" :span="3" ><a-badge :status="form.status === 1 ? 'success' : form.status === 2 ? 'default' : 'warning'" :text="form.statusName" /></a-descriptions-item>
+        <a-descriptions-item label="状态"><a-badge :status="form.status === 1 ? 'success' : form.status === 2 ? 'default' : 'warning'" :text="form.statusName" /></a-descriptions-item>
         <a-descriptions-item label="版本号">{{ form.version }}</a-descriptions-item>
         <a-descriptions-item label="顺序值">{{ form.sort ? form.sort : "" }}</a-descriptions-item>
-        <a-descriptions-item label="备注">{{ form.remark ? form.remark : "" }}</a-descriptions-item>-->
+        <a-descriptions-item label="备注" :span="2">{{ form.remark ? form.remark : "" }}</a-descriptions-item>
 
       </a-descriptions>
     </a-spin>
