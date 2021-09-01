@@ -60,7 +60,7 @@
 <script>
 
 export default {
-  name:"DictionaryIndex",
+  name:"ConfigDictionaryIndex",
   data() {
     return {
       form: {
@@ -102,7 +102,7 @@ export default {
     edit(record) {
 
       let to = {
-        name: "dictionary_type_edit"
+        name: "config_dictionary_type_edit"
       }
 
       if (record !== undefined) {

@@ -136,7 +136,7 @@
 <script>
 
 export default {
-  name:"DictionaryTypeEdit",
+  name:"ConfigDictionaryTypeEdit",
   data() {
     return {
       dataDictionary: {
@@ -247,7 +247,7 @@ export default {
     },
     editDataDictionary(record) {
       let to = {
-        name: "data_dictionary_edit"
+        name: "config_data_dictionary_edit"
       }
 
       let query = {};

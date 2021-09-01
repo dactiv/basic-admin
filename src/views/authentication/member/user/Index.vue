@@ -113,7 +113,7 @@
 <script>
 
 export default {
-  name:"MemberUserIndex",
+  name:"AuthenticationMemberUserIndex",
   data() {
     return {
       columns:[
@@ -179,7 +179,7 @@ export default {
     detail(record) {
 
       let to = {
-        name: "member_user_detail"
+        name: "authentication_member_user_detail"
       }
 
       if (record !== undefined) {

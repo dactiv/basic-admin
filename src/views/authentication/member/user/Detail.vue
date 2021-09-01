@@ -38,7 +38,7 @@
 <script>
 
 export default {
-  name:"ResourceDetail",
+  name:"AuthenticationMemberUserDetail",
   data() {
     return {
       spinning:true,

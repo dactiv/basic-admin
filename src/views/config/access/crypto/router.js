@@ -1,7 +1,7 @@
 export const router = [{
     path: "config/access/crypto",
     component: () => import("@/views/config/access/crypto/Index.vue"),
-    name: "access_crypto",
+    name: "config_access_crypto",
     meta: {
         title: "访问加解密",
         parent: "config"
@@ -10,7 +10,7 @@ export const router = [{
 },{
     path: "config/access/crypto/edit",
     component: () => import("@/views/config/access/crypto/Edit.vue"),
-    name: "access_crypto_edit",
+    name: "config_access_crypto_edit",
     meta: {
         title: "编辑访问加解密",
         parent: "cofnig",

@@ -157,7 +157,7 @@ const defaultData = {
 }
 
 export default {
-  name:"SendMail",
+  name:"MessageMailSend",
   components:{
     QuillEditor
   },
@@ -218,31 +218,33 @@ export default {
     },
     submitForm() {
 
-      console.log(this.form);
-
       let _this = this;
 
       _this.$refs['edit-form'].validate().then(() => {
+
+        _this.sending = true;
+
         _this
             .$http
             .post("/message/send", this.form)
             .then((r) => {
 
+              _this.sending = false;
               _this.$message.success(r.data.message);
 
               let to = {};
 
               if (r.data.data.batchId) {
-                to["name"] = "batch_detail";
+                to["name"] = "message_batch_detail";
                 to["query"] = {id:r.data.data.batchId};
               } else {
-                to["name"] = "email_detail";
+                to["name"] = "message_email_detail";
                 to["query"] = {id:r.data.data.id[0]};
               }
 
               _this.$router.push(to);
 
-            })
+            }).catch(() => _this.sending = false)
       });
     },
     removeAttachment(file) {
@@ -318,7 +320,7 @@ export default {
           module: BlotFormatter
         }]
       },
-      sending:false,
+      sending: false,
       searching: false,
       fileList:[],
       typeOptions:[],

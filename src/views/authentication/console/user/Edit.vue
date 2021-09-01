@@ -119,7 +119,7 @@ import GroupTable from '@/components/GroupTable.vue';
 import ResourceTable from "@/components/ResourceTable";
 
 export default {
-  name:"ConsoleUserEdit",
+  name:"AuthenticationConsoleUserEdit",
   components:{GroupTable, ResourceTable},
   data() {
     return {
@@ -209,7 +209,7 @@ export default {
               _this.$message.success(r.data.message);
 
               if (id !== _this.form.id) {
-                _this.$router.push({name:"console_user_edit", query:{id}, replace:true});
+                _this.$router.push({name:"authentication_console_user_edit", query:{id}, replace:true});
                 _this.form.id = r.data.data;
               }
 

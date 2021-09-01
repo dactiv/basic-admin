@@ -106,7 +106,7 @@
 <script>
 
 export default {
-  name:"DataDictionaryEdit",
+  name:"ConfigDataDictionaryEdit",
   data() {
     return {
       spinning:true,
@@ -183,7 +183,7 @@ export default {
               _this.$message.success(r.data.message);
 
               if (id !== _this.form.id) {
-                _this.$router.push({name:"data_dictionary_edit", query:{id:id,typeId:_this.typeEntity}, replace:true});
+                _this.$router.push({name:"config_data_dictionary_edit", query:{id:id,typeId:_this.typeEntity}, replace:true});
                 _this.form.id = r.data.data;
               }
 

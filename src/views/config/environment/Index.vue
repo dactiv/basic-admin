@@ -47,7 +47,7 @@
 <script>
 
 export default {
-  name:"EnumerateIndex",
+  name:"ConfigEnvironmentIndex",
   data() {
     return {
       spinning:false,

@@ -42,7 +42,7 @@
 import GroupTable from '@/components/GroupTable';
 
 export default {
-  name:"GroupIndex",
+  name:"AuthenticationGroupIndex",
   components: {GroupTable},
   data() {
     return {

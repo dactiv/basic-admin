@@ -161,7 +161,7 @@
 <script>
 
 export default {
-  name:"CryptoEdit",
+  name:"ConfigCryptoEdit",
   data() {
     return {
       spinning:true,
@@ -307,7 +307,7 @@ export default {
               _this.$message.success(r.data.message);
 
               if (id !== _this.form.id) {
-                _this.$router.push({name:"access_crypto_edit", query:{id}});
+                _this.$router.push({name:"config_access_crypto_edit", query:{id}});
                 _this.form.id = r.data.data;
               }
 

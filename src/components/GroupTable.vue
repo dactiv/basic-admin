@@ -36,7 +36,7 @@
 <script>
 
 export default {
-  name:"GroupTable",
+  name:"AuthenticationGroupTable",
   props:["enableDisabledCheckbox"],
   data() {
     return {
@@ -80,7 +80,7 @@ export default {
     edit(record) {
 
       let to = {
-        name: "group_edit"
+        name: "authentication_group_edit"
       }
 
       if (record !== undefined) {

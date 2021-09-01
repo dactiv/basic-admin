@@ -110,7 +110,7 @@
 <script>
 
 export default {
-  name:"CryptoIndex",
+  name:"ConfigCryptoIndex",
   data() {
     return {
       columns:[
@@ -183,7 +183,7 @@ export default {
     edit(record) {
 
       let to = {
-        name: "access_crypto_edit"
+        name: "config_access_crypto_edit"
       }
 
       if (record !== undefined) {

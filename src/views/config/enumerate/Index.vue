@@ -46,7 +46,7 @@
 <script>
 
 export default {
-  name:"EnumerateIndex",
+  name:"ConfigEnumerateIndex",
   data() {
     return {
       sync:false,

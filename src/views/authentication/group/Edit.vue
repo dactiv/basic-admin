@@ -110,7 +110,7 @@
 import ResourceTable from "@/components/ResourceTable";
 
 export default {
-  name:"GroupEdit",
+  name:"AuthenticationGroupEdit",
   components:{ResourceTable},
   data() {
     return {
@@ -200,7 +200,7 @@ export default {
               _this.$message.success(r.data.message);
 
               if (id !== _this.form.id) {
-                _this.$router.push({name:"group_edit", query:{id}, replace:true});
+                _this.$router.push({name:"authentication_group_edit", query:{id}, replace:true});
                 _this.form.id = r.data.data;
               }
 

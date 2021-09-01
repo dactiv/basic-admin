@@ -3,43 +3,53 @@
   <a-breadcrumb class="hidden-xs">
     <a-breadcrumb-item><router-link to='/'><icon-font class="icon" type="icon-home" /> 首页</router-link></a-breadcrumb-item>
     <a-breadcrumb-item><icon-font class="icon" type="icon-message" /> 消息管理</a-breadcrumb-item>
-    <a-breadcrumb-item><icon-font class="icon" type="icon-email" /> 邮件管理</a-breadcrumb-item>
+    <a-breadcrumb-item><icon-font class="icon" type="icon-batch" /> 批量消息管理</a-breadcrumb-item>
   </a-breadcrumb>
 
-  <a-card title="邮件管理" class="basic-box-shadow margin-top-20">
+  <a-card title="批量消息管理" class="basic-box-shadow margin-top-20">
 
     <template #extra>
-      <icon-font class="icon" type="icon-email" />
+      <icon-font class="icon" type="icon-icon" />
     </template>
 
     <a-spin :spinning="spinning" tip="数据加载中...">
 
       <a-space :size="10" class="margin-bottom-20">
-        <a-button @click="this.searchDialogVisible=true;">
-          <icon-font class="icon" type="icon-search" />
-          <span class="hidden-xs">搜索</span>
-        </a-button>
-        <a-button @click="send" v-if="this.principal.hasPermission('perms[message:send]')">
-          <icon-font class="icon" type="icon-send" />
-          <span class="hidden-xs">发送</span>
+
+        <a-button @click="search(this.page.number)" :loading="spinning">
+          <icon-font class="icon" v-if="!spinning" type="icon-refresh" />
+          <span class="hidden-xs">刷新</span>
         </a-button>
 
-        <a-button type="primary" @click="remove(null)" danger v-if="this.principal.hasPermission('perms[email:delete]')">
+        <a-button @click="this.searchDialogVisible=true;" :loading="spinning">
+          <icon-font class="icon" v-if="!spinning" type="icon-search" />
+          <span class="hidden-xs">搜索</span>
+        </a-button>
+
+        <a-button type="primary" @click="remove(null)" danger v-if="this.principal.hasPermission('perms[batch_message:delete]')">
           <icon-font class="icon" type="icon-ashbin" />
           <span class="hidden-xs">删除选中</span>
         </a-button>
       </a-space>
 
-      <a-table class="ant-table-striped" :row-selection="{ selectedRowKeys: selectedIds, onChange:selectChange }" :rowKey="record=>record.id" :scroll="{ x: 1575 }" :pagination="false" :data-source="page.content" :columns="columns" bordered>
+      <a-table class="ant-table-striped" :row-selection="{ selectedRowKeys: selectedIds, onChange:selectChange }" :rowKey="record=>record.id" :scroll="{ x: 1375 }" :pagination="false" :data-source="page.content" :columns="columns" bordered>
+
+        <template #creationTime="{ text:creationTime }">
+          {{ this.timestampFormat(creationTime)}}
+        </template>
+
+        <template #completeTime="{ text:completeTime }">
+          {{ this.timestampFormat(completeTime)}}
+        </template>
 
         <template #action="{ record }">
           <div class="text-center">
             <a-space :size="10">
-              <a-button size="small" @click="detail(record)" v-if="this.principal.hasPermission('perms[email:get]')">
+              <a-button size="small" @click="detail(record)" v-if="this.principal.hasPermission('perms[batch_message:get]')">
                 <icon-font class="icon" type="icon-file" />
                 <span class="hidden-xs">详情</span>
               </a-button>
-              <a-button size="small" type="primary" danger @click="remove(record)" v-if="this.principal.hasPermission('perms[email:delete]')">
+              <a-button size="small" type="primary" danger @click="remove(record)" v-if="this.principal.hasPermission('perms[batch_message:delete]')">
                 <icon-font class="icon" type="icon-ashbin" />
                 <span class="hidden-xs">删除</span>
               </a-button>
@@ -66,24 +76,11 @@
     </a-spin>
   </a-card>
 
-  <a-modal v-model:visible="searchDialogVisible" width="600px" title="查询邮件消息" @ok="search(null)" layout="vertical">
+  <a-modal v-model:visible="searchDialogVisible" width="600px" title="查询批量消息" @ok="search(null)" layout="vertical">
     <a-form ref="search-form" :model="form" layout="vertical">
 
-      <a-row :gutter="[24]">
-        <a-col :span="12">
-          <a-form-item label="标题:">
-            <a-input v-model:value="form['filter_[title_like]']" />
-          </a-form-item>
-        </a-col>
-        <a-col :span="12">
-          <a-form-item label="内容:">
-            <a-input v-model:value="form['filter_[content_eq]']" />
-          </a-form-item>
-        </a-col>
-      </a-row>
-
-      <a-row :gutter="[24]">
-        <a-col :span="12">
+      <a-row>
+        <a-col :span="24">
           <a-form-item label="类型:">
             <a-select v-model:value="form['filter_[type_eq]']">
               <a-select-option value="">
@@ -95,37 +92,24 @@
             </a-select>
           </a-form-item>
         </a-col>
-        <a-col :span="12">
-          <a-form-item label="状态:">
-            <a-select v-model:value="form['filter_[status_eq]']">
-              <a-select-option value="">
-                全部
-              </a-select-option>
-              <a-select-option v-for="(value, name) of statusOptions" :key="value" :value="value">
-                {{name}}
-              </a-select-option>
-            </a-select>
-          </a-form-item>
-        </a-col>
       </a-row>
 
-      <a-row :gutter="[24]">
-        <a-col :span="12">
-          <a-form-item label="发送邮件:">
-            <a-input v-model:value="form['filter_[from_like]']" />
-          </a-form-item>
-        </a-col>
-        <a-col :span="12">
-          <a-form-item label="收取邮件:">
-            <a-input v-model:value="form['filter_[to_like]']" />
+      <a-row>
+        <a-col :span="24">
+          <a-form-item label="完成时间:">
+            <a-range-picker show-time class="width-100-percent" v-model:value="form['filter_[complete_time_between]']">
+              <template #suffixIcon>
+                <icon-font class="icon" type="icon-calendar" />
+              </template>
+            </a-range-picker>
           </a-form-item>
         </a-col>
       </a-row>
 
       <a-row>
         <a-col :span="24">
-          <a-form-item label="最后发送时间:">
-            <a-range-picker show-time class="width-100-percent" v-model:value="form['filter_[last_send_time_between]']">
+          <a-form-item label="创建时间:">
+            <a-range-picker show-time class="width-100-percent" v-model:value="form['filter_[creation_time_between]']">
               <template #suffixIcon>
                 <icon-font class="icon" type="icon-calendar" />
               </template>
@@ -142,53 +126,50 @@
 <script>
 
 export default {
-  name:"MessageEmailIndex",
+  name:"MessageBatchIndex",
   data() {
     return {
       columns:[
         {
-          title: "状态",
-          dataIndex: "status",
+          title: "类型",
+          dataIndex: "typeName",
           ellipsis: true,
           width: 80
         },
         {
-          title: "类型",
-          dataIndex: "type",
+          title: "创建时间",
+          dataIndex: "creationTime",
           ellipsis: true,
-          width: 120
+          width: 200,
+          slots: { customRender: "creationTime" }
         },
         {
-          title: "发送邮件",
-          dataIndex: "from",
+          title: "状态",
+          dataIndex: "statusName",
           ellipsis: true,
-          width: 200
+          width: 80
         },
         {
-          title: "收取邮件",
-          dataIndex: "to",
+          title: "发送成功数量",
+          dataIndex: "successNumber",
           ellipsis: true,
           width: 200
         },{
-          title: "标题",
-          dataIndex: "title",
-          ellipsis: true,
-          width: 250
-        },{
-          title: "重试次数",
-          dataIndex: "retryCount",
-          ellipsis: true,
-          width: 150
-        },{
-          title: "最后发送时间",
-          dataIndex: "lastSendTime",
+          title: "发送失败数量",
+          dataIndex: "failNumber",
           ellipsis: true,
           width: 200
         },{
-          title: "发送成功时间",
-          dataIndex: "successTime",
+          title: "发送中数量",
+          dataIndex: "sendingNumber",
           ellipsis: true,
           width: 200
+        }, {
+          title: "完成时间",
+          dataIndex: "completeTime",
+          ellipsis: true,
+          width: 200,
+          slots: { customRender: "completeTime" }
         },{
           title: "操作",
           fixed: "right",
@@ -198,13 +179,9 @@ export default {
       ],
       selectedIds:[],
       form:{
-        "filter_[title_like]":"",
-        "filter_[content_eq]":"",
         "filter_[type_eq]":"",
-        "filter_[status_eq]":"",
-        "filter_[from_like]":"",
-        "filter_[to_like]":"",
-        "filter_[last_send_time_between]":[]
+        "filter_[creation_time_between]":"",
+        "filter_[complete_time_between]":[]
       },
       page: {
         content:[],
@@ -213,23 +190,19 @@ export default {
         number:1
       },
       spinning: false,
-      statusOptions:[],
       typeOptions:[],
       searchDialogVisible: false
     }
   },
   created() {
-    this.loadConfig({service:"message", enumerateName:"MessageType"}, r=> this.typeOptions = r.data.data);
-    this.loadConfig({service:"config", enumerateName:"ExecuteStatus"}, r=> this.statusOptions = r.data.data);
+    this.loadConfig({service:"message", enumerateName:"AttachmentType"}, r=> this.typeOptions = r.data.data);
   },
   methods:{
-    send() {
-      this.$router.push({name:"message_email_send"});
-    },
+
     detail(record) {
 
       let to = {
-        name: "message_email_detail"
+        name: "message_batch_detail"
       }
 
       if (record !== undefined) {
@@ -250,7 +223,7 @@ export default {
 
       if (record) {
         ids.push(record.id);
-        confirmMessage = "确定要删除 [" + record.username + "] 邮件吗?"
+        confirmMessage = "确定要删除 [" + record.username + "] 批量消息吗?"
       } else {
         ids = this.selectedIds;
         confirmMessage = "确定要删除" + ids.length + "条记录吗?"
@@ -262,11 +235,11 @@ export default {
         _this.spinning = true;
         _this
             .$http
-            .post("/message/email/delete",_this.formUrlencoded({ids:ids})).then((r) => {
-              this.$message.success(r.data.message);
-              _this.selectedIds = [];
-              _this.search();
-            })
+            .post("/message/batch/delete",_this.formUrlencoded({ids:ids})).then((r) => {
+          this.$message.success(r.data.message);
+          _this.selectedIds = [];
+          _this.search();
+        })
             .catch(() => _this.spinning = false);
       });
 
@@ -285,7 +258,7 @@ export default {
 
       _this
           .$http
-          .post("/message/email/page",_this.formUrlencoded(param))
+          .post("/message/batch/page",_this.formUrlencoded(param))
           .then(r => {
             _this.page = r.data.data;
             _this.spinning = false;

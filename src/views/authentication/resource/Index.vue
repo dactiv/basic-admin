@@ -38,7 +38,7 @@
 import ResourceTable from "@/components/ResourceTable";
 
 export default {
-  name:"GroupIndex",
+  name:"AuthenticationGroupIndex",
   components: {ResourceTable},
   data() {
     return {

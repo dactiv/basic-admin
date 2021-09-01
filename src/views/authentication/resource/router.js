@@ -1,7 +1,7 @@
 export const router = [{
     path: "authentication/resource",
     component: () => import("@/views/authentication/resource/Index.vue"),
-    name: "resource",
+    name: "authentication_resource",
     meta: {
         title: "資源管理",
         parent: "system"
@@ -10,7 +10,7 @@ export const router = [{
 },{
     path: "authentication/resource/detail",
     component: () => import("@/views/authentication/resource/Detail.vue"),
-    name: "resource_detail",
+    name: "authentication_resource_detail",
     meta: {
         title: "查看資源",
         parent: "system",

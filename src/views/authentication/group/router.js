@@ -1,7 +1,7 @@
 export const router = [{
     path: "authentication/group",
     component: () => import("@/views/authentication/group/Index.vue"),
-    name: "group",
+    name: "authentication_group",
     meta: {
         title: "组管理",
         parent: "system"
@@ -10,7 +10,7 @@ export const router = [{
 },{
     path: "authentication/group/edit",
     component: () => import("@/views/authentication/group/Edit.vue"),
-    name: "group_edit",
+    name: "authentication_group_edit",
     meta: {
         title: "编辑组",
         parent: "system",

@@ -110,7 +110,7 @@
 <script>
 
 export default {
-  name:"ConsoleUserIndex",
+  name:"AuthenticationConsoleUserIndex",
   data() {
     return {
       columns:[
@@ -173,7 +173,7 @@ export default {
     edit(record) {
 
       let to = {
-        name: "console_user_edit"
+        name: "authentication_console_user_edit"
       }
 
       if (record !== undefined) {

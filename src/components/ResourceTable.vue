@@ -39,7 +39,7 @@
 <script>
 
 export default {
-  name:"ResourceTable",
+  name:"AuthenticationResourceTable",
   props:["selection"],
   data() {
     return {
@@ -163,7 +163,7 @@ export default {
     detail(record) {
 
       let to = {
-        name: "resource_detail"
+        name: "authentication_resource_detail"
       }
 
       if (record !== undefined) {

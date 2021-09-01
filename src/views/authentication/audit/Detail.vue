@@ -36,7 +36,7 @@
 <script>
 
 export default {
-  name:"AuditDetail",
+  name:"AuthenticationAuditDetail",
   data() {
     return {
       spinning:true,

@@ -96,7 +96,7 @@
 <script>
 
 export default {
-  name:"ConsoleUserIndex",
+  name:"AuthenticationAuditIndex",
   data() {
     return {
       columns:[
@@ -147,7 +147,7 @@ export default {
     detail(record) {
 
       let to = {
-        name: "audit_detail"
+        name: "authentication_audit_detail"
       }
 
       if (record !== undefined) {
