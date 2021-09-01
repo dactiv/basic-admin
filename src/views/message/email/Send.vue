@@ -2,6 +2,7 @@
   <a-breadcrumb class="hidden-xs">
     <a-breadcrumb-item><router-link to='/'><icon-font class="icon" type="icon-home" /> 首页</router-link></a-breadcrumb-item>
     <a-breadcrumb-item><icon-font class="icon" type="icon-message" /> 消息管理</a-breadcrumb-item>
+    <a-breadcrumb-item><router-link :to="{name:'message_email'}"><icon-font class="icon" type="icon-email" /> 邮件消息</router-link></a-breadcrumb-item>
     <a-breadcrumb-item><icon-font class="icon" type="icon-send" /> 发送邮件</a-breadcrumb-item>
   </a-breadcrumb>
 
@@ -382,12 +383,14 @@ export default {
         type:"",
         content:"",
         title:"",
-        remark:"",
         attachmentList:[]
       },
       rules: {
         title: [{ required: true, message: "请输入标题", trigger: "blur" }],
-        toEmails: [{ required: true, message: "请输入对方邮件", trigger: "blur", type: "array"}],
+        toEmails: [
+          { required: true, message: "请输入对方邮件", trigger: "blur", type: "array"},
+          {type: "email",trigger: "blur", message:"电子邮箱格式不正确"}
+        ],
         type: [{ required: true, message: "请选择类型", trigger: "change" }]
       }
     }

@@ -2,7 +2,7 @@
 
   <a-breadcrumb class="hidden-xs">
     <a-breadcrumb-item><router-link to='/'><icon-font class="icon" type="icon-home" /> 首页</router-link></a-breadcrumb-item>
-    <a-breadcrumb-item><icon-font class="icon" type="icon-site" /> 消息管理</a-breadcrumb-item>
+    <a-breadcrumb-item><icon-font class="icon" type="icon-message" /> 消息管理</a-breadcrumb-item>
     <a-breadcrumb-item><router-link :to="{name:'message_site'}"><icon-font class="icon" type="icon-notification" /> 站内信消息</router-link></a-breadcrumb-item>
     <a-breadcrumb-item><icon-font class="icon" type="icon-file" /> 站内信消息明细</a-breadcrumb-item>
   </a-breadcrumb>
@@ -37,14 +37,37 @@
 
       <a-descriptions bordered :column="{ xxl: 2, xl: 2, lg: 2, md: 2, sm: 2, xs: 1 }">
 
-        <a-descriptions-item label="发送渠道">{{ form.fromEmail }}</a-descriptions-item>
-        <a-descriptions-item label="收件用户 id">{{ form.toUserId}}</a-descriptions-item>
+        <a-descriptions-item label="发送渠道">{{ form.channel }}</a-descriptions-item>
+        <a-descriptions-item label="收件用户 id">
+          <router-link :to="{name:'authentication_member_user_detail', query:{id: form.toUserId}}">
+            {{ form.toUserId }}
+          </router-link>
+        </a-descriptions-item>
+        <a-descriptions-item label="推送 app">{{ form.isPushName}}</a-descriptions-item>
+        <a-descriptions-item label="已读">{{form.isReadName}}</a-descriptions-item>
         <a-descriptions-item label="标题" :span="2">{{ form.title}}</a-descriptions-item>
         <a-descriptions-item label="内容" :span="2"><p v-html="form.content"></p></a-descriptions-item>
         <a-descriptions-item v-if="form.hasAttachment > 0" label="附件" :span="2">
-          <a-typography-link v-for="a of form.attachmentList" :key="a.id" :href="a.meta.link" target="_blank">
-            <p><icon-font class="icon" type="icon-attachment" /> {{ a.name }}</p>
-          </a-typography-link>
+
+          <a-list class="attachment" item-layout="horizontal" bordered  :data-source="form.attachmentList">
+            <template #renderItem="{ item }">
+              <a-list-item :key="item.id">
+                <a-list-item-meta>
+                  <template #title>
+                    <a-typography-link :href="item.meta.link" target="_blank">
+                      {{ item.name }}
+                    </a-typography-link>
+                  </template>
+                  <template #avatar>
+                    <a-typography-link :href="item.meta.link" target="_blank">
+                      <icon-font class="icon" :type="'icon-' + item.contentType.substring(item.contentType.indexOf('/') + 1,item.contentType.length).toUpperCase()" />
+                    </a-typography-link>
+                  </template>
+                </a-list-item-meta>
+              </a-list-item>
+            </template>
+          </a-list>
+
         </a-descriptions-item>
       </a-descriptions>
 
@@ -93,13 +116,15 @@ export default {
         creationTime: "",
         type:"",
         typeName: "",
+        isPushName:"",
+        isReadName:"",
         status:"",
         statusName: "",
         lastSendTime: "",
         successTime:"",
         nextRetryTime:"",
-        fromEmail: "",
-        toEmail: "",
+        channel: "",
+        toUserId: "",
         retryCount:"",
         maxRetryCount:"",
         hasAttachment: 0,

@@ -3,11 +3,11 @@
   <a-breadcrumb class="hidden-xs">
     <a-breadcrumb-item><router-link to='/'><icon-font class="icon" type="icon-home" /> 首页</router-link></a-breadcrumb-item>
     <a-breadcrumb-item><icon-font class="icon" type="icon-message" /> 消息管理</a-breadcrumb-item>
-    <a-breadcrumb-item><router-link :to="{name:'message_email'}"><icon-font class="icon" type="icon-email" /> 邮件消息</router-link></a-breadcrumb-item>
-    <a-breadcrumb-item><icon-font class="icon" type="icon-file" /> 邮件消息明细</a-breadcrumb-item>
+    <a-breadcrumb-item><router-link :to="{name:'message_site'}"><icon-font class="icon" type="icon-notification" /> 短信消息</router-link></a-breadcrumb-item>
+    <a-breadcrumb-item><icon-font class="icon" type="icon-file" /> 短信消息明细</a-breadcrumb-item>
   </a-breadcrumb>
 
-  <a-card title="邮件明细" class="basic-box-shadow">
+  <a-card title="短信消息明细" class="basic-box-shadow">
     <template #extra>
       <a-button @click="reload" :loading="spinning">
         <icon-font class="icon" v-if="!spinning" type="icon-refresh" />
@@ -33,36 +33,14 @@
 
       </a-descriptions>
 
-      <a-divider><a-typography-text type="secondary">邮件数据</a-typography-text></a-divider>
+      <a-divider><a-typography-text type="secondary">短信数据</a-typography-text></a-divider>
 
       <a-descriptions bordered :column="{ xxl: 2, xl: 2, lg: 2, md: 2, sm: 2, xs: 1 }">
 
-        <a-descriptions-item label="发送的邮件">{{ form.fromEmail }}</a-descriptions-item>
-        <a-descriptions-item label="收取的收件">{{ form.toEmail}}</a-descriptions-item>
+        <a-descriptions-item label="发送渠道">{{ form.channel }}</a-descriptions-item>
+        <a-descriptions-item label="收信号码">{{ form.phoneNumber }}</a-descriptions-item>
         <a-descriptions-item label="标题" :span="2">{{ form.title}}</a-descriptions-item>
         <a-descriptions-item label="内容" :span="2"><p v-html="form.content"></p></a-descriptions-item>
-        <a-descriptions-item v-if="form.hasAttachment > 0" label="附件" :span="2">
-
-          <a-list class="attachment" item-layout="horizontal" bordered  :data-source="form.attachmentList">
-            <template #renderItem="{ item }">
-              <a-list-item :key="item.id">
-                <a-list-item-meta>
-                  <template #title>
-                    <a-typography-link :href="item.meta.link" target="_blank">
-                      {{ item.name }}
-                    </a-typography-link>
-                  </template>
-                  <template #avatar>
-                    <a-typography-link :href="item.meta.link" target="_blank">
-                      <icon-font class="icon" :type="'icon-' + item.contentType.substring(item.contentType.indexOf('/') + 1,item.contentType.length).toUpperCase()" />
-                    </a-typography-link>
-                  </template>
-                </a-list-item-meta>
-              </a-list-item>
-            </template>
-          </a-list>
-
-        </a-descriptions-item>
       </a-descriptions>
 
     </a-spin>
@@ -83,7 +61,7 @@ export default {
 
       _this
           .$http
-          .get("/message/email/get?id=" + this.$route.query.id)
+          .get("/message/sms/get?id=" + this.$route.query.id)
           .then(r => {
             _this.form = r.data.data;
             _this.spinning = false
@@ -115,12 +93,10 @@ export default {
         lastSendTime: "",
         successTime:"",
         nextRetryTime:"",
-        fromEmail: "",
-        toEmail: "",
+        channel: "",
+        phoneNumber: "",
         retryCount:"",
         maxRetryCount:"",
-        hasAttachment: 0,
-        attachmentList:[],
         exception:""
       }
     }

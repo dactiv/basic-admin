@@ -3,13 +3,13 @@
   <a-breadcrumb class="hidden-xs">
     <a-breadcrumb-item><router-link to='/'><icon-font class="icon" type="icon-home" /> 首页</router-link></a-breadcrumb-item>
     <a-breadcrumb-item><icon-font class="icon" type="icon-message" /> 消息管理</a-breadcrumb-item>
-    <a-breadcrumb-item><icon-font class="icon" type="icon-email" /> 站内信消息</a-breadcrumb-item>
+    <a-breadcrumb-item><icon-font class="icon" type="icon-notification" /> 站内信消息</a-breadcrumb-item>
   </a-breadcrumb>
 
   <a-card title="站内信管理" class="basic-box-shadow margin-top-20">
 
     <template #extra>
-      <icon-font class="icon" type="icon-email" />
+      <icon-font class="icon" type="icon-notification" />
     </template>
 
     <a-spin :spinning="spinning" tip="数据加载中...">
@@ -24,7 +24,7 @@
           <span class="hidden-xs">发送</span>
         </a-button>
 
-        <a-button type="primary" @click="remove(null)" danger v-if="this.principal.hasPermission('perms[email:delete]')">
+        <a-button type="primary" @click="remove(null)" danger v-if="this.principal.hasPermission('perms[site:delete]')">
           <icon-font class="icon" type="icon-ashbin" />
           <span class="hidden-xs">删除选中</span>
         </a-button>
@@ -35,11 +35,11 @@
         <template #action="{ record }">
           <div class="text-center">
             <a-space :size="10">
-              <a-button size="small" @click="detail(record)" v-if="this.principal.hasPermission('perms[email:get]')">
+              <a-button size="small" @click="detail(record)" v-if="this.principal.hasPermission('perms[site:get]')">
                 <icon-font class="icon" type="icon-file" />
                 <span class="hidden-xs">详情</span>
               </a-button>
-              <a-button size="small" type="primary" danger @click="remove(record)" v-if="this.principal.hasPermission('perms[email:delete]')">
+              <a-button size="small" type="primary" danger @click="remove(record)" v-if="this.principal.hasPermission('perms[site:delete]')">
                 <icon-font class="icon" type="icon-ashbin" />
                 <span class="hidden-xs">删除</span>
               </a-button>
@@ -111,6 +111,14 @@
 
       <a-row>
         <a-col :span="24">
+          <a-form-item label="发送渠道:">
+            <a-input v-model:value="form['filter_[channel_eq]']" />
+          </a-form-item>
+        </a-col>
+      </a-row>
+
+      <a-row>
+        <a-col :span="24">
           <a-form-item label="创建时间:">
             <a-range-picker show-time class="width-100-percent" v-model:value="form['filter_[creation_time_between]']">
               <template #suffixIcon>
@@ -129,7 +137,7 @@
 <script>
 
 export default {
-  name:"MessageEmailIndex",
+  name:"MessageSiteIndex",
   data() {
     return {
       columns:[
@@ -188,6 +196,7 @@ export default {
         "filter_[title_like]":"",
         "filter_[content_eq]":"",
         "filter_[type_eq]":"",
+        "filter_[channel_eq]":"",
         "filter_[status_eq]":"",
         "filter_[creation_time_between]":[]
       },

@@ -2,7 +2,8 @@
   <a-breadcrumb class="hidden-xs">
     <a-breadcrumb-item><router-link to='/'><icon-font class="icon" type="icon-home" /> 首页</router-link></a-breadcrumb-item>
     <a-breadcrumb-item><icon-font class="icon" type="icon-message" /> 消息管理</a-breadcrumb-item>
-    <a-breadcrumb-item><icon-font class="icon" type="icon-notification" /> 发送站内信</a-breadcrumb-item>
+    <a-breadcrumb-item><router-link :to="{name:'message_site'}"><icon-font class="icon" type="icon-sms" /> 站内信消息</router-link></a-breadcrumb-item>
+    <a-breadcrumb-item><icon-font class="icon" type="icon-send" /> 发送站内信</a-breadcrumb-item>
   </a-breadcrumb>
 
   <a-card title="发送站内信" class="basic-box-shadow margin-top-20">
@@ -30,7 +31,7 @@
           <a-form-item label="发送给:" name="toUserIds">
             <a-row type="flex">
               <a-col flex="auto" class="margin-right-10">
-                <a-select class="width-100-percent" :max-tag-count="2" ref="select-tags" :disabled="form.toUserIds.includes('ALL_USER')" mode="multiple" :token-separators="[',']" v-model:value="form.toUserIds" :filter-option="false" :not-found-content="searching ? undefined : null" :options="data" @search="searchSelectUser">
+                <a-select class="width-100-percent" :max-tag-count="2" ref="select-multiple" :disabled="form.toUserIds.includes('ALL_USER')" mode="multiple" :token-separators="[',']" v-model:value="form.toUserIds" :filter-option="false" :not-found-content="searching ? undefined : null" :options="data" @search="searchSelectUser">
                 </a-select>
               </a-col>
               <a-col>
@@ -390,7 +391,6 @@ export default {
         type:"",
         content:"",
         title:"",
-        remark:"",
         attachmentList:[]
       },
       rules: {

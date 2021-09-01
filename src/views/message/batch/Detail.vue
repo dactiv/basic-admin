@@ -71,9 +71,20 @@ export default {
       } else if (_this.form.type === 20) {
         _this.loadEmailData();
       } else if (_this.form.type === 30) {
-        console.log(_this.form.type);
+        _this.loadSmsData();
       }
 
+    },
+    loadSmsData() {
+      let _this = this;
+
+      _this
+          .$http
+          .post("/message/sms/page",_this.formUrlencoded({"filter_[batch_id_eq]":this.form.id}))
+          .then(r => {
+            _this.page = r.data.data;
+            _this.columns = _this.smsColumns;
+          });
     },
     loadSiteData() {
       let _this = this;
@@ -121,6 +132,52 @@ export default {
         ellipsis: true,
         width: 80
       }],
+      smsColumns:[
+        {
+          title: "状态",
+          dataIndex: "statusName",
+          ellipsis: true,
+          width: 100
+        },
+        {
+          title: "类型",
+          dataIndex: "typeName",
+          ellipsis: true,
+          width: 100
+        },
+        {
+          title: "发送渠道",
+          dataIndex: "channel",
+          ellipsis: true,
+          width: 200
+        },
+        {
+          title: "收信电话",
+          dataIndex: "phoneNumber",
+          ellipsis: true,
+          width: 200
+        },{
+          title: "内容",
+          dataIndex: "content",
+          ellipsis: true,
+          width: 250
+        },{
+          title: "重试次数",
+          dataIndex: "retryCount",
+          ellipsis: true,
+          width: 150
+        },{
+          title: "最后发送时间",
+          dataIndex: "lastSendTime",
+          ellipsis: true,
+          width: 200
+        },{
+          title: "发送成功时间",
+          dataIndex: "successTime",
+          ellipsis: true,
+          width: 200
+        }
+      ],
       siteColumns:[
         {
           title: "状态",
