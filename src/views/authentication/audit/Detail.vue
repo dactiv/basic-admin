@@ -3,7 +3,7 @@
   <a-breadcrumb class="hidden-xs">
     <a-breadcrumb-item><router-link to='/'><icon-font class="icon" type="icon-home" /> 首页</router-link></a-breadcrumb-item>
     <a-breadcrumb-item><icon-font class="icon" type="icon-setting" /> 系统管理</a-breadcrumb-item>
-    <a-breadcrumb-item><router-link :to="{name:'audit'}"><icon-font class="icon" type="icon-audit" /> 操作审计</router-link></a-breadcrumb-item>
+    <a-breadcrumb-item><router-link :to="{name:'authentication_audit'}"><icon-font class="icon" type="icon-audit" /> 操作审计</router-link></a-breadcrumb-item>
     <a-breadcrumb-item><icon-font class="icon" type="icon-file" /> 审计详情</a-breadcrumb-item>
   </a-breadcrumb>
 

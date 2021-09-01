@@ -3,7 +3,7 @@
   <a-breadcrumb class="hidden-xs">
     <a-breadcrumb-item><router-link to='/'><icon-font class="icon" type="icon-home" /> 首页</router-link></a-breadcrumb-item>
     <a-breadcrumb-item><icon-font class="icon" type="icon-message" /> 消息管理</a-breadcrumb-item>
-    <a-breadcrumb-item><icon-font class="icon" type="icon-batch" /> 批量消息管理</a-breadcrumb-item>
+    <a-breadcrumb-item><icon-font class="icon" type="icon-batch" /> 批量消息</a-breadcrumb-item>
   </a-breadcrumb>
 
   <a-card title="批量消息管理" class="basic-box-shadow margin-top-20">
@@ -150,21 +150,11 @@ export default {
           width: 80
         },
         {
-          title: "发送成功数量",
-          dataIndex: "successNumber",
+          title: "总发送数量",
+          dataIndex: "count",
           ellipsis: true,
           width: 200
         },{
-          title: "发送失败数量",
-          dataIndex: "failNumber",
-          ellipsis: true,
-          width: 200
-        },{
-          title: "发送中数量",
-          dataIndex: "sendingNumber",
-          ellipsis: true,
-          width: 200
-        }, {
           title: "完成时间",
           dataIndex: "completeTime",
           ellipsis: true,
@@ -223,7 +213,7 @@ export default {
 
       if (record) {
         ids.push(record.id);
-        confirmMessage = "确定要删除 [" + record.username + "] 批量消息吗?"
+        confirmMessage = "确定要删除这条批量消息吗?"
       } else {
         ids = this.selectedIds;
         confirmMessage = "确定要删除" + ids.length + "条记录吗?"

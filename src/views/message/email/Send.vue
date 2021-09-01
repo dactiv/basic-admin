@@ -58,20 +58,39 @@
         </a-col>
       </a-row>
 
+      <a-list class="margin-bottom-20 attachment" item-layout="horizontal" bordered v-if="fileList.length > 0" :data-source="fileList">
+        <template #renderItem="{ item }">
+          <a-list-item :key="item.uid">
+            <template #actions>
+              <a-button danger @click="removeAttachment(item.uid)">
+                <icon-font class="icon" type="icon-ashbin" />
+                <span class="hidden-xs">删除</span>
+              </a-button>
+            </template>
+            <a-list-item-meta>
+              <template #title>
+                <a-typography-text :type="item.status !== 'done' ? 'secondary' : item.status === 'error' ? 'danger' : 'success'">{{ item.name }}</a-typography-text>
+              </template>
+              <template #description>
+                <a-progress :percent="item.percent" />
+              </template>
+              <template #avatar>
+                <a-typography-text :type="item.status !== 'done' ? 'secondary' : item.status === 'error' ? 'danger' : 'success'">
+                  <icon-font class="icon file" :type="'icon-' + item.type.substring(item.type.indexOf('/') + 1,item.type.length).toUpperCase()" />
+                </a-typography-text>
+              </template>
+            </a-list-item-meta>
+          </a-list-item>
+        </template>
+      </a-list>
+
       <a-row >
         <a-col :span="24">
           <a-form-item label="内容:" name="content">
-            <QuillEditor :modules="editor.modules" toolbar="full" theme="snow" v-model:content="form.content" content-type="html" />
+            <QuillEditor toolbar="full" theme="snow" v-model:content="form.content" content-type="html" />
           </a-form-item>
         </a-col>
       </a-row>
-
-      <a-upload-dragger v-if="this.principal.hasPermission('perms[file_manager:upload]')" :multiple="true" :remove="removeAttachment" v-model:file-list="fileList" action="/file-manager/upload/email-attachment" @change="fileListChange">
-        <p class="ant-upload-drag-icon">
-          <icon-font type="icon-attachment" />
-        </p>
-        <p class="ant-upload-text">点击或者拖拽文件到此区域进行附件上传</p>
-      </a-upload-dragger>
 
       <a-divider></a-divider>
 
@@ -81,6 +100,13 @@
           <icon-font class="icon" v-if="!sending" type="icon-send" />
           <span class="hidden-xs">发送</span>
         </a-button>
+
+        <a-upload v-if="this.principal.hasPermission('perms[message:send]')" :showUploadList="false" :multiple="true" v-model:file-list="fileList" action="/file-manager/upload/email-attachment" @change="fileListChange">
+          <a-button>
+            <icon-font class="icon" type="icon-attachment" />
+            <span class="hidden-xs">上传附件</span>
+          </a-button>
+        </a-upload>
 
       </a-space>
 
@@ -146,7 +172,6 @@
 <script>
 
 import { QuillEditor } from '@vueup/vue-quill'
-import BlotFormatter from 'quill-blot-formatter'
 
 import '@vueup/vue-quill/dist/vue-quill.snow.css';
 import '@/assets/css/quill.css'
@@ -205,7 +230,9 @@ export default {
     searchTableUser() {
       let _this = this;
 
-      this.search.spinning = true;
+      _this.search.spinning = true;
+
+      _this.data = [JSON.parse(JSON.stringify(defaultData))];
 
       _this
           .$http
@@ -226,7 +253,7 @@ export default {
 
         _this
             .$http
-            .post("/message/send", this.form)
+            .post("/message/send", _this.form)
             .then((r) => {
 
               _this.sending = false;
@@ -247,7 +274,9 @@ export default {
             }).catch(() => _this.sending = false)
       });
     },
-    removeAttachment(file) {
+    removeAttachment(uid) {
+
+      let file = this.fileList.find(f => f.uid === uid);
 
       if (file.status !== "done") {
         return ;
@@ -260,45 +289,32 @@ export default {
         return false;
       }
 
-      return new Promise((resolve, reject) => {
+      _this
+          .$http
+          .post("/file-manager/delete", _this.formUrlencoded({bucketName:file.response.data.bucket, filename:file.name}))
+          .then(r => {
 
-        _this
-            .$http
-            .post("/file-manager/delete", _this.formUrlencoded({bucketName:file.response.data.bucket, filename:file.name}))
-            .then(r => {
+            _this.$message.success(r.data.message);
 
-              if (r.data.status !== 200) {
-                _this.$message.error(r.data.message);
-                resolve(false);
-              } else {
-                _this.$message.success(r.data.message);
-                resolve(true);
-              }
+            let fileIndex = _this.fileList.indexOf(a => a.uid === uid);
+            _this.fileList.splice(fileIndex, 1);
 
-            })
-            .catch(r => {reject(r)});
+            let attachmentIndex = this.form.attachmentList.indexOf(a => a.uid === uid);
+            this.form.attachmentList.splice(attachmentIndex, 1);
 
-      });
+          });
 
     },
     fileListChange(info) {
 
-      if (info.file.percent !== 100) {
-        return ;
-      }
-
-      if (info.file.status === "removed") {
-        let index = this.form.attachmentList.indexOf(a => a.uid = info.file.uid);
-        this.form.attachmentList.splice(index, 1);
-      } else if (info.file.status === "done") {
+      if (info.file.status === "done") {
 
         let attachment = {
           name: info.file.name,
           contentType: info.file.type,
           uid: info.file.uid,
-          type: 20,
           meta: {
-            like:info.file.response.data.url,
+            link:info.file.response.data.url,
             bucket:info.file.response.data.bucket
           }
         };
@@ -314,12 +330,6 @@ export default {
   },
   data() {
     return {
-      editor: {
-        modules:[{
-          name: 'blotFormatter',
-          module: BlotFormatter
-        }]
-      },
       sending: false,
       searching: false,
       fileList:[],

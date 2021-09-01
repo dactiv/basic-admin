@@ -3,7 +3,7 @@
   <a-breadcrumb class="hidden-xs">
     <a-breadcrumb-item><router-link to='/'><icon-font class="icon" type="icon-home" /> 首页</router-link></a-breadcrumb-item>
     <a-breadcrumb-item><icon-font class="icon" type="icon-un-config-o" /> 配置管理</a-breadcrumb-item>
-    <a-breadcrumb-item><router-link :to="{name:'dictionary'}"> <icon-font class="icon" type="icon-dictionary" /> 数据字典管理</router-link></a-breadcrumb-item>
+    <a-breadcrumb-item><router-link :to="{name:'config_dictionary'}"> <icon-font class="icon" type="icon-dictionary" /> 数据字典管理</router-link></a-breadcrumb-item>
     <a-breadcrumb-item><icon-font class="icon" type="icon-edit" /> {{ (form.id ? '编辑 [' + form.name + '] ': '添加') + '字典类型' }}</a-breadcrumb-item>
   </a-breadcrumb>
 

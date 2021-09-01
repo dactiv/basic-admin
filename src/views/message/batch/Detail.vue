@@ -3,7 +3,8 @@
   <a-breadcrumb class="hidden-xs">
     <a-breadcrumb-item><router-link to='/'><icon-font class="icon" type="icon-home" /> 首页</router-link></a-breadcrumb-item>
     <a-breadcrumb-item><icon-font class="icon" type="icon-message" /> 消息管理</a-breadcrumb-item>
-    <a-breadcrumb-item><icon-font class="icon" type="icon-batch" /> 批量消息管理</a-breadcrumb-item>
+    <a-breadcrumb-item><router-link :to="{name:'message_batch'}"><icon-font class="icon" type="icon-batch" /> 批量消息</router-link></a-breadcrumb-item>
+    <a-breadcrumb-item><icon-font class="icon" type="icon-file" /> 批量消息明细</a-breadcrumb-item>
   </a-breadcrumb>
 
   <a-card title="批量消息明细" class="basic-box-shadow">
@@ -20,10 +21,11 @@
           :column="{ xxl: 2, xl: 2, lg: 2, md: 2, sm: 2, xs: 1 }"
       >
 
-        <a-descriptions-item label="类型" :span="2"><icon-font class="icon" :type="form.type === 10 ? 'icon-notification' : form.type === 20 ? 'icon-email' : 'icon-sms'" /> {{ form.typeName }}</a-descriptions-item>
+        <a-descriptions-item label="类型"><icon-font class="icon" :type="form.type === 10 ? 'icon-notification' : form.type === 20 ? 'icon-email' : 'icon-sms'" /> {{ form.typeName }}</a-descriptions-item>
+        <a-descriptions-item label="状态"><a-badge :status="form.status === 0 ? 'processing' : form.status === 1 ? 'success' : 'error'" :text="form.statusName" /></a-descriptions-item>
         <a-descriptions-item label="创建时间">{{ this.timestampFormat(form.creationTime) }} </a-descriptions-item>
         <a-descriptions-item label="完成时间">{{ this.timestampFormat(form.completeTime) }}</a-descriptions-item>
-        <a-descriptions-item label="状态"><a-badge :status="form.status === 0 ? 'processing' : form.status === 1 ? 'success' : 'error'" :text="form.statusName" /></a-descriptions-item>
+        <a-descriptions-item label="总发送数量">{{ form.count}}</a-descriptions-item>
         <a-descriptions-item label="发送中数量">{{ form.sendingNumber}}</a-descriptions-item>
         <a-descriptions-item label="发送成功数量"><a-typography-text type="success">{{ form.successNumber }}</a-typography-text></a-descriptions-item>
         <a-descriptions-item label="发送失败数量"><a-typography-text type="danger">{{ form.failNumber }}</a-typography-text></a-descriptions-item>
@@ -65,13 +67,24 @@ export default {
       let _this = this;
 
       if (_this.form.type === 10) {
-        console.log(_this.form.type);
+        _this.loadSiteData();
       } else if (_this.form.type === 20) {
         _this.loadEmailData();
       } else if (_this.form.type === 30) {
         console.log(_this.form.type);
       }
 
+    },
+    loadSiteData() {
+      let _this = this;
+
+      _this
+          .$http
+          .post("/message/site/page",_this.formUrlencoded({"filter_[batch_id_eq]":this.form.id}))
+          .then(r => {
+            _this.page = r.data.data;
+            _this.columns = _this.siteColumns;
+          });
     },
     loadEmailData() {
       let _this = this;
@@ -108,28 +121,74 @@ export default {
         ellipsis: true,
         width: 80
       }],
-      emailColumns:[
+      siteColumns:[
         {
           title: "状态",
-          dataIndex: "status",
+          dataIndex: "statusName",
           ellipsis: true,
           width: 100
         },
         {
           title: "类型",
-          dataIndex: "type",
+          dataIndex: "typeName",
+          ellipsis: true,
+          width: 100
+        },
+        {
+          title: "发送渠道",
+          dataIndex: "channel",
+          ellipsis: true,
+          width: 200
+        },
+        {
+          title: "收信用户 id",
+          dataIndex: "toUserId",
+          ellipsis: true,
+          width: 200
+        },{
+          title: "标题",
+          dataIndex: "title",
+          ellipsis: true,
+          width: 250
+        },{
+          title: "重试次数",
+          dataIndex: "retryCount",
+          ellipsis: true,
+          width: 150
+        },{
+          title: "最后发送时间",
+          dataIndex: "lastSendTime",
+          ellipsis: true,
+          width: 200
+        }, {
+          title: "发送成功时间",
+          dataIndex: "successTime",
+          ellipsis: true,
+          width: 200
+        }
+      ],
+      emailColumns:[
+        {
+          title: "状态",
+          dataIndex: "statusName",
+          ellipsis: true,
+          width: 100
+        },
+        {
+          title: "类型",
+          dataIndex: "typeName",
           ellipsis: true,
           width: 100
         },
         {
           title: "发送邮件",
-          dataIndex: "from",
+          dataIndex: "fromEmail",
           ellipsis: true,
           width: 200
         },
         {
           title: "收取邮件",
-          dataIndex: "to",
+          dataIndex: "toEmail",
           ellipsis: true,
           width: 200
         },{
@@ -173,9 +232,9 @@ export default {
 
     let _this = this;
 
-    this
+    _this
         .$http
-        .get("/message/batch/get?id=" + this.$route.query.id)
+        .get("/message/batch/get?id=" + _this.$route.query.id)
         .then(r => {
           _this.form = r.data.data;
           _this.reload();

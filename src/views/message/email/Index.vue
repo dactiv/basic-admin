@@ -3,7 +3,7 @@
   <a-breadcrumb class="hidden-xs">
     <a-breadcrumb-item><router-link to='/'><icon-font class="icon" type="icon-home" /> 首页</router-link></a-breadcrumb-item>
     <a-breadcrumb-item><icon-font class="icon" type="icon-message" /> 消息管理</a-breadcrumb-item>
-    <a-breadcrumb-item><icon-font class="icon" type="icon-email" /> 邮件管理</a-breadcrumb-item>
+    <a-breadcrumb-item><icon-font class="icon" type="icon-email" /> 邮件消息</a-breadcrumb-item>
   </a-breadcrumb>
 
   <a-card title="邮件管理" class="basic-box-shadow margin-top-20">
@@ -125,7 +125,7 @@
       <a-row>
         <a-col :span="24">
           <a-form-item label="最后发送时间:">
-            <a-range-picker show-time class="width-100-percent" v-model:value="form['filter_[last_send_time_between]']">
+            <a-range-picker show-time class="width-100-percent" v-model:value="form['filter_[creation_time_between]']">
               <template #suffixIcon>
                 <icon-font class="icon" type="icon-calendar" />
               </template>
@@ -148,25 +148,25 @@ export default {
       columns:[
         {
           title: "状态",
-          dataIndex: "status",
+          dataIndex: "statusName",
           ellipsis: true,
-          width: 80
+          width: 100
         },
         {
           title: "类型",
-          dataIndex: "type",
+          dataIndex: "typeName",
           ellipsis: true,
-          width: 120
+          width: 100
         },
         {
           title: "发送邮件",
-          dataIndex: "from",
+          dataIndex: "fromEmail",
           ellipsis: true,
           width: 200
         },
         {
           title: "收取邮件",
-          dataIndex: "to",
+          dataIndex: "toEmail",
           ellipsis: true,
           width: 200
         },{
@@ -204,7 +204,7 @@ export default {
         "filter_[status_eq]":"",
         "filter_[from_like]":"",
         "filter_[to_like]":"",
-        "filter_[last_send_time_between]":[]
+        "filter_[creation_time_between]":[]
       },
       page: {
         content:[],
@@ -250,7 +250,7 @@ export default {
 
       if (record) {
         ids.push(record.id);
-        confirmMessage = "确定要删除 [" + record.username + "] 邮件吗?"
+        confirmMessage = "确定要删除 [" + record.title + "] 邮件吗?"
       } else {
         ids = this.selectedIds;
         confirmMessage = "确定要删除" + ids.length + "条记录吗?"

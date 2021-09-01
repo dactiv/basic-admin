@@ -3,7 +3,7 @@
   <a-breadcrumb class="hidden-xs">
     <a-breadcrumb-item><router-link to='/'><icon-font class="icon" type="icon-home" /> 首页</router-link></a-breadcrumb-item>
     <a-breadcrumb-item><icon-font class="icon" type="icon-setting" /> 系统管理</a-breadcrumb-item>
-    <a-breadcrumb-item><router-link :to="{name:'group'}"><icon-font class="icon" type="icon-group" /> 组管理</router-link></a-breadcrumb-item>
+    <a-breadcrumb-item><router-link :to="{name:'authentication_group'}"><icon-font class="icon" type="icon-group" /> 组管理</router-link></a-breadcrumb-item>
     <a-breadcrumb-item><icon-font class="icon" type="icon-edit" /> {{ (form.id ? '编辑 [' + form.name + '] ': '添加') + '组' }}</a-breadcrumb-item>
   </a-breadcrumb>
 

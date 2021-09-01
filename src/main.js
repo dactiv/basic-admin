@@ -47,6 +47,9 @@ import {
     Empty,
     Upload,
     Tooltip,
+    List,
+    Progress,
+    Switch,
     notification,
     message
 } from "ant-design-vue";
@@ -112,7 +115,7 @@ app.config.globalProperties.loadConfig = function(params, callback) {
 }
 
 const IconFont = createFromIconfontCN({
-    scriptUrl: "//at.alicdn.com/t/font_2732722_u757ruv53u.js"
+    scriptUrl: ["//at.alicdn.com/t/font_2732722_u757ruv53u.js","//at.alicdn.com/t/font_2783178_1oxezexugxr.js"]
 });
 
 app.component('IconFont', IconFont);
@@ -181,4 +184,7 @@ app.use(router)
     .use(Empty)
     .use(Upload)
     .use(Tooltip)
+    .use(List)
+    .use(Progress)
+    .use(Switch)
     .mount('#app');
