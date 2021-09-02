@@ -14,50 +14,38 @@
 
     <a-form ref="edit-form" :model="form" :rules="rules" layout="vertical">
 
-      <a-row>
-        <a-col :span="24">
-          <a-form-item has-feedback label="类型:" name="type">
-            <a-select class="width-100-percent" v-model:value="form.type">
-              <a-select-option v-for="(value, name) of typeOptions" :key="name" :value="name">
-                {{value}}
-              </a-select-option>
+      <a-form-item has-feedback label="类型:" name="type">
+        <a-select class="width-100-percent" v-model:value="form.type">
+          <a-select-option v-for="(value, name) of typeOptions" :key="name" :value="name">
+            {{value}}
+          </a-select-option>
+        </a-select>
+      </a-form-item>
+
+      <a-form-item label="发送给:" name="phoneNumbers">
+        <a-row type="flex">
+          <a-col flex="auto" class="margin-right-10">
+            <a-select class="width-100-percent" :max-tag-count="2" ref="select-tags" :disabled="form.phoneNumbers.includes(13000000000)" mode="tags" :token-separators="[',']" v-model:value="form.phoneNumbers" :filter-option="false" :not-found-content="searching ? undefined : null" :options="data" @search="searchSelectUser">
             </a-select>
-          </a-form-item>
-        </a-col>
-      </a-row>
+          </a-col>
+          <a-col>
+            <a-space :size="10">
+              <a-button ref="btn-all-user" @click="sendAll">
+                <icon-font class="icon" :type="form.phoneNumbers.includes(13000000000) ? 'icon-ashbin' : 'icon-all'" />
+                <span class="hidden-xs">{{form.phoneNumbers.includes(13000000000) ? '取消选择' : '全网站内信'}}</span>
+              </a-button>
+              <a-button :disabled="form.phoneNumbers.includes('ALL_USER')" ref="btn-search-user" @click="search.dialogVisible = true">
+                <icon-font class="icon" type="icon-filter"/>
+                <span class="hidden-xs">条件搜索站内信</span>
+              </a-button>
+            </a-space>
+          </a-col>
+        </a-row>
+      </a-form-item>
 
-      <a-row >
-        <a-col :span="24">
-          <a-form-item label="发送给:" name="phoneNumbers">
-            <a-row type="flex">
-              <a-col flex="auto" class="margin-right-10">
-                <a-select class="width-100-percent" :max-tag-count="2" ref="select-tags" :disabled="form.phoneNumbers.includes(13000000000)" mode="tags" :token-separators="[',']" v-model:value="form.phoneNumbers" :filter-option="false" :not-found-content="searching ? undefined : null" :options="data" @search="searchSelectUser">
-                </a-select>
-              </a-col>
-              <a-col>
-                <a-space :size="10">
-                  <a-button ref="btn-all-user" @click="sendAll">
-                    <icon-font class="icon" :type="form.phoneNumbers.includes(13000000000) ? 'icon-ashbin' : 'icon-all'" />
-                    <span class="hidden-xs">{{form.phoneNumbers.includes(13000000000) ? '取消选择' : '全网站内信'}}</span>
-                  </a-button>
-                  <a-button :disabled="form.phoneNumbers.includes('ALL_USER')" ref="btn-search-user" @click="search.dialogVisible = true">
-                    <icon-font class="icon" type="icon-filter"/>
-                    <span class="hidden-xs">条件搜索站内信</span>
-                  </a-button>
-                </a-space>
-              </a-col>
-            </a-row>
-          </a-form-item>
-        </a-col>
-      </a-row>
-
-      <a-row >
-        <a-col :span="24">
-          <a-form-item label="内容:" name="content">
-            <a-textarea v-model:value="form.content" :auto-size="{ minRows: 3, maxRows: 6 }"/>
-          </a-form-item>
-        </a-col>
-      </a-row>
+      <a-form-item label="内容:" name="content">
+        <a-textarea v-model:value="form.content" :auto-size="{ minRows: 3, maxRows: 6 }"/>
+      </a-form-item>
 
       <a-divider></a-divider>
 

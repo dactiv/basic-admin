@@ -29,27 +29,18 @@
           </a-col>
         </a-row>
 
-        <a-row>
-          <a-col :span="24">
-            <a-form-item label="上级:" name="parentId">
-              <a-select show-search class="width-100-percent" v-model:value="form.parentId" @change="parentChange" optionFilterProp="key">
-                <a-select-option key="" value="">无</a-select-option>
-                <a-select-option v-for="p of parentOptions" :key="p.name" :value="p.id + ''">
-                  {{p.name}}
-                </a-select-option>
-              </a-select>
-            </a-form-item>
-          </a-col>
+        <a-form-item label="上级:" name="parentId">
+          <a-select show-search class="width-100-percent" v-model:value="form.parentId" @change="parentChange" optionFilterProp="key">
+            <a-select-option key="" value="">无</a-select-option>
+            <a-select-option v-for="p of parentOptions" :key="p.name" :value="p.id + ''">
+              {{p.name}}
+            </a-select-option>
+          </a-select>
+        </a-form-item>
 
-        </a-row>
-
-        <a-row>
-          <a-col :span="24">
-            <a-form-item label="备注:" name="remark">
-              <a-textarea v-model:value="form.remark" :auto-size="{ minRows: 2, maxRows: 5 }"/>
-            </a-form-item>
-          </a-col>
-        </a-row>
+        <a-form-item label="备注:" name="remark">
+          <a-textarea v-model:value="form.remark" :auto-size="{ minRows: 2, maxRows: 5 }"/>
+        </a-form-item>
 
         <a-card title="数据字典内容" v-if="this.form.id !== null">
 

@@ -75,14 +75,9 @@
 
         </a-row>
 
-        <a-row>
-          <a-col :span="24">
-            <a-form-item label="拥有权限:" name="remark">
-              <resource-table ref="resource-table" :selection="true"/>
-            </a-form-item>
-          </a-col>
-
-        </a-row>
+        <a-form-item label="拥有权限:" name="remark">
+          <resource-table ref="resource-table" :selection="true"/>
+        </a-form-item>
 
       </a-form>
 

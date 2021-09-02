@@ -59,7 +59,6 @@
               </a-select>
             </a-form-item>
           </a-col>
-
         </a-row>
 
         <a-row>
@@ -149,7 +148,7 @@ export default {
         ],
         confirmPassword: [
           { required: true, message: "请输入确认密码", trigger: "change" },
-          { validator:this.validatePass, trigger: "change"}
+          { validator:this.validatePassword, trigger: "change"}
         ],
         email: [
           {type: "email", message:"电子邮箱格式不正确",trigger: "change"},
@@ -173,7 +172,7 @@ export default {
         });
       });
     },
-    async validatePass() {
+    async validatePassword() {
       if (this.form.confirmPassword !== this.form.password) {
         return Promise.reject('登陆密码与确认密码不一致');
       } else {

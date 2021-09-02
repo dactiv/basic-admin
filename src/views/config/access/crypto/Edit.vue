@@ -73,14 +73,9 @@
 
         </a-row>
 
-        <a-row>
-          <a-col :span="24">
-            <a-form-item label="备注:" name="remark">
-              <a-textarea v-model:value="form.remark" :auto-size="{ minRows: 2, maxRows: 5 }"/>
-            </a-form-item>
-          </a-col>
-
-        </a-row>
+        <a-form-item label="备注:" name="remark">
+          <a-textarea v-model:value="form.remark" :auto-size="{ minRows: 2, maxRows: 5 }"/>
+        </a-form-item>
 
         <a-space :size="10" class="margin-bottom-20">
           <a-button @click="editPredicate(null)" v-if="this.principal.hasPermission('perms[access_crypto:save]')">

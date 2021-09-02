@@ -24,10 +24,12 @@
             <a-menu-item key="1"><icon-font class="icon" type="icon-moon" /></a-menu-item>
             <a-sub-menu key="2">
               <template #title>
-                <a-avatar :src="require('../assets/avatar/男生-紫.png')" ></a-avatar>
+                <a-space :size="20">
+                  <span>{{ this.principal.details.username }}</span>
+                  <a-avatar :src="require('../assets/avatar/男生-紫.png')" ></a-avatar>
+                </a-space>
               </template>
-              <a-menu-item key="2-1"><a-button type="text"><icon-font class="icon" type="icon-profile" /> {{ this.principal.details.username }}</a-button></a-menu-item>
-              <a-menu-item key="2-2"><a-button type="text"><icon-font class="icon" type="icon-setting" /> 系统设置</a-button> </a-menu-item>
+              <a-menu-item key="2-2"><a-button type="text" @click="profile()"><icon-font class="icon" type="icon-setting" /> 系统设置</a-button> </a-menu-item>
               <a-menu-item key="2-4"><a-button type="text" @click="logout()"><icon-font class="icon" type="icon-sign-out" /> 注销账户</a-button></a-menu-item>
             </a-sub-menu>
           </a-menu>
@@ -58,7 +60,9 @@
 
       <a-layout-content :class="menu.collapsed ? 'main-content toggle' : 'main-content'">
         <div class="header-navbar-shadow"></div>
+        <div class="margin-top-20">
         <router-view />
+        </div>
       </a-layout-content>
 
     </a-layout>
@@ -113,6 +117,9 @@ export default {
 
   },
   methods: {
+    profile() {
+      this.$router.push({name:"profile"});
+    },
     menuSelect(item) {
       this.menu.selectedKeys = [item.key];
     },

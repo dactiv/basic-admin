@@ -56,8 +56,6 @@ import {
 
 const app = createApp(App);
 
-app.config.globalProperties.$moment = moment;
-
 app.config.globalProperties.timestampFormat = function (timestamp) {
     return moment(timestamp).format(process.env.VUE_APP_TIMESTAMP_FORMAT);
 }
@@ -114,18 +112,6 @@ app.config.globalProperties.loadConfig = function(params, callback) {
     this.$http.get(process.env.VUE_APP_SERVER_CONFIG_URI_SUFFIX,{params: params}).then(callback);
 }
 
-const IconFont = createFromIconfontCN({
-    scriptUrl: ["//at.alicdn.com/t/font_2732722_u757ruv53u.js","//at.alicdn.com/t/font_2783178_1oxezexugxr.js"]
-});
-
-app.component('IconFont', IconFont);
-
-app.config.globalProperties.principal = {
-    details: store.state.principal,
-    hasPermission: store.getters[PRINCIPAL_GETTER_TYPE.HasPermission],
-    hasRole: store.getters[PRINCIPAL_GETTER_TYPE.HasRole]
-}
-
 app.config.globalProperties.confirm = function(config, ok, cancel) {
 
     let props = {
@@ -146,9 +132,89 @@ app.config.globalProperties.confirm = function(config, ok, cancel) {
 
 };
 
+app.config.globalProperties.getFileIcon = function(filename) {
+
+    let index = filename.lastIndexOf(".");
+
+    if (index < 0) {
+        return "icon-unkown";
+    }
+
+    let suffix = filename.substring(index + 1, filename.length);
+
+    let icon = this.attachmentFileSupport.find(a => a.name === suffix);
+
+    if (!icon) {
+        return "icon-unkown";
+    }
+
+    return icon.icon
+}
+
+const IconFont = createFromIconfontCN({
+    scriptUrl: ["//at.alicdn.com/t/font_2732722_7a25f7furcn.js","//at.alicdn.com/t/font_2783178_o30jvdzd5vo.js"]
+});
+
+app.component('IconFont', IconFont);
+
+app.config.globalProperties.principal = {
+    details: store.state.principal,
+    hasPermission: store.getters[PRINCIPAL_GETTER_TYPE.HasPermission],
+    hasRole: store.getters[PRINCIPAL_GETTER_TYPE.HasRole]
+}
+
 app.config.globalProperties.$message = message;
 
 app.config.globalProperties.$notification = notification;
+
+app.config.globalProperties.$moment = moment;
+
+app.config.globalProperties.attachmentFileSupport = [
+    {name:"7z",icon:"icon-z"},
+    {name:"avi",icon:"icon-AVI"},
+    {name:"bat",icon:"icon-BAT"},
+    {name:"ai",icon:"icon-AI"},
+    {name:"bmp",icon:"icon-BMP"},
+    {name:"css",icon:"icon-CSS"},
+    {name:"conf",icon:"icon-CONF"},
+    {name:"eot",icon:"icon-EOT"},
+    {name:"docx",icon:"icon-DOCX"},
+    {name:"doc",icon:"icon-DOC"},
+    {name:"htm",icon:"icon-HTM"},
+    {name:"html",icon:"icon-HTML"},
+    {name:"ico",icon:"icon-ICO"},
+    {name:"ini",icon:"icon-INI"},
+    {name:"jar",icon:"icon-JAR"},
+    {name:"java",icon:"icon-JAVA"},
+    {name:"jpeg",icon:"icon-JPEG"},
+    {name:"jpg",icon:"icon-JPG"},
+    {name:"js",icon:"icon-JS"},
+    {name:"md",icon:"icon-MD"},
+    {name:"mp3",icon:"icon-MP"},
+    {name:"mp4",icon:"icon-MP1"},
+    {name:"mp5",icon:"icon-MP2"},
+    {name:"mpge",icon:"icon-MPGE"},
+    {name:"pdf",icon:"icon-PDF"},
+    {name:"pl",icon:"icon-PL"},
+    {name:"png",icon:"icon-PNG"},
+    {name:"ppt",icon:"icon-PPT"},
+    {name:"psd",icon:"icon-PSD"},
+    {name:"py",icon:"icon-PY"},
+    {name:"rar",icon:"icon-RAR"},
+    {name:"rm",icon:"icon-RM"},
+    {name:"sh",icon:"icon-SH"},
+    {name:"svg",icon:"icon-SVG"},
+    {name:"ttf",icon:"icon-TTF"},
+    {name:"tar",icon:"icon-TAR"},
+    {name:"text",icon:"icon-TEXT"},
+    {name:"xlsx",icon:"icon-XLSX"},
+    {name:"woff",icon:"icon-WOFF"},
+    {name:"xml",icon:"icon-XML"},
+    {name:"yml",icon:"icon-YML"},
+    {name:"yaml",icon:"icon-YAML"},
+    {name:"zip",icon:"icon-ZIP"},
+    {name:"bin",icon:"icon-BIN"}
+]
 
 app.use(router)
     .use(store)

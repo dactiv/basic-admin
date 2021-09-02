@@ -60,7 +60,7 @@
                   </template>
                   <template #avatar>
                     <a-typography-link :href="item.meta.link" target="_blank">
-                      <icon-font class="icon" :type="'icon-' + item.contentType.substring(item.contentType.indexOf('/') + 1,item.contentType.length).toUpperCase()" />
+                      <icon-font class="icon" :type="this.getFileIcon(item.name)" />
                     </a-typography-link>
                   </template>
                 </a-list-item-meta>

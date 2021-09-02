@@ -65,22 +65,13 @@
 
         </a-row>
 
-        <a-row>
-          <a-col :span="24">
-            <a-form-item has-feedback label="值:" name="value">
-              <a-textarea v-model:value="form.value" :auto-size="{ minRows: 5, maxRows: 5 }"/>
-            </a-form-item>
-          </a-col>
-        </a-row>
+        <a-form-item has-feedback label="值:" name="value">
+          <a-textarea v-model:value="form.value" :auto-size="{ minRows: 5, maxRows: 5 }"/>
+        </a-form-item>
 
-        <a-row>
-          <a-col :span="24">
-            <a-form-item label="备注:" name="remark">
-              <a-textarea v-model:value="form.remark" :auto-size="{ minRows: 2, maxRows: 5 }"/>
-            </a-form-item>
-          </a-col>
-
-        </a-row>
+        <a-form-item label="备注:" name="remark">
+          <a-textarea v-model:value="form.remark" :auto-size="{ minRows: 2, maxRows: 5 }"/>
+        </a-form-item>
 
       </a-form>
 

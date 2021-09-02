@@ -7,6 +7,8 @@ import NotFound from '@/views/error/404'
 import Forbidden from '@/views/error/403'
 import BadRequest from '@/views/error/400'
 
+import Profile from '@/views/authentication/console/user/Profile'
+
 import store from '@/store'
 
 import NProgress from 'nprogress'
@@ -27,6 +29,10 @@ const childrenRoutes = [
     path: '400',
     name: '400',
     component: BadRequest
+  },{
+    path: "profile",
+    name: 'profile',
+    component: Profile
   }
 ]
 

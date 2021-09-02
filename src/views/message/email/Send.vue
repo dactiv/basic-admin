@@ -14,50 +14,38 @@
 
     <a-form ref="edit-form" :model="form" :rules="rules" layout="vertical">
 
-      <a-row>
-        <a-col :span="24">
-          <a-form-item has-feedback label="类型:" name="type">
-            <a-select class="width-100-percent" v-model:value="form.type">
-              <a-select-option v-for="(value, name) of typeOptions" :key="name" :value="name">
-                {{value}}
-              </a-select-option>
+      <a-form-item has-feedback label="类型:" name="type">
+        <a-select class="width-100-percent" v-model:value="form.type">
+          <a-select-option v-for="(value, name) of typeOptions" :key="name" :value="name">
+            {{value}}
+          </a-select-option>
+        </a-select>
+      </a-form-item>
+
+      <a-form-item label="发送给:" name="toEmails">
+        <a-row type="flex">
+          <a-col flex="auto" class="margin-right-10">
+            <a-select class="width-100-percent" :max-tag-count="2" ref="select-tags" :disabled="form.toEmails.includes('ALL_USER@domain.com')" mode="tags" :token-separators="[',']" v-model:value="form.toEmails" :filter-option="false" :not-found-content="searching ? undefined : null" :options="data" @search="searchSelectUser">
             </a-select>
-          </a-form-item>
-        </a-col>
-      </a-row>
+          </a-col>
+          <a-col>
+            <a-space :size="10">
+              <a-button ref="btn-all-user" @click="sendAll">
+                <icon-font class="icon" :type="form.toEmails.includes('ALL_USER@domain.com') ? 'icon-ashbin' : 'icon-all'" />
+                <span class="hidden-xs">{{form.toEmails.includes('ALL_USER@domain.com') ? '取消选择' : '全网邮件'}}</span>
+              </a-button>
+              <a-button :disabled="form.toEmails.includes('ALL_USER@domain.com')" ref="btn-search-user" @click="search.dialogVisible = true">
+                <icon-font class="icon" type="icon-filter"/>
+                <span class="hidden-xs">条件搜索邮件</span>
+              </a-button>
+            </a-space>
+          </a-col>
+        </a-row>
+      </a-form-item>
 
-      <a-row >
-        <a-col :span="24">
-          <a-form-item label="发送给:" name="toEmails">
-            <a-row type="flex">
-              <a-col flex="auto" class="margin-right-10">
-                <a-select class="width-100-percent" :max-tag-count="2" ref="select-tags" :disabled="form.toEmails.includes('ALL_USER@domain.com')" mode="tags" :token-separators="[',']" v-model:value="form.toEmails" :filter-option="false" :not-found-content="searching ? undefined : null" :options="data" @search="searchSelectUser">
-                </a-select>
-              </a-col>
-              <a-col>
-                <a-space :size="10">
-                  <a-button ref="btn-all-user" @click="sendAll">
-                    <icon-font class="icon" :type="form.toEmails.includes('ALL_USER@domain.com') ? 'icon-ashbin' : 'icon-all'" />
-                    <span class="hidden-xs">{{form.toEmails.includes('ALL_USER@domain.com') ? '取消选择' : '全网邮件'}}</span>
-                  </a-button>
-                  <a-button :disabled="form.toEmails.includes('ALL_USER@domain.com')" ref="btn-search-user" @click="search.dialogVisible = true">
-                    <icon-font class="icon" type="icon-filter"/>
-                    <span class="hidden-xs">条件搜索邮件</span>
-                  </a-button>
-                </a-space>
-              </a-col>
-            </a-row>
-          </a-form-item>
-        </a-col>
-      </a-row>
-
-      <a-row >
-        <a-col :span="24">
-          <a-form-item has-feedback label="标题:" name="title">
-            <a-input v-model:value="form.title" :default-value="form.title" />
-          </a-form-item>
-        </a-col>
-      </a-row>
+      <a-form-item has-feedback label="标题:" name="title">
+        <a-input v-model:value="form.title" :default-value="form.title" />
+      </a-form-item>
 
       <a-list class="margin-bottom-20 attachment" item-layout="horizontal" bordered v-if="fileList.length > 0" :data-source="fileList">
         <template #renderItem="{ item }">
@@ -77,7 +65,7 @@
               </template>
               <template #avatar>
                 <a-typography-text :type="item.status !== 'done' ? 'secondary' : item.status === 'error' ? 'danger' : 'success'">
-                  <icon-font class="icon file" :type="'icon-' + item.type.substring(item.type.indexOf('/') + 1,item.type.length).toUpperCase()" />
+                  <icon-font class="icon file" :type="this.getFileIcon(item.name)" />
                 </a-typography-text>
               </template>
             </a-list-item-meta>
@@ -85,13 +73,9 @@
         </template>
       </a-list>
 
-      <a-row >
-        <a-col :span="24">
-          <a-form-item label="内容:" name="content">
-            <QuillEditor toolbar="full" theme="snow" v-model:content="form.content" content-type="html" />
-          </a-form-item>
-        </a-col>
-      </a-row>
+      <a-form-item label="内容:" name="content">
+        <QuillEditor toolbar="full" theme="snow" v-model:content="form.content" content-type="html" />
+      </a-form-item>
 
       <a-divider></a-divider>
 
