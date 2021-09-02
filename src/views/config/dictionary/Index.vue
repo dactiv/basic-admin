@@ -14,8 +14,8 @@
 
     <a-input v-model:value="form['filter_[code_like]']" placeholder="请输入名称进行查询" class="margin-bottom-20">
       <template #addonAfter>
-        <a-button type="text" @click="search()">
-          <icon-font class="icon" type="icon-search" />
+        <a-button type="text" @click="search()" :loading="spinning">
+          <icon-font class="icon" v-if="!spinning" type="icon-search" />
           <span class="hidden-xs">搜索</span>
         </a-button>
       </template>

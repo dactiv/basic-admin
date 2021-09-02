@@ -15,8 +15,8 @@
     <a-spin :spinning="spinning" tip="数据加载中...">
 
       <a-space :size="10" class="margin-bottom-20">
-        <a-button @click="this.searchDialogVisible=true;">
-          <icon-font class="icon" type="icon-search" />
+        <a-button @click="this.searchDialogVisible=true;" :loading="spinning">
+          <icon-font class="icon" v-if="!spinning" type="icon-search" />
           <span class="hidden-xs">搜索</span>
         </a-button>
         <a-button @click="send" v-if="this.principal.hasPermission('perms[message:send]')">

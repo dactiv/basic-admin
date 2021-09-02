@@ -77,7 +77,7 @@
         <QuillEditor toolbar="full" theme="snow" v-model:content="form.content" content-type="html" />
       </a-form-item>
 
-      <a-divider></a-divider>
+      <a-divider />
 
       <a-space :size="10">
 
@@ -86,7 +86,7 @@
           <span class="hidden-xs">发送</span>
         </a-button>
 
-        <a-upload v-if="this.principal.hasPermission('perms[message:send]')" :showUploadList="false" :multiple="true" v-model:file-list="fileList" action="/file-manager/upload/email-attachment" @change="fileListChange">
+        <a-upload v-if="this.principal.hasPermission('perms[message:send]')" :showUploadList="false" :multiple="true" v-model:file-list="fileList" action="/file-manager/upload/attachment.email" @change="fileListChange">
           <a-button>
             <icon-font class="icon" type="icon-attachment" />
             <span class="hidden-xs">上传附件</span>
@@ -140,8 +140,8 @@
     </a-form>
 
     <template #footer>
-      <a-button key="search" @click="searchTableUser">
-        <icon-font class="icon" type="icon-search" />
+      <a-button key="search" :loading="search.spinning" @click="searchTableUser">
+        <icon-font class="icon" v-if="!search.spinning"  type="icon-search" />
         <span class="hidden-xs">查询</span>
       </a-button>
       <a-button key="confirm" type="primary" @click="search.dialogVisible = false">

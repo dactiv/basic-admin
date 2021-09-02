@@ -18,46 +18,46 @@
       <a-typography-title class="margin-top-15" :level="5" disabled>所在组:{{ this.principal.details.roleAuthorityStrings }}</a-typography-title>
     </div>
 
-    <a-form ref="edit-form" :model="form" :rules="rules" layout="vertical">
+    <a-tabs>
 
-      <a-divider orientation="left">修改密码</a-divider>
+      <a-tab-pane key="update-password">
 
-      <a-row >
-        <a-col :span="24">
+        <template #tab>
+          <icon-font class="icon" type="icon-security" />
+          <span class="hidden-xs">修改密码</span>
+        </template>
+
+        <a-form ref="edit-form" :model="form" :rules="rules" layout="vertical">
+
           <a-form-item has-feedback label="旧密码:" name="oldPassword">
             <a-input-password v-model:value="form.oldPassword" />
           </a-form-item>
-        </a-col>
-      </a-row>
 
-      <a-row >
-        <a-col :span="24">
           <a-form-item has-feedback label="新密码:" name="newPassword">
             <a-input-password v-model:value="form.newPassword" />
           </a-form-item>
-        </a-col>
-      </a-row>
 
-      <a-row >
-        <a-col :span="24">
           <a-form-item has-feedback label="确认密码:" name="confirmPassword">
             <a-input-password v-model:value="form.confirmPassword" />
           </a-form-item>
-        </a-col>
-      </a-row>
 
-      <a-space :size="10">
-        <a-button type="primary">
-          <icon-font class="icon" type="icon-select" />
-          <span class="hidden-xs">保存</span>
-        </a-button>
-        <a-button @click="this.refs['edit-form'].resetFields();">
-          <icon-font class="icon" type="icon-ashbin" />
-          <span class="hidden-xs">重置</span>
-        </a-button>
-      </a-space>
+          <a-divider />
 
-    </a-form>
+          <a-space :size="10">
+            <a-button type="primary" @click="submitForm()" :loading="spinning">
+              <icon-font class="icon" type="icon-select" />
+              <span class="hidden-xs">保存</span>
+            </a-button>
+            <a-button @click="this.refs['edit-form'].resetFields();">
+              <icon-font class="icon" type="icon-ashbin" />
+              <span class="hidden-xs">重置</span>
+            </a-button>
+          </a-space>
+
+        </a-form>
+      </a-tab-pane>
+
+    </a-tabs>
 
   </a-card>
 </template>
@@ -67,9 +67,30 @@
 export default {
   name: "AuthenticationConsoleUserProfile",
   methods:{
+    submitForm:function() {
+      let _this = this;
+
+      _this.$refs['edit-form'].validate().then(() => {
+
+        _this.spinning = true;
+
+        _this
+            .$http
+            .post("/authentication/console/user/updatePassword",_this.formUrlencoded(_this.form))
+            .then((r) => {
+
+              _this.$message.success(r.data.message);
+              _this.$router.push({name:process.env.VUE_APP_LOGIN_PAGE.replace("/","")});
+              _this.spinning = false;
+
+            })
+            .catch(() => _this.spinning = false);
+
+      });
+    },
     async validatePassword() {
-      if (this.form.confirmPassword !== this.form.password) {
-        return Promise.reject('登陆密码与确认密码不一致');
+      if (this.form.confirmPassword !== this.form.newPassword) {
+        return Promise.reject('新密码与确认密码不一致');
       } else {
         return Promise.resolve();
       }
@@ -77,6 +98,7 @@ export default {
   },
   data() {
     return {
+      spinning:false,
       form: {
         oldPassword:"",
         newPassword:"",
@@ -90,7 +112,7 @@ export default {
         ],
         confirmPassword: [
           { required: true, message: "请输入确认密码", trigger: "change" },
-          { validator:this.validatePass, trigger: "change"}
+          { validator:this.validatePassword, trigger: "change"}
         ],
       }
     }

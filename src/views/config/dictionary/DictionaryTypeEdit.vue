@@ -105,11 +105,11 @@
 
       </a-form>
 
-      <a-divider></a-divider>
+      <a-divider />
 
       <a-space :size="10">
-        <a-button type="primary" @click="submitForm" v-if="this.principal.hasPermission('perms[dictionary_type:save]')">
-          <icon-font class="icon" type="icon-select" />
+        <a-button type="primary" @click="submitForm" v-if="this.principal.hasPermission('perms[dictionary_type:save]')" :loading="spinning" >
+          <icon-font class="icon" v-if="!spinning" type="icon-select" />
           <span class="hidden-xs">保存</span>
         </a-button>
         <a-button @click="this.refs['edit-form'].resetFields();">

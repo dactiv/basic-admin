@@ -47,8 +47,7 @@
         <a-textarea v-model:value="form.content" :auto-size="{ minRows: 3, maxRows: 6 }"/>
       </a-form-item>
 
-      <a-divider></a-divider>
-
+      <a-divider />
 
       <a-button type="primary" :loading="sending" @click="submitForm" v-if="this.principal.hasPermission('perms[message:send]')">
         <icon-font class="icon" v-if="!sending" type="icon-send" />
@@ -100,8 +99,8 @@
     </a-form>
 
     <template #footer>
-      <a-button key="search" @click="searchTableUser">
-        <icon-font class="icon" type="icon-search" />
+      <a-button key="search" :loading="search.spinning" @click="searchTableUser">
+        <icon-font class="icon" v-if="!search.spinning"  type="icon-search" />
         <span class="hidden-xs">查询</span>
       </a-button>
       <a-button key="confirm" type="primary" @click="search.dialogVisible = false">

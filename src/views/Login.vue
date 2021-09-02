@@ -36,13 +36,11 @@
               <a-checkbox v-model:checked="form.rememberMe"> 一周内记住我 </a-checkbox>
             </a-form-item>
 
-            <a-button type="primary" block @click="submitForm('login-form')">
-              <icon-font class="icon" type="icon-security" />
-              登陆
+            <a-button type="primary" block @click="submitForm('login-form')" :loading="spinning">
+              <icon-font class="icon" v-if="!spinning" type="icon-security" /> 登陆
             </a-button>
 
             <a-divider class="logo"><icon-font class="icon" type="icon-vue" /></a-divider>
-
 
           </a-form>
         </div>
