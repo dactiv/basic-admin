@@ -11,10 +11,8 @@ import Profile from '@/views/authentication/console/user/Profile'
 
 import store from '@/store'
 
-import NProgress from 'nprogress'
-import 'nprogress/nprogress.css';
 import RecursionMenu from "@/components/RecursionMenu";
-import {PRINCIPAL_MUTATION_TYPE} from '@/store/principal'
+import {PRINCIPAL_ACTION_TYPE} from '@/store/principal'
 
 const childrenRoutes = [
   {
@@ -114,44 +112,34 @@ const router = createRouter({
  */
 router.beforeEach((to, from, next) => {
 
-  NProgress.start();
-
   if (to.path === process.env.VUE_APP_LOGIN_PAGE) {
 
-    store.commit(PRINCIPAL_MUTATION_TYPE.ClearPrincipal);
+    store.dispatch(PRINCIPAL_ACTION_TYPE.Logout);
 
     clearRoute();
 
     next();
 
-  } else {
+  } else if (store.state.principal.authentication || store.state.principal.rememberMe) {
 
-    if (!store.state.principal.authentication) {
-      next(process.env.VUE_APP_LOGIN_PAGE);
-    } else {
+    let defaultLength = routes.length + childrenRoutes.length
 
-      if (router.getRoutes().length === routes.length + childrenRoutes.length && store.state.principal.menus.length > 0) {
-
-        reloadRoute();
-
-        if (routes.find(r => r.path === to.path)) {
-          next();
-        } else {
-          next({ ...to, replace: true });
-        }
-
-      } else {
-        next();
-      }
-
+    if (router.getRoutes().length === defaultLength && store.state.principal.menus.length > 0) {
+      reloadRoute();
     }
 
+    if (router.getRoutes().find(r => r.path === to.path)) {
+      console.log("next()");
+      next();
+    } else {
+      next({ ...to, replace: true });
+      console.log("next({ ...to, replace: true })");
+    }
+
+  } else {
+    next();
   }
 
-});
-
-router.afterEach(() => {
-  NProgress.done()
 });
 
 export default router

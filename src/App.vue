@@ -1,8 +1,10 @@
 <template>
   <a-config-provider :locale="this.$store.state.locale.app">
-    <transition name="fade">
-      <router-view/>
-    </transition>
+    <router-view v-slot="{ Component }">
+      <transition name="fade">
+        <component :is="Component" />
+      </transition>
+    </router-view>
   </a-config-provider>
 </template>
 

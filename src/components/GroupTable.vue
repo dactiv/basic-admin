@@ -128,7 +128,7 @@ export default {
     search(form) {
       let _this = this;
 
-      this.spinning = true;
+      _this.spinning = true;
 
       _this
           .$http

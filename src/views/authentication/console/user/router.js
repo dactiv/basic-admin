@@ -5,7 +5,6 @@ export const router = [{
     meta: {
         title: "后台用户管理",
         parent: "system"
-
     }
 },{
     path: "authentication/console/user/edit",
@@ -14,6 +13,7 @@ export const router = [{
     meta: {
         title: "编辑后台用户",
         parent: "system",
+        authentication: true,
         selectMenu: process.env.VUE_APP_SITE_ROOT + "/authentication/console/user"
     }
 }]

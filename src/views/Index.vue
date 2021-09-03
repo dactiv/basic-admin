@@ -61,7 +61,7 @@
       <a-layout-content :class="menu.collapsed ? 'main-content toggle' : 'main-content'">
         <div class="header-navbar-shadow"></div>
         <div class="margin-top-20">
-        <router-view />
+          <router-view />
         </div>
       </a-layout-content>
 
@@ -76,7 +76,7 @@
 <script>
 
 import RecursionMenu from '@/components/RecursionMenu.vue'
-import { PRINCIPAL_ACTION_TYPE, PRINCIPAL_MUTATION_TYPE } from "@/store/principal"
+import { PRINCIPAL_MUTATION_TYPE } from "@/store/principal"
 
 export default {
   name: "Index",
@@ -108,12 +108,23 @@ export default {
     _this.$http
         .get("/authentication/prepare")
         .then(r => {
-          if (r.data.data.authentication === true) {
+
+          let data = r.data.data;
+
+          if (data.rememberMe === true) {
+            data.details.rememberMe = true;
+
+            _this.$store.commit(PRINCIPAL_MUTATION_TYPE.SetPrincipal, data.details);
+          }
+
+          if (_this.principal.details.authentication === true || _this.principal.details.rememberMe === true) {
             _this.getMenus();
           } else {
-            _this.$router.push("/login");
+            _this.$router.push(process.env.VUE_APP_LOGIN_PAGE);
           }
-        }).catch(() => _this.$router.push("/login"))
+
+        })
+        .catch(() => _this.$router.push(process.env.VUE_APP_LOGIN_PAGE))
 
   },
   methods: {
@@ -131,7 +142,7 @@ export default {
       localStorage.setItem("menu-collapsed", this.menu.collapsed);
     },
     logout() {
-      this.$store.dispatch(PRINCIPAL_ACTION_TYPE.Logout).then(() => this.$router.push(process.env.VUE_APP_LOGIN_PAGE));
+      this.$router.push(process.env.VUE_APP_LOGIN_PAGE);
     },
     setMenus(response) {
 

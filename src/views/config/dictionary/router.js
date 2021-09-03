@@ -13,6 +13,7 @@ export const router = [{
     meta: {
         title: "编辑字典类型",
         parent: "config",
+        authentication: true,
         selectMenu: process.env.VUE_APP_SITE_ROOT + "/config/dictionary"
     }
 },{
@@ -22,6 +23,7 @@ export const router = [{
     meta: {
         title: "编辑数据字典",
         parent: "config",
+        authentication: true,
         selectMenu: process.env.VUE_APP_SITE_ROOT + "/config/dictionary"
     }
 }]

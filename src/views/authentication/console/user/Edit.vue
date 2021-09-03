@@ -24,7 +24,7 @@
           </a-col>
           <a-col :span="12">
             <a-form-item has-feedback label="真是姓名:" name="realName">
-              <a-input v-model:value="form.realName" />
+              <a-input v-model:value="form.realName" autocomplete="username" />
             </a-form-item>
           </a-col>
         </a-row>
@@ -32,12 +32,12 @@
         <a-row v-if="form.id === null" :gutter="[24]">
           <a-col :span="12">
             <a-form-item has-feedback label="登陆密码:" name="password">
-              <a-input-password v-model:value="form.password" />
+              <a-input-password v-model:value="form.password" autocomplete="new-password" />
             </a-form-item>
           </a-col>
           <a-col :span="12">
             <a-form-item has-feedback label="确认密码:" name="confirmPassword">
-              <a-input-password v-model:value="form.confirmPassword" />
+              <a-input-password v-model:value="form.confirmPassword" autocomplete="new-password" />
             </a-form-item>
           </a-col>
         </a-row>

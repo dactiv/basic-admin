@@ -14,8 +14,9 @@
 
     <a-input v-model:value="form['filter_[name_like]']" placeholder="请输入名称进行查询" class="margin-bottom-20">
       <template #addonAfter>
-        <a-button type="text" @click="$refs['resource-table'].search(this.form)" :loading="$refs['resource-table'].spinning">
-          <icon-font class="icon" v-if="!$refs['resource-table'].spinning" type="icon-search" />
+        <!-- FIXME 怎么获取 resource-table 的 spinning ？-->
+        <a-button type="text" @click="$refs['resource-table'].search(this.form)" >
+          <icon-font class="icon" type="icon-search" />
           <span class="hidden-xs">搜索</span>
         </a-button>
       </template>

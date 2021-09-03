@@ -8,6 +8,7 @@ const defaultStatus = {
     status: 1,
     statusName: '启用',
     authentication: false,
+    rememberMe: false,
     resourceAuthorityStrings: [],
     menus:[]
 };
@@ -40,11 +41,10 @@ export default {
     },
     mutations: {
         setPrincipal(state, principal) {
-            state.authentication = true;
 
             for (let key in principal) {
 
-                if (state[key]) {
+                if (state[key] !== undefined) {
                     state[key] = principal[key];
                 }
 
@@ -69,7 +69,9 @@ export default {
                 axios
                     .post("/authentication/login", payload, {headers: {"X-AUTHENTICATION-TYPE": "Console"}})
                     .then(response => {
-                        context.commit("setPrincipal", response.data.data);
+                        let data = response.data.data;
+                        data.authentication = true;
+                        context.commit("setPrincipal", data);
                         resolve(response)
                     })
                     .catch(e => reject(e));

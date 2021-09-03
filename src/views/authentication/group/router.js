@@ -14,6 +14,7 @@ export const router = [{
     meta: {
         title: "编辑组",
         parent: "system",
+        authentication: true,
         selectMenu: process.env.VUE_APP_SITE_ROOT + "/authentication/group"
     }
 }]

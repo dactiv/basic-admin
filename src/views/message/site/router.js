@@ -14,6 +14,7 @@ export const router = [{
     meta: {
         title: "发送站内信",
         parent: "message",
+        authentication: true,
         selectMenu: process.env.VUE_APP_SITE_ROOT + "/message/site"
     }
 },{
