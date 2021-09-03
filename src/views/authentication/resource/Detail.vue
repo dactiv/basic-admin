@@ -19,7 +19,7 @@
           :column="{ xxl: 2, xl: 2, lg: 2, md: 2, sm: 2, xs: 1 }"
       >
 
-        <a-descriptions-item label="名称"><icon-font class="icon" v-if="form.icon" :type="form.icon" /> {{form.name}} </a-descriptions-item>
+        <a-descriptions-item label="名称"><icon-font class="icon" :type="!form.icon ? 'icon-unkown' : form.icon" /> {{form.name}} </a-descriptions-item>
         <a-descriptions-item label="来源">{{ form.sourceName}}</a-descriptions-item>
         <a-descriptions-item label="代码">{{ form.code }}</a-descriptions-item>
         <a-descriptions-item label="資源值">{{ form.value ? form.value : ""}}</a-descriptions-item>

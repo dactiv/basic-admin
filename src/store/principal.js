@@ -52,7 +52,6 @@ export default {
 
         },
         clearPrincipal(state) {
-            state.authentication = false;
 
             for (let key in defaultStatus) {
 

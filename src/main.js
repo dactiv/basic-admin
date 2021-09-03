@@ -54,13 +54,13 @@ import {
     message
 } from "ant-design-vue";
 
-const app = createApp(App);
+const application = createApp(App);
 
-app.config.globalProperties.timestampFormat = function (timestamp) {
+application.config.globalProperties.timestampFormat = function (timestamp) {
     return moment(timestamp).format(process.env.VUE_APP_TIMESTAMP_FORMAT);
 }
 
-app.config.globalProperties.convertFormUrlencoded = function (val) {
+application.config.globalProperties.convertFormUrlencoded = function (val) {
 
     if (this.$moment.isMoment(val)) {
         return val.format(process.env.VUE_APP_POST_DATE_FORMAT);
@@ -69,7 +69,7 @@ app.config.globalProperties.convertFormUrlencoded = function (val) {
     return val;
 }
 
-app.config.globalProperties.formUrlencoded = function(json, ignoreProperties, valueConvert) {
+application.config.globalProperties.formUrlencoded = function(json, ignoreProperties, valueConvert) {
 
     let param = new URLSearchParams();
 
@@ -108,11 +108,11 @@ app.config.globalProperties.formUrlencoded = function(json, ignoreProperties, va
     return param;
 }
 
-app.config.globalProperties.loadConfig = function(params, callback) {
+application.config.globalProperties.loadConfig = function(params, callback) {
     this.$http.get(process.env.VUE_APP_SERVER_CONFIG_URI_SUFFIX,{params: params}).then(callback);
 }
 
-app.config.globalProperties.confirm = function(config, ok, cancel) {
+application.config.globalProperties.confirm = function(config, ok, cancel) {
 
     let props = {
         icon: createVNode(ExclamationCircleOutlined),
@@ -132,7 +132,7 @@ app.config.globalProperties.confirm = function(config, ok, cancel) {
 
 };
 
-app.config.globalProperties.getFileIcon = function(filename) {
+application.config.globalProperties.getFileIcon = function(filename) {
 
     let index = filename.lastIndexOf(".");
 
@@ -155,21 +155,21 @@ const IconFont = createFromIconfontCN({
     scriptUrl: ["//at.alicdn.com/t/font_2732722_7a25f7furcn.js","//at.alicdn.com/t/font_2783178_o30jvdzd5vo.js"]
 });
 
-app.component('IconFont', IconFont);
+application.component('IconFont', IconFont);
 
-app.config.globalProperties.principal = {
+application.config.globalProperties.principal = {
     details: store.state.principal,
     hasPermission: store.getters[PRINCIPAL_GETTER_TYPE.HasPermission],
     hasRole: store.getters[PRINCIPAL_GETTER_TYPE.HasRole]
 }
 
-app.config.globalProperties.$message = message;
+application.config.globalProperties.$message = message;
 
-app.config.globalProperties.$notification = notification;
+application.config.globalProperties.$notification = notification;
 
-app.config.globalProperties.$moment = moment;
+application.config.globalProperties.$moment = moment;
 
-app.config.globalProperties.attachmentFileSupport = [
+application.config.globalProperties.attachmentFileSupport = [
     {name:"7z",icon:"icon-z"},
     {name:"avi",icon:"icon-AVI"},
     {name:"bat",icon:"icon-BAT"},
@@ -216,8 +216,9 @@ app.config.globalProperties.attachmentFileSupport = [
     {name:"bin",icon:"icon-BIN"}
 ]
 
-app.use(router)
+application
     .use(store)
+    .use(router)
     .use(VueAxios, axios)
     .use(DatePicker)
     .use(Button)

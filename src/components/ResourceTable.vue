@@ -6,7 +6,7 @@
 
       <template #name="{ record }">
         <a-button type="text">
-          <icon-font class="icon" v-if="record.icon" :type="record.icon" />
+          <icon-font class="icon" :type="!record.icon ? 'icon-unkown' : record.icon" />
           <span>{{record.name}} </span>
         </a-button>
       </template>

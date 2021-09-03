@@ -61,10 +61,10 @@ const routes = [
 
 export function reloadRoute() {
 
-  if (router.getRoutes().length !== routes.length + childrenRoutes.length) {
+  let defaultLength = routes.length + childrenRoutes.length
 
+  if (router.getRoutes().length !== defaultLength) {
     clearRoute();
-
   }
 
   setRouter(store.state.principal.menus);
@@ -111,34 +111,40 @@ const router = createRouter({
  * 添加导航卫士
  */
 router.beforeEach((to, from, next) => {
+  console.log(store.state.principal);
 
   if (to.path === process.env.VUE_APP_LOGIN_PAGE) {
-
     store.dispatch(PRINCIPAL_ACTION_TYPE.Logout);
 
     clearRoute();
 
     next();
-
-  } else if (store.state.principal.authentication || store.state.principal.rememberMe) {
+  } else if (!store.state.principal.authentication) {
+    next(process.env.VUE_APP_LOGIN_PAGE);
+  } else if (store.state.principal.rememberMe && to.meta.authentication) {
+    sessionStorage.setItem(process.env.VUE_APP_SESSION_STORAGE_REQUEST_PATH_NAME, to.path);
+    next(process.env.VUE_APP_LOGIN_PAGE);
+  } else {
 
     let defaultLength = routes.length + childrenRoutes.length
 
+    let isReload = false;
+
     if (router.getRoutes().length === defaultLength && store.state.principal.menus.length > 0) {
       reloadRoute();
+      isReload = true;
     }
 
-    if (router.getRoutes().find(r => r.path === to.path)) {
-      console.log("next()");
+    if (routes.find(r => r.path === to.path)) {
       next();
-    } else {
+    } else if (isReload){
       next({ ...to, replace: true });
-      console.log("next({ ...to, replace: true })");
+    } else {
+      next();
     }
 
-  } else {
-    next();
   }
+
 
 });
 

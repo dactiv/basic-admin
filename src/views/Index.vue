@@ -107,27 +107,37 @@ export default {
 
     _this.$http
         .get("/authentication/prepare")
-        .then(r => {
-
-          let data = r.data.data;
-
-          if (data.rememberMe === true) {
-            data.details.rememberMe = true;
-
-            _this.$store.commit(PRINCIPAL_MUTATION_TYPE.SetPrincipal, data.details);
-          }
-
-          if (_this.principal.details.authentication === true || _this.principal.details.rememberMe === true) {
-            _this.getMenus();
-          } else {
-            _this.$router.push(process.env.VUE_APP_LOGIN_PAGE);
-          }
-
-        })
+        .then(_this.postPrepare)
         .catch(() => _this.$router.push(process.env.VUE_APP_LOGIN_PAGE))
 
   },
   methods: {
+    postPrepare(r) {
+      let data = r.data.data;
+
+      if (data.authentication) {
+        let details = JSON.parse(JSON.stringify(this.principal.details));
+        details.authentication = data.authentication;
+
+        if (data.rememberMe === true) {
+          details.rememberMe = true;
+        }
+
+        this.$store.commit(PRINCIPAL_MUTATION_TYPE.SetPrincipal, details);
+
+      } else {
+        this.$store.commit(PRINCIPAL_MUTATION_TYPE.ClearPrincipal);
+      }
+
+      if (this.principal.details.rememberMe === true && this.$route.meta.authentication) {
+        sessionStorage.setItem(process.env.VUE_APP_SESSION_STORAGE_REQUEST_PATH_NAME, this.$route.path);
+        this.$router.push(process.env.VUE_APP_LOGIN_PAGE);
+      } else if (this.principal.details.authentication === true) {
+        this.getMenus();
+      } else {
+        this.$router.push(process.env.VUE_APP_LOGIN_PAGE);
+      }
+    },
     profile() {
       this.$router.push({name:"profile"});
     },
@@ -153,6 +163,13 @@ export default {
       this.$store.commit(PRINCIPAL_MUTATION_TYPE.SetPrincipal, details);
 
       this.spinning = false;
+
+      let requestPath = sessionStorage.getItem(process.env.VUE_APP_SESSION_STORAGE_REQUEST_PATH_NAME);
+
+      if (requestPath !== null) {
+        this.$router.push(requestPath);
+        sessionStorage.removeItem(process.env.VUE_APP_SESSION_STORAGE_REQUEST_PATH_NAME);
+      }
 
     },
     getMenus() {
@@ -180,6 +197,7 @@ export default {
       spinning: false,
       menu: {
         collapsed: document.body.clientWidth <= 768,
+        // FIXME push 调用跳转的页面不会选择菜单。
         selectedKeys:[this.$route.meta.selectMenu ? this.$route.meta.selectMenu : this.$route.path],
         openKeys:[this.$route.meta.parent]
       }
