@@ -21,7 +21,7 @@
         <a-col :span="8">
 
           <a-menu mode="horizontal" class="float-right right">
-            <a-menu-item key="1"><icon-font class="icon" type="icon-moon" /></a-menu-item>
+            <a-menu-item key="1"><a-button type="text"><icon-font class="icon" type="icon-moon" /></a-button></a-menu-item>
             <a-sub-menu key="2">
               <template #title>
                 <a-space :size="20">
@@ -51,7 +51,7 @@
         </div>
         <div class="main-menu">
           <a-spin :spinning="spinning" tip="初始化导航...">
-            <a-menu mode="inline" :selectedKeys="menu.selectedKeys" :openKeys="menu.openKeys" @openChange="menuOpen" @select="menuSelect">
+            <a-menu mode="inline" :selectedKeys="menu.selectedKeys" :openKeys="menu.openKeys" @openChange="menuOpen" >
               <recursion-menu :data="this.principal.details.menus" />
             </a-menu>
           </a-spin>
@@ -141,9 +141,9 @@ export default {
     profile() {
       this.$router.push({name:"profile"});
     },
-    menuSelect(item) {
+    /*menuSelect(item) {
       this.menu.selectedKeys = [item.key];
-    },
+    },*/
     menuOpen(keys) {
       this.menu.openKeys = keys.filter(key => this.menu.openKeys.indexOf(key) === -1);
     },
@@ -186,6 +186,13 @@ export default {
             .then(this.setMenus);
       }
     },
+  },
+  watch: {
+    $route:function(r) {
+      console.log(r);
+      this.menu.selectedKeys = [r.meta.selectMenu ? r.meta.selectMenu : r.path];
+      this.menu.openKeys = [r.meta.parent];
+    }
   },
   data() {
     return {

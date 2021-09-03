@@ -111,14 +111,14 @@ const router = createRouter({
  * 添加导航卫士
  */
 router.beforeEach((to, from, next) => {
-  console.log(store.state.principal);
 
   if (to.path === process.env.VUE_APP_LOGIN_PAGE) {
-    store.dispatch(PRINCIPAL_ACTION_TYPE.Logout);
 
-    clearRoute();
+    store.dispatch(PRINCIPAL_ACTION_TYPE.Logout).then(() => {
+      clearRoute();
+      next();
+    });
 
-    next();
   } else if (!store.state.principal.authentication) {
     next(process.env.VUE_APP_LOGIN_PAGE);
   } else if (store.state.principal.rememberMe && to.meta.authentication) {

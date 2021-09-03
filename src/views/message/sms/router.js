@@ -15,7 +15,7 @@ export const router = [{
         title: "发送短信",
         parent: "message",
         authentication: true,
-        selectMenu: process.env.VUE_APP_sms_ROOT + "/message/sms"
+        selectMenu: process.env.VUE_APP_SITE_ROOT + "/message/sms"
     }
 },{
     path: "message/sms/detail",
@@ -24,6 +24,6 @@ export const router = [{
     meta: {
         title: "短信详情",
         parent: "message",
-        selectMenu: process.env.VUE_APP_sms_ROOT + "/message/sms"
+        selectMenu: process.env.VUE_APP_SITE_ROOT + "/message/sms"
     }
 }]
