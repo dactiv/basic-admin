@@ -204,7 +204,6 @@ export default {
       spinning: false,
       menu: {
         collapsed: document.body.clientWidth <= 768,
-        // FIXME push 调用跳转的页面不会选择菜单。
         selectedKeys:[this.$route.meta.selectMenu ? this.$route.meta.selectMenu : this.$route.path],
         openKeys:[this.$route.meta.parent]
       }
