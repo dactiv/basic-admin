@@ -14,21 +14,20 @@
 
     <a-input v-model:value="form['filter_[name_like]']" placeholder="请输入名称进行查询" class="margin-bottom-20">
       <template #addonAfter>
-        <!-- FIXME 怎么获取 resource-table 的 spinning ？-->
-        <a-button type="text" @click="$refs['resource-table'].search(this.form)" >
-          <icon-font class="icon" type="icon-search" />
+        <a-button type="text" @click="$refs['resource-table'].search(this.form)" :loading="spinning">
+          <icon-font class="icon" v-if="!spinning" type="icon-search" />
           <span class="hidden-xs">搜索</span>
         </a-button>
       </template>
       <template #addonBefore>
-        <a-button type="text" :loading="sync" @click="syncResource" v-if="this.principal.hasPermission('perms[resource:sync_plugin_resource]')">
-          <icon-font class="icon" v-if="!sync" type="icon-history"/>
+        <a-button type="text" :loading="spinning" @click="syncResource" v-if="this.principal.hasPermission('perms[resource:sync_plugin_resource]')">
+          <icon-font class="icon" v-if="!spinning" type="icon-history"/>
           <span class="hidden-xs">同步資源</span>
         </a-button>
       </template>
     </a-input>
 
-    <resourceTable ref="resource-table"/>
+    <resourceTable ref="resource-table" @searching="this.spinning=true" @search="this.spinning=false"/>
 
   </a-card>
 
@@ -43,7 +42,7 @@ export default {
   components: {ResourceTable},
   data() {
     return {
-      sync:false,
+      spinning:false,
       form:{
         "mergeTree":true,
         "filter_[name_like]":""
@@ -53,16 +52,16 @@ export default {
   methods:{
     syncResource() {
       let _this = this;
-      _this.sync = true;
+      _this.spinning = true;
 
       _this
           .$http
           .post("/authentication/resource/syncPluginResource")
           .then(r => {
-            _this.sync = false;
+            _this.spinning = false;
             _this.$message.success(r.data.message);
           })
-          .catch(() => _this.sync = false);
+          .catch(() => _this.spinning = false);
 
     }
   }

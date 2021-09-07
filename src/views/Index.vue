@@ -141,9 +141,6 @@ export default {
     profile() {
       this.$router.push({name:"profile"});
     },
-    /*menuSelect(item) {
-      this.menu.selectedKeys = [item.key];
-    },*/
     menuOpen(keys) {
       this.menu.openKeys = keys.filter(key => this.menu.openKeys.indexOf(key) === -1);
     },
@@ -189,7 +186,6 @@ export default {
   },
   watch: {
     $route:function(r) {
-      console.log(r);
       this.menu.selectedKeys = [r.meta.selectMenu ? r.meta.selectMenu : r.path];
       this.menu.openKeys = [r.meta.parent];
     }

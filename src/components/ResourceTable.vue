@@ -41,6 +41,7 @@
 export default {
   name:"AuthenticationResourceTable",
   props:["selection"],
+  emits: ['searching', 'search'],
   data() {
     return {
       columns:[
@@ -177,6 +178,7 @@ export default {
       let _this = this;
 
       _this.spinning = true;
+      _this.$emit('searching');
 
       _this
           .$http
@@ -184,6 +186,7 @@ export default {
           .then(r => {
             _this.data = r.data.data;
             _this.spinning = false;
+            _this.$emit('search');
           })
           .catch(() => _this.spinning = false);
     }

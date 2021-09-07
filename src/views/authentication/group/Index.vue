@@ -14,9 +14,8 @@
 
     <a-input v-model:value="form['filter_[name_like]']" placeholder="请输入名称进行查询" class="margin-bottom-20">
       <template #addonAfter>
-        <!-- FIXME 怎么获取 group-table 的 spinning ？-->
-        <a-button type="text" @click="$refs['group-table'].search(this.form)" >
-          <icon-font class="icon" type="icon-search" />
+        <a-button type="text" @click="$refs['group-table'].search(this.form)" :loading="spinning">
+          <icon-font class="icon" v-if="!spinning" type="icon-search" />
           <span class="hidden-xs">搜索</span>
         </a-button>
       </template>
@@ -32,7 +31,7 @@
       </template>
     </a-input>
 
-    <group-table ref="group-table" :enable-disabled-checkbox="true"/>
+    <group-table ref="group-table" :enable-disabled-checkbox="true" @searching="this.spinning=true" @search="this.spinning=false"/>
 
   </a-card>
 
@@ -47,6 +46,7 @@ export default {
   components: {GroupTable},
   data() {
     return {
+      spinning:false,
       form:{
         "mergeTree":true,
         "filter_[name_like]":""

@@ -13,7 +13,7 @@ export const router = [{
     name: "config_access_crypto_edit",
     meta: {
         title: "编辑访问加解密",
-        parent: "cofnig",
+        parent: "config",
         authentication: true,
         selectMenu: process.env.VUE_APP_SITE_ROOT + "/config/access/crypto"
     }

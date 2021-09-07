@@ -38,6 +38,7 @@
 export default {
   name:"AuthenticationGroupTable",
   props:["enableDisabledCheckbox"],
+  emits: ['searching', 'search'],
   data() {
     return {
       columns:[
@@ -129,13 +130,14 @@ export default {
       let _this = this;
 
       _this.spinning = true;
-
+      this.$emit('searching');
       _this
           .$http
           .post("/authentication/group/find",_this.formUrlencoded(form))
           .then(r => {
             _this.data = r.data.data;
             _this.spinning = false;
+            this.$emit('search');
           })
           .catch(() => _this.spinning = false);
     }

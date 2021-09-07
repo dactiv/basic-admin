@@ -1,6 +1,6 @@
 <template>
   <template v-for="d of data" :key="d.id">
-    <a-menu-item :key="getPath(d)" v-if="!hasChildren(d)">
+    <a-menu-item :key="getPath(d)" v-if="!hasChildren(d)" :disabled="d.status !== 1">
       <router-link :to='getPath(d)'>
         <icon-font class="icon" :type="d.icon" v-if="d.icon ? d.icon : 'icon-file'" />
         <span>{{d.name}}</span>
@@ -20,7 +20,7 @@
 <script>
 
 /**
- * 递归菜单，
+ * 递归菜单
  */
 export default {
   name: "RecursionMenu",

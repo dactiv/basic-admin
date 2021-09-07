@@ -93,14 +93,12 @@
           <template #title>断言规则</template>
 
           <template v-for="col of ['name', 'value', 'remark']" #[col]="{ text, record }" :key="col">
-            <div>
-              <a-form-item v-if="editableData[record.id]" has-feedback :name="record.id + '-' + col">
-                <a-input v-model:value="editableData[record.id][col]"/>
-              </a-form-item>
-              <template v-else>
-                {{ text }}
-              </template>
-            </div>
+            <a-form-item v-if="editableData[record.id]" has-feedback :name="record.id + '-' + col">
+              <a-input v-model:value="editableData[record.id][col]"/>
+            </a-form-item>
+            <template v-else>
+              {{ text }}
+            </template>
           </template>
 
           <template #action="{ record }">
@@ -236,15 +234,7 @@ export default {
 
       ids.forEach(id => delete this.editableData[id]);
       // FIXME 动态验证有问题.
-      /*this.editableData.forEach(o => {
-        let newRule = ["name", "value"];
 
-        for (let key in newRule) {
-          if (this.rules[o.id + '-' + newRule[key]]) {
-            delete this.rules[o.id + '-' + newRule[key]];
-          }
-        }
-      });*/
 
     },
     editPredicate(record) {
@@ -271,13 +261,6 @@ export default {
 
         this.editableData[id] = add;
       }
-
-      // FIXME 动态验证有问题.
-      /*let newRule = ["name", "value"];
-
-      for (let key in newRule) {
-        this.rules[id + '-' + newRule[key]] = [{ required: true, message: "该值不能为空", trigger: "blur" }];
-      }*/
 
     },
     selectPredicateChange(values) {
