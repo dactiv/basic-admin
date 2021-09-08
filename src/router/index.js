@@ -72,7 +72,6 @@ export function reloadRoute() {
   router.addRoute({
     path: "/:pathMatch(.*)*",
     name: 'NotFound',
-    //component: NotFound
     redirect: process.env.VUE_APP_SITE_ROOT + "/404"
   });
 
@@ -122,7 +121,7 @@ router.beforeEach((to, from, next) => {
   } else if (!store.state.principal.authentication) {
     next(process.env.VUE_APP_LOGIN_PAGE);
   } else if (store.state.principal.rememberMe && to.meta.authentication) {
-    sessionStorage.setItem(process.env.VUE_APP_SESSION_STORAGE_REQUEST_PATH_NAME, to.path);
+    sessionStorage.setItem(process.env.VUE_APP_SESSION_STORAGE_REQUEST_PATH_NAME, to.fullPath);
     next(process.env.VUE_APP_LOGIN_PAGE);
   } else {
 

@@ -123,19 +123,8 @@ export default {
         this
             .$store
             .dispatch(PRINCIPAL_ACTION_TYPE.Login, _this.formUrlencoded(_this.form))
-            .then(() => {
-              _this.$router.push("/");
-              /*let requestPath = sessionStorage.getItem(process.env.VUE_APP_SESSION_STORAGE_REQUEST_PATH_NAME);
-
-              if (requestPath !== null) {
-                _this.$router.push(requestPath);
-                sessionStorage.removeItem(process.env.VUE_APP_SESSION_STORAGE_REQUEST_PATH_NAME);
-              } else {
-                _this.$router.push("/");
-              }*/
-
-            })
-            .catch(this.validCaptcha);
+            .then(() => _this.$router.push("/"))
+            .catch(_this.validCaptcha);
 
       });
     }

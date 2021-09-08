@@ -130,6 +130,9 @@ export default {
   },
   methods: {
     validateRemoteCode() {
+      if (this.$refs["code"].disabled) {
+        return Promise.resolve();
+      }
       return new Promise((resolve, reject) => {
         this.$http.get("/config/dictionary/isDataDictionaryCodeUnique?code=" + this.parentCode + this.form.code).then(r => {
           return r.data.data ? resolve() : reject("类型代码已存在");

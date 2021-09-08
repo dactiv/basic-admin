@@ -159,6 +159,9 @@ export default {
   },
   methods: {
     validateRemoteUsername(value, s) {
+      if (this.$refs["username"].disabled) {
+        return Promise.resolve();
+      }
       return new Promise((resolve, reject) => {
         this.$http.get("/authentication/console/user/isUsernameUnique?username=" + s).then(r => {
           return r.data.data ? resolve() : reject("登陆账户已存在");
@@ -166,6 +169,9 @@ export default {
       });
     },
     validateRemoteEmail() {
+      if (this.$refs["email"].disabled) {
+        return Promise.resolve();
+      }
       return new Promise((resolve, reject) => {
         this.$http.get("/authentication/console/user/isEmailUnique?email=" + this.form.email).then(r => {
           return r.data.data ? resolve() : reject("电子邮箱已存在");

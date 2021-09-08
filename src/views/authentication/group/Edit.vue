@@ -134,7 +134,7 @@ export default {
           { required: true, message: "请输入权限名称", trigger: "change" },
           { validator:this.validateRemoteAuthority, trigger: "change" }
         ],
-        source: [{ required: true, message: "请输入组名称", trigger: "change", type: "array" }]
+        source: [{ required: true, message: "请选择组来源", trigger: "change", type: "array" }]
       }
     }
   },
@@ -147,6 +147,10 @@ export default {
       }
     },
     validateRemoteName() {
+      console.log(this.$refs["name"].disabled);
+      if (this.$refs["name"].disabled) {
+        return Promise.resolve();
+      }
       return new Promise((resolve, reject) => {
         this.$http.get("/authentication/group/isNameUnique?name=" + this.form.name).then(r => {
           return r.data.data ? resolve() : reject("组名称已存在");
@@ -154,6 +158,9 @@ export default {
       });
     },
     validateRemoteAuthority() {
+      if (this.$refs["authority"].disabled) {
+        return Promise.resolve();
+      }
       return new Promise((resolve, reject) => {
         this.$http.get("/authentication/group/isAuthorityUnique?authority=" + this.form.authority).then(r => {
           return r.data.data ? resolve() : reject("权限名称已存在");
@@ -215,6 +222,7 @@ export default {
           .then(r => {
             _this.form = r.data.data;
             _this.form.status = _this.form.status + '';
+            _this.form.source =  r.data.data.source.split(",");
             _this.spinning = false;
 
             if (_this.form.source.length > 0) {

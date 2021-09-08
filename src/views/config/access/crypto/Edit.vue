@@ -77,50 +77,60 @@
           <a-textarea v-model:value="form.remark" :auto-size="{ minRows: 2, maxRows: 5 }"/>
         </a-form-item>
 
-        <a-space :size="10" class="margin-bottom-20">
-          <a-button @click="editPredicate(null)" v-if="this.principal.hasPermission('perms[access_crypto:save]')">
-            <icon-font class="icon" type="icon-add"/>
-            <span class="hidden-xs">添加断言</span>
-          </a-button>
-          <a-button type="primary" danger @click="removePredicate(null)" v-if="this.principal.hasPermission('perms[access_crypto:delete]')">
-            <icon-font class="icon" type="icon-ashbin" />
-            <span class="hidden-xs">删除选中</span>
-          </a-button>
-        </a-space>
-
         <a-table class="ant-table-striped" :row-selection="{ selectedRowKeys: predicate.selectedIds, onChange: selectPredicateChange}" :rowKey="record=>record.id" :scroll="{ x: 835 }" :pagination="false" :data-source="form.predicates" :columns="predicate.columns" bordered>
 
-          <template #title>断言规则</template>
+          <template #title>
+            <a-row>
+              <a-col :span="8" class="text-line-height-32">
+                <icon-font class="icon" type="icon-un-config-o" /> 断言条件
+              </a-col>
+              <a-col :span="8" :offset="8" class="text-right">
+                <a-space :size="10">
+                  <a-button @click="editPredicate(null)" v-if="this.principal.hasPermission('perms[access_crypto:save]')">
+                    <icon-font class="icon" type="icon-add"/>
+                    <span class="hidden-xs">添加断言</span>
+                  </a-button>
+                  <a-button type="primary" danger @click="removePredicate(null)" v-if="this.principal.hasPermission('perms[access_crypto:delete]')">
+                    <icon-font class="icon" type="icon-ashbin" />
+                    <span class="hidden-xs">删除选中</span>
+                  </a-button>
+                </a-space>
+              </a-col>
+            </a-row>
+          </template>
 
-          <template v-for="col of ['name', 'value', 'remark']" #[col]="{ text, record }" :key="col">
-            <a-form-item v-if="editableData[record.id]" has-feedback :name="record.id + '-' + col">
-              <a-input v-model:value="editableData[record.id][col]"/>
+          <template v-for="col of ['name', 'value', 'remark']" #[col]="{ text, record, index }" :key="col">
+            <a-form-item v-if="record.editing" :key="col" has-feedback :name="['predicates', index, col]" :rules="{required: true, message: '该项不能为空',trigger: 'change'}">
+              <a-input v-model:value="record[col]"/>
             </a-form-item>
             <template v-else>
+              <span :title="text">
               {{ text }}
+              </span>
             </template>
           </template>
+
 
           <template #action="{ record }">
             <div class="text-center">
               <a-space :size="10">
 
-                <a-button size="small" @click="savePredicate(record)" v-if="this.principal.hasPermission('perms[access_crypto:save]') && editableData[record.id]">
+                <a-button size="small" @click="cancelAndSavePredicate(record)" v-if="this.principal.hasPermission('perms[access_crypto:save]') && record.editing">
                   <icon-font class="icon" type="icon-select" />
                   <span class="hidden-xs">确定</span>
                 </a-button>
 
-                <a-button size="small" v-if="editableData[record.id]" @click="cancelPredicate(record)">
+                <a-button size="small" v-if="record.editing" @click="cancelAndSavePredicate(record)">
                   <icon-font class="icon" type="icon-close" />
                   <span class="hidden-xs">取消</span>
                 </a-button>
 
-                <a-button size="small" @click="editPredicate(record)" v-if="this.principal.hasPermission('perms[access_crypto:get]') && !editableData[record.id]">
+                <a-button size="small" @click="editPredicate(record)" v-if="this.principal.hasPermission('perms[access_crypto:get]') && !record.editing">
                   <icon-font class="icon" type="icon-edit" />
                   <span class="hidden-xs">编辑</span>
                 </a-button>
 
-                <a-button size="small" type="primary" danger @click="removePredicate(record)" v-if="this.principal.hasPermission('perms[access_crypto:delete]')">
+                <a-button size="small" type="primary" danger @click="removePredicate(record)" v-if="this.principal.hasPermission('perms[access_crypto:delete]') && !record.editing">
                   <icon-font class="icon" type="icon-ashbin" />
                   <span class="hidden-xs">删除</span>
                 </a-button>
@@ -210,15 +220,8 @@ export default {
     }
   },
   methods: {
-    cancelPredicate(record) {
-      delete this.editableData[record.id];
-    },
-    savePredicate(record) {
-      let index = this.form.predicates.findIndex(p => p.id === record.id);
-
-      this.form.predicates[index] = JSON.parse(JSON.stringify(this.editableData[record.id]));
-
-      delete this.editableData[record.id];
+    cancelAndSavePredicate(record) {
+      record.editing = false;
     },
     removePredicate(record) {
 
@@ -230,36 +233,30 @@ export default {
         this.predicate.selectedIds.forEach(o => ids.push(o));
       }
 
-      this.form.predicates = this.form.predicates.filter(o => !ids.includes(o.id));
-
-      ids.forEach(id => delete this.editableData[id]);
-      // FIXME 动态验证有问题.
-
+      ids.forEach(id => this.form.predicates.splice(this.form.predicates.findIndex(p => p.id === id),1));
 
     },
     editPredicate(record) {
-      let id = "gen-" + this.$moment().unix();
 
       if (record) {
-        id = record.id;
-        this.editableData[id] = JSON.parse(JSON.stringify(record));
+        let p = this.form.predicates.find(p => p.id === record.id)
+        p.editing = true;
       } else {
-
+        let id = "gen-" + this.$moment().unix();
         let add = {
-          id:id,
-          name:"",
-          value:"",
-          remark:"",
+          id: id,
+          name: "",
+          value: "",
+          remark: "",
+          editing: true,
         };
 
         // 点太快不给添加
         if (this.form.predicates.filter(o => o.id === id).length > 0) {
-          return ;
+          return;
         }
 
         this.form.predicates.push(add);
-
-        this.editableData[id] = add;
       }
 
     },
@@ -314,6 +311,13 @@ export default {
           .$http
           .get("/config/access/crypto/get?id=" + this.$route.query.id)
           .then(r => {
+
+            r.data.data.predicates = r.data.data.predicates || [];
+
+            if (r.data.data.predicates.length > 0) {
+              r.data.data.predicates.forEach(p => {p.editing = false});
+            }
+
             _this.form = r.data.data;
 
             _this.form.enabled = _this.form.enabled + '';
