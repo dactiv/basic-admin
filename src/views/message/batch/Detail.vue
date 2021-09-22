@@ -36,6 +36,14 @@
 
       <a-table class="ant-table-striped" :rowKey="record=>record.id" :scroll="{ x: tableScrollX }" :pagination="false" :data-source="page.content" :columns="columns" bordered>
 
+        <template #lastSendTime="{ text:lastSendTime }">
+          <span :title="this.timestampFormat(lastSendTime)">{{ this.timestampFormat(lastSendTime)}}</span>
+        </template>
+
+        <template #successTime="{ text:successTime }">
+          <span :title="this.timestampFormat(successTime)">{{ this.timestampFormat(successTime)}}</span>
+        </template>
+
       </a-table>
 
       <div class="margin-top-15 text-right" >
@@ -62,47 +70,102 @@
 export default {
   name:"MessageBatchDetail",
   methods:{
+    search(number) {
+      let _this = this;
+
+      if (_this.form.type === 10) {
+        _this.loadSiteData(number);
+      } else if (_this.form.type === 20) {
+        _this.loadEmailData(number);
+      } else if (_this.form.type === 30) {
+        _this.loadSmsData(number);
+      }
+
+    },
     reload(){
 
       let _this = this;
 
-      if (_this.form.type === 10) {
-        _this.loadSiteData();
-      } else if (_this.form.type === 20) {
-        _this.loadEmailData();
-      } else if (_this.form.type === 30) {
-        _this.loadSmsData();
+      if (!_this.$route.query.id) {
+        return
       }
-
-    },
-    loadSmsData() {
-      let _this = this;
 
       _this
           .$http
-          .post("/message/sms/page",_this.formUrlencoded({"filter_[batch_id_eq]":this.form.id}))
+          .get("/message/batch/get?id=" + _this.$route.query.id)
+          .then(r => {
+            _this.form = r.data.data;
+            if (_this.form.type === 10) {
+              _this.loadSiteData();
+            } else if (_this.form.type === 20) {
+              _this.loadEmailData();
+            } else if (_this.form.type === 30) {
+              _this.loadSmsData();
+            }
+            _this.spinning = false
+          })
+          .catch(() => _this.spinning = false);
+    },
+    loadBatchData() {
+      let _this = this;
+
+      if (!_this.$route.query.id) {
+        return
+      }
+
+      _this
+          .$http
+          .get("/message/batch/get?id=" + _this.$route.query.id)
+          .then(r => {
+            _this.form = r.data.data;
+            _this.reload();
+            _this.spinning = false
+          })
+          .catch(() => _this.spinning = false);
+    },
+    loadSmsData(number) {
+      let _this = this;
+
+      let param = {"filter_[batch_id_eq]":this.form.id};
+
+      param.size = _this.page.size || 10;
+      param.number = number || _this.page.number;
+
+      _this
+          .$http
+          .post("/message/sms/page",_this.formUrlencoded(param))
           .then(r => {
             _this.page = r.data.data;
             _this.columns = _this.smsColumns;
           });
     },
-    loadSiteData() {
+    loadSiteData(number) {
       let _this = this;
+
+      let param = {"filter_[batch_id_eq]":this.form.id};
+
+      param.size = _this.page.size || 10;
+      param.number = number || _this.page.number;
 
       _this
           .$http
-          .post("/message/site/page",_this.formUrlencoded({"filter_[batch_id_eq]":this.form.id}))
+          .post("/message/site/page",_this.formUrlencoded(param))
           .then(r => {
             _this.page = r.data.data;
             _this.columns = _this.siteColumns;
           });
     },
-    loadEmailData() {
+    loadEmailData(number) {
       let _this = this;
+
+      let param = {"filter_[batch_id_eq]":this.form.id};
+
+      param.size = _this.page.size || 10;
+      param.number = number || _this.page.number;
 
       _this
           .$http
-          .post("/message/email/page",_this.formUrlencoded({"filter_[batch_id_eq]":this.form.id}))
+          .post("/message/email/page",_this.formUrlencoded(param))
           .then(r => {
             _this.page = r.data.data;
             _this.columns = _this.emailColumns;
@@ -170,12 +233,14 @@ export default {
           title: "最后发送时间",
           dataIndex: "lastSendTime",
           ellipsis: true,
-          width: 200
+          width: 200,
+          slots: { customRender: "lastSendTime" }
         },{
           title: "发送成功时间",
           dataIndex: "successTime",
           ellipsis: true,
-          width: 200
+          width: 200,
+          slots: { customRender: "successTime" }
         }
       ],
       siteColumns:[
@@ -216,12 +281,14 @@ export default {
           title: "最后发送时间",
           dataIndex: "lastSendTime",
           ellipsis: true,
-          width: 200
-        }, {
+          width: 200,
+          slots: { customRender: "lastSendTime" }
+        },{
           title: "发送成功时间",
           dataIndex: "successTime",
           ellipsis: true,
-          width: 200
+          width: 200,
+          slots: { customRender: "successTime" }
         }
       ],
       emailColumns:[
@@ -262,12 +329,14 @@ export default {
           title: "最后发送时间",
           dataIndex: "lastSendTime",
           ellipsis: true,
-          width: 200
+          width: 200,
+          slots: { customRender: "lastSendTime" }
         },{
           title: "发送成功时间",
           dataIndex: "successTime",
           ellipsis: true,
-          width: 200
+          width: 200,
+          slots: { customRender: "successTime" }
         }
       ],
       spinning:true,
@@ -286,19 +355,7 @@ export default {
     }
   },
   created() {
-
-    let _this = this;
-
-    _this
-        .$http
-        .get("/message/batch/get?id=" + _this.$route.query.id)
-        .then(r => {
-          _this.form = r.data.data;
-          _this.reload();
-          _this.spinning = false
-        })
-        .catch(() => _this.spinning = false);
-
+    this.reload();
   }
 }
 </script>

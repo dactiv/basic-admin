@@ -1,6 +1,13 @@
+const webpack = require('webpack');
+
 module.exports = {
     devServer: {
         proxy: process.env.VUE_APP_SERVER_URL
+    },
+    configureWebpack: {
+        plugins:[
+            new webpack.ContextReplacementPlugin(/moment[/\\]locale$/, /zh-cn/)
+        ]
     },
     css: {
         loaderOptions: {

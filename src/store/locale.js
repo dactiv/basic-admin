@@ -1,5 +1,4 @@
 import zhCn from 'ant-design-vue/es/locale/zh_CN'
-import enUs from 'ant-design-vue/es/locale/en_US'
 
 import moment from "moment";
 
@@ -13,11 +12,6 @@ export const LOCALE_TYPE = [
         moment: "zh-cn",
         name: "简体中文",
         id: 1
-    }, {
-        app: enUs,
-        moment: "en-us",
-        name: "english",
-        id: 2
     }
 ]
 

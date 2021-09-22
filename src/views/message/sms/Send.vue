@@ -188,13 +188,15 @@ export default {
 
         _this.sending = true;
 
-        if (_this.form.phoneNumbers.length === 1 && _this.form.phoneNumbers.includes(defaultData.value)) {
-          _this.form.phoneNumbers = ["ALL_USER"]
+        let data = JSON.parse(JSON.stringify(_this.form));
+
+        if (data.phoneNumbers.length === 1 && data.phoneNumbers.includes(defaultData.value)) {
+          data.phoneNumbers = ["ALL_USER"]
         }
 
         _this
             .$http
-            .post("/message/send", _this.form)
+            .post("/message/send", data)
             .then((r) => {
 
               _this.sending = false;
