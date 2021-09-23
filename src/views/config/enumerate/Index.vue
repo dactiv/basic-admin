@@ -9,15 +9,11 @@
   <a-card title="系统枚举查询" class="basic-box-shadow margin-top-20">
 
     <template #extra>
-      <icon-font class="icon" type="icon-enum-major-o" />
-    </template>
-
-    <a-space :size="10">
       <a-button :loading="sync" @click="syncEnumerate" v-if="this.principal.hasPermission('perms[enumerate:sync]')">
         <icon-font class="icon" v-if="!sync" type="icon-history"/>
         <span class="hidden-xs">同步枚举</span>
       </a-button>
-    </a-space>
+    </template>
 
     <a-spin :spinning="spinning">
 

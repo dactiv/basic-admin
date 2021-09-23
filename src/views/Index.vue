@@ -90,7 +90,7 @@ export default {
         if (document.body.clientWidth < 768) {
           _this.menu.collapsed = true;
         } else {
-          let collapsed = localStorage.getItem("menu-collapsed");
+          let collapsed = localStorage.getItem(process.env.VUE_APP_LOCAL_STORAGE_MENU_COLLAPSED_NAME);
 
           if (collapsed !== "true") {
             _this.menu.collapsed = false;
@@ -99,7 +99,7 @@ export default {
       })()
     }
 
-    let collapsed = localStorage.getItem("menu-collapsed");
+    let collapsed = localStorage.getItem(process.env.VUE_APP_LOCAL_STORAGE_MENU_COLLAPSED_NAME);
 
     if (collapsed === "true") {
       _this.menu.collapsed = true;
@@ -137,6 +137,8 @@ export default {
       } else {
         this.$router.push(process.env.VUE_APP_LOGIN_PAGE);
       }
+
+      this.saveDeviceIdentified(r);
     },
     profile() {
       this.$router.push({name:"profile"});
@@ -146,7 +148,7 @@ export default {
     },
     toggleCollapsed() {
       this.menu.collapsed = !this.menu.collapsed;
-      localStorage.setItem("menu-collapsed", this.menu.collapsed);
+      localStorage.setItem(process.env.VUE_APP_LOCAL_STORAGE_MENU_COLLAPSED_NAME, this.menu.collapsed);
     },
     logout() {
       this.$router.push(process.env.VUE_APP_LOGIN_PAGE);

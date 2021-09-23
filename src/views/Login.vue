@@ -74,6 +74,7 @@ export default {
         password: "",
         rememberMe: true,
         type: "Username",
+        deviceIdentified:"",
         captcha:""
       },
       rules: {
@@ -87,20 +88,23 @@ export default {
 
     let _this = this;
 
-    _this.$http.get("/authentication/prepare").then(this.validCaptcha);
+    _this.$http.get("/authentication/prepare").then(this.prepare);
 
   },
   methods: {
-    validCaptcha(error) {
+
+    prepare(r) {
 
       this.spinning = false;
 
-      if (error.data.executeCode === "1001") {
+      if (r.data.executeCode === process.env.VUE_APP_ERROR_CAPTCH_CODE) {
         this.captcha.submit = true;
-        this.captcha.data = error.data.data;
+        this.captcha.data = r.data.data;
 
         this.captcha.generateMapping[this.captcha.data.type]();
       }
+
+      this.form.deviceIdentified = this.saveDeviceIdentified(r);
 
     },
     getPictureCaptchaField() {

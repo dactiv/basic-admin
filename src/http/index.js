@@ -2,6 +2,8 @@ import axios from 'axios'
 import router from '@/router'
 import { message } from 'ant-design-vue';
 
+import store from '@/store'
+
 /**
  * 错误代码对应消息
  *
@@ -19,8 +21,19 @@ const ignoreErrorStatus = [404];
  * http 请求拦截器
  */
 function requestInterceptor(config) {
-    config.headers["X-FILTER-RESULT-ID"] = process.env.VUE_APP_X_FILTER_RESULT_ID;
-    config.headers["X-DATA-VERSION"] = process.env.VUE_APP_X_DATA_VERSION;
+
+    config.headers[process.env.VUE_APP_HEADER_FILTER_RESULT_ID_NAME] = process.env.VUE_APP_HEADER_FILTER_RESULT_ID_VALUE;
+    config.headers[process.env.VUE_APP_HEADER_DATA_VERSION_NAME] = process.env.VUE_APP_HEADER_DATA_VERSION_VALUE;
+
+    let deviceId = localStorage.getItem(process.env.VUE_APP_LOCAL_STORAGE_DEVICE_IDENTIFIED_NAME);
+    if (deviceId) {
+        config.headers[process.env.VUE_APP_HEADER_DEVICE_IDENTIFIED_HEADER_NAME] = deviceId;
+    }
+
+    if (store.state.principal.id > 0) {
+        config.headers[process.env.VUE_APP_HEADER_ACCESS_USER_ID_NAME] = store.state.principal.id;
+    }
+
     return config;
 }
 

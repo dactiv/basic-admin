@@ -10,6 +10,7 @@ const defaultStatus = {
     authentication: false,
     rememberMe: false,
     resourceAuthorityStrings: [],
+    token:"",
     menus:[]
 };
 
@@ -60,6 +61,8 @@ export default {
                 }
 
             }
+
+            localStorage.removeItem(process.env.VUE_APP_LOCAL_STORAGE_DEVICE_IDENTIFIED_NAME);
         }
     },
     actions: {

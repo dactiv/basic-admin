@@ -115,6 +115,17 @@ application.config.globalProperties.loadConfig = function(params, callback) {
     this.$http.get(process.env.VUE_APP_SERVER_CONFIG_URI_SUFFIX,{params: params}).then(callback);
 }
 
+application.config.globalProperties.saveDeviceIdentified = function(r) {
+    let deviceIdentified = localStorage.getItem(process.env.VUE_APP_LOCAL_STORAGE_DEVICE_IDENTIFIED_NAME);
+
+    if (!deviceIdentified) {
+        deviceIdentified = r.data.data.deviceIdentified;
+        localStorage.setItem(process.env.VUE_APP_LOCAL_STORAGE_DEVICE_IDENTIFIED_NAME, deviceIdentified);
+    }
+
+    return deviceIdentified;
+}
+
 application.config.globalProperties.confirm = function(config, ok, cancel) {
 
     let props = {
