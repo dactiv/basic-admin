@@ -6,22 +6,12 @@
         <a-col :span="16">
           <a-menu mode="horizontal" class="left">
             <a-menu-item key="1" @click="toggleCollapsed" class="hidden-xs"><icon-font class="icon" :type="this.menu.collapsed ? 'icon-arrow-right-circle' : 'icon-arrow-left-circle'" /></a-menu-item>
-            <a-menu-item key="2">
-              <a-badge :count="badge.calendar">
-                <icon-font class="icon" type="icon-calendar" />
-              </a-badge>
-            </a-menu-item>
-            <a-menu-item key="3">
-              <a-badge :count="badge.message" >
-                <icon-font class="icon" type="icon-comment" />
-              </a-badge>
-            </a-menu-item>
           </a-menu>
         </a-col>
         <a-col :span="8">
 
           <a-menu mode="horizontal" class="float-right right">
-            <a-menu-item key="1"><a-button type="text"><icon-font class="icon" type="icon-moon" /></a-button></a-menu-item>
+            <a-menu-item key="1"><icon-font class="icon" type="icon-moon" /></a-menu-item>
             <a-sub-menu key="2">
               <template #title>
                 <a-space :size="20">
@@ -44,8 +34,8 @@
         <div class="logo">
           <router-link to='/'>
             <a-space>
-            <icon-font type="icon-vue" />
-            <span v-if="!menu.collapsed"> Dactiv </span>
+              <icon-font type="icon-vue" />
+              <span v-if="!menu.collapsed"> Dactiv </span>
             </a-space>
           </router-link>
         </div>
@@ -195,10 +185,6 @@ export default {
   data() {
     return {
       screenWidth: document.body.clientWidth,
-      badge:{
-        calendar:0,
-        message:0
-      },
       spinning: false,
       menu: {
         collapsed: document.body.clientWidth <= 768,

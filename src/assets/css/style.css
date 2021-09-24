@@ -63,12 +63,13 @@ body {
   display: flex;
 }
 
-.logo span{
+.logo span {
   line-height: 36px;
   vertical-align: middle;
   color: #1196da!important;;
   font-weight: 600;
   font-size: 1.55rem;
+  margin-left: 5px!important;
 }
 
 .main-aside {
@@ -192,4 +193,8 @@ body {
 .fade-enter-from,
 .fade-leave-to {
   opacity: 0;
+}
+
+.ant-menu-submenu.ant-menu-submenu-horizontal {
+  padding: 0 10px!important;
 }
