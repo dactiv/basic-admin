@@ -1,26 +1,18 @@
 # basic-service-vue
 
-basic-service vue 开发的前端
+使用 vue 对 [basic-service](https://github.com/dactiv/basic-service) 功能的前端实现。
 
-## Project setup
+## 项目初始化
 ```
 npm install
 ```
 
-### Compiles and hot-reloads for development
+### 运行项目
 ```
 npm run serve
 ```
 
-### Compiles and minifies for production
+### 打包项目到生产环境
 ```
 npm run build
 ```
-
-### Lints and fixes files
-```
-npm run lint
-```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
