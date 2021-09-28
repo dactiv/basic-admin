@@ -80,7 +80,7 @@
       </a-layout>
     </a-layout>
   </a-drawer>
-  <a-layout>
+  <a-layout class="height-100-percent">
 
     <a-layout-header :class="menu.collapsed ? 'header-navbar basic-box-shadow toggle' : 'header-navbar basic-box-shadow'">
       <a-row>
@@ -121,7 +121,7 @@
       </a-row>
     </a-layout-header>
 
-    <a-layout>
+    <a-layout class="height-100-percent">
 
       <a-layout-sider class="main-aside" width="260" v-model:collapsed="menu.collapsed" :trigger="null" collapsible>
         <div class="logo">
@@ -141,16 +141,15 @@
         </div>
       </a-layout-sider>
 
-      <a-layout-content :class="menu.collapsed ? 'main-content toggle' : 'main-content'">
+      <a-layout-content :class="menu.collapsed ? 'main-content height-100-percent toggle' : 'main-content height-100-percent'">
         <div class="header-navbar-shadow"></div>
-        <div class="margin-top-20">
+        <div class="content-body">
           <router-view />
         </div>
+        <a-layout-footer class="main-footer text-center">COPYRIGHT © 2021 Dactiv, All rights ReservedHand-crafted & Made with </a-layout-footer>
       </a-layout-content>
 
     </a-layout>
-
-    <a-layout-footer :class="menu.collapsed ? 'main-footer toggle text-center' : 'main-footer text-center'">COPYRIGHT © 2021 Dactiv, All rights ReservedHand-crafted & Made with </a-layout-footer>
 
   </a-layout>
 

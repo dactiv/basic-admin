@@ -85,13 +85,7 @@ body {
   color: #6e6b7b;
   line-height: 60px;
   padding: 0;
-  margin-left: 257px;
   transition: 0.2s;
-}
-
-.main-footer.toggle {
-  margin-left: 100px;
-  transition: 0.3s;
 }
 
 .main-menu {
@@ -140,6 +134,11 @@ body {
   margin-right: 15px;
   margin-left: 275px;
   transition: 0.2s;
+}
+
+.main-content .content-body {
+  margin-top: 20px;
+  min-height: calc(100% - 80px);
 }
 
 .main-content.toggle {
