@@ -16,6 +16,7 @@ import '@/assets/css/basic.css';
 import '@/assets/less/responsive-utilities.less'
 
 import {
+    Drawer,
     DatePicker,
     Button,
     Layout,
@@ -166,7 +167,12 @@ application.config.globalProperties.getFileIcon = function(filename) {
 }
 
 const IconFont = createFromIconfontCN({
-    scriptUrl: ["//at.alicdn.com/t/font_2732722_7a25f7furcn.js","//at.alicdn.com/t/font_2783178_o30jvdzd5vo.js"]
+    scriptUrl: [
+        // commons-icon
+        "//at.alicdn.com/t/font_2732722_90fxtlj180i.js",
+        // file-icon
+        "//at.alicdn.com/t/font_2783178_o30jvdzd5vo.js"
+    ]
 });
 
 application.component('IconFont', IconFont);
@@ -268,4 +274,5 @@ application
     .use(List)
     .use(Progress)
     .use(Switch)
+    .use(Drawer)
     .mount('#app');

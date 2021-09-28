@@ -19,11 +19,11 @@
           <p class="text-center"> 请登陆您的账户 </p>
 
           <a-form ref="login-form" :model="form" :rules="rules" layout="vertical">
-            <a-form-item label="登陆账户:" has-feedback name="username">
+            <a-form-item label="登陆账户:" has-feedback name="username" autocomplete="username">
               <a-input v-model:value="form.username" />
             </a-form-item>
-            <a-form-item label="登陆密码:" has-feedback name="password">
-              <a-input-password v-model:value="form.password" />
+            <a-form-item label="登陆密码:" has-feedback name="password" autocomplete="current-password">
+              <a-input-password v-model:value="form.password"/>
             </a-form-item>
             <a-form-item label="验证码:" has-feedback name="captcha" class="picture-captcha" v-if="captcha.data.type === 'picture'">
               <a-input v-model:value="form.captcha">
@@ -92,7 +92,6 @@ export default {
 
   },
   methods: {
-
     prepare(r) {
 
       this.spinning = false;
@@ -128,7 +127,10 @@ export default {
             .$store
             .dispatch(PRINCIPAL_ACTION_TYPE.Login, _this.formUrlencoded(_this.form))
             .then(() => _this.$router.push("/"))
-            .catch(_this.validCaptcha);
+            .catch((r) => {
+              _this.prepare(r);
+              _this.spinning = false;
+            });
 
       });
     }

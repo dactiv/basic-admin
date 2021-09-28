@@ -30,15 +30,15 @@
         <a-form ref="edit-form" :model="form" :rules="rules" layout="vertical">
 
           <a-form-item has-feedback label="旧密码:" name="oldPassword">
-            <a-input-password v-model:value="form.oldPassword" />
+            <a-input-password v-model:value="form.oldPassword" autocomplete="current-password"/>
           </a-form-item>
 
           <a-form-item has-feedback label="新密码:" name="newPassword">
-            <a-input-password v-model:value="form.newPassword" />
+            <a-input-password v-model:value="form.newPassword" autocomplete="new-password"/>
           </a-form-item>
 
           <a-form-item has-feedback label="确认密码:" name="confirmPassword">
-            <a-input-password v-model:value="form.confirmPassword" />
+            <a-input-password v-model:value="form.confirmPassword" autocomplete="new-password"/>
           </a-form-item>
 
           <a-divider />

@@ -66,7 +66,7 @@ export default {
         }
     },
     actions: {
-        login: function (context, payload) {
+        login(context, payload) {
             return new Promise((resolve, reject) => {
                 axios
                     .post("/authentication/login", payload, {headers: {"X-AUTHENTICATION-TYPE": "Console"}})
@@ -79,7 +79,7 @@ export default {
                     .catch(e => reject(e));
             });
         },
-        logout: function(context) {
+        logout(context) {
             return new Promise((resolve, reject) => {
                 axios
                     .post("/authentication/logout")

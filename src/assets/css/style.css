@@ -169,10 +169,6 @@ body {
   font-size: 20px!important;
 }
 
-.attachment {
-
-}
-
 .attachment .file {
   font-size: 42px!important;
 }
@@ -185,16 +181,60 @@ body {
   margin-bottom: 0;
 }
 
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity 0.5s ease;
-}
-
-.fade-enter-from,
-.fade-leave-to {
-  opacity: 0;
-}
-
 .ant-menu-submenu.ant-menu-submenu-horizontal {
   padding: 0 10px!important;
+}
+
+.chat .ant-drawer-body {
+  padding:0;
+  height: 100%;
+}
+
+.chat .ant-drawer-body .main-aside {
+  box-shadow:none;
+}
+
+.chat .ant-drawer-body header, .chat .ant-drawer-body main {
+  margin-left: 200px;
+}
+
+.chat .ant-drawer-body header {
+  background-color: #ffffff;
+  padding: 0 20px;
+}
+
+.chat .ant-drawer-body .ant-menu .ant-menu-item {
+  padding:24px
+}
+
+.chat .message {
+  height: calc(100% - 165px);
+  padding: 20px;
+  overflow: auto;
+}
+
+.chat .message .ant-card {
+  margin-bottom: 5px;
+}
+
+.chat .message .ant-card.self {
+  color: #000000;
+  background-color: #e6fafe;
+}
+
+.chat .message .ant-card .ant-card-body {
+  padding: 10px;
+}
+
+.chat .input {
+  height: 165px;
+  background-color: #ffffff;
+}
+
+.chat .input .ql-container {
+  height: 122px;
+}
+
+.chat .input .ql-toolbar, .chat .input .ql-container {
+  border-left: none;
 }

@@ -13,6 +13,7 @@ import store from '@/store'
 
 import RecursionMenu from "@/components/RecursionMenu";
 import {PRINCIPAL_ACTION_TYPE} from '@/store/principal'
+import {SOCKET_IO_ACTION_TYPE} from '@/store/socketIo'
 
 const childrenRoutes = [
   {
@@ -117,6 +118,8 @@ router.beforeEach((to, from, next) => {
       clearRoute();
       next();
     });
+
+    store.dispatch(SOCKET_IO_ACTION_TYPE.Disconnect);
 
   } else if (!store.state.principal.authentication) {
     next(process.env.VUE_APP_LOGIN_PAGE);
