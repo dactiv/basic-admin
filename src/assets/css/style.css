@@ -226,7 +226,7 @@ body {
 }
 
 .chat .tool-bar .ant-menu-item .icon{
-  font-size: 24px!important;
+  font-size: 20px!important;
 }
 
 .chat .message {
@@ -241,6 +241,7 @@ body {
 
 .chat .message .ant-card {
   margin-bottom: 5px;
+  display: inline-block;
 }
 
 .chat .message .ant-card.self {
@@ -276,4 +277,13 @@ body {
 
 .chat .input .ql-toolbar, .chat .input .ql-container {
   border-left: none;
+}
+
+.chat .contacts-name {
+  line-height: 20px;
+}
+
+.chat .contacts-message {
+  font-size: 12px;
+  line-height: 18px;
 }

@@ -28,7 +28,10 @@
                   <a-badge dot :color="c.status" :offset="[-5,33]">
                     <a-avatar :src="c.icon" />
                   </a-badge>
-                  <a-typography-text :style="{width: '120px'}" :ellipsis="true" :content="c.username" />
+                  <div>
+                    <a-typography-text :style="{width: '120px'}" :ellipsis="true" strong class="contacts-name display-block">{{ c.username }}</a-typography-text>
+                    <a-typography-text :style="{width: '120px'}" :ellipsis="true" type="secondary" class="contacts-message display-block">{{ c.lastMessage }}</a-typography-text>
+                  </div>
                 </a-space>
               </a-menu-item>
             </a-menu>
@@ -44,7 +47,7 @@
             <a-col :span="20">
               <a-space v-if="this.chat.current" :size="10" :color="this.chat.current.status">
                 <a-avatar :src="this.chat.current.icon" />
-                <span>{{ this.chat.current.username }}</span>
+                <a-typography-text strong>{{ this.chat.current.username }}</a-typography-text>
               </a-space>
             </a-col>
             <a-col :span="4" class="text-right">
@@ -62,16 +65,20 @@
                   <template v-if="m.id !== this.principal.details.id + ''">
                     <a-avatar :src="m.icon" class="basic-box-shadow" />
                     <div class="message-content">
-                      <a-card v-for="c of m.content" :key="c" class="border-radius-4 basic-box-shadow">
-                        {{ c }}
-                      </a-card>
+                      <div v-for="c of m.content" :key="c">
+                        <a-card class="border-radius-4 basic-box-shadow">
+                          {{ c }}
+                        </a-card>
+                      </div>
                     </div>
                   </template>
                   <template v-else>
                     <div class="message-content">
-                      <a-card v-for="c of m.content" :key="c" class="border-radius-4 basic-box-shadow self">
-                        {{ c }}
-                      </a-card>
+                      <div v-for="c of m.content" :key="c" >
+                        <a-card class="border-radius-4 basic-box-shadow self">
+                          {{ c }}
+                        </a-card>
+                      </div>
                     </div>
                     <a-avatar :src="m.icon" class="basic-box-shadow" />
                   </template>
@@ -160,7 +167,6 @@
     </a-layout>
 
   </a-layout>
-
 </template>
 
 <script>
@@ -262,10 +268,7 @@ export default {
           this
               .$http
               .post("/authentication/group/find")
-              .then(r => {
-                this.chat.groupData = r.data.data;
-                console.log(this.chat);
-              });
+              .then(r => this.chat.groupData = r.data.data);
         });
       });
 
@@ -338,15 +341,15 @@ export default {
           messages:[{
             id:"2",
             creationTime:"",
-            content:["你好","在吗？"]
+            content:["你好","在吗？。。。"]
           },{
             id:"1",
             creationTime:"",
-            content:["在","怎么了"]
+            content:["在","怎么了，发送到发撒地方"]
           },{
             id:"2",
             creationTime:"",
-            content:["没什么"]
+            content:["没什么，撒发送到发送到发撒地方阿"]
           }],
           lastMessage:"没什么",
         }],
