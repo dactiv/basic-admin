@@ -159,7 +159,6 @@
 import { QuillEditor } from '@vueup/vue-quill'
 
 import '@vueup/vue-quill/dist/vue-quill.snow.css';
-import '@/assets/css/quill.css'
 
 const defaultData = {
   value: 'ALL_USER@domain.com',

@@ -15,6 +15,8 @@ import '@/assets/css/basic.css';
 
 import '@/assets/less/responsive-utilities.less'
 
+import '@/assets/css/quill.css'
+
 import {
     Drawer,
     DatePicker,
@@ -51,6 +53,7 @@ import {
     List,
     Progress,
     Switch,
+    Tree,
     notification,
     message
 } from "ant-design-vue";
@@ -275,4 +278,5 @@ application
     .use(Progress)
     .use(Switch)
     .use(Drawer)
+    .use(Tree)
     .mount('#app');

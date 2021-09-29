@@ -1,80 +1,86 @@
 <template>
-  <a-drawer :width="768" placement="right" :closable="false" v-model:visible="this.chat.visible" class="chat">
+  <a-drawer :width="950" placement="right" :closable="false" v-model:visible="this.chat.visible" class="chat">
     <a-layout class="height-100-percent">
-      <a-layout-sider class="main-aside">
-
-        <div class="padding-16">
-          <a-row type="flex" justify="space-around" class="height-100-percent" align="middle">
-            <a-col :span="24">
-              <a-input placeholder="搜索用户" />
-            </a-col>
-          </a-row>
-        </div>
-        <a-menu mode="inline" class="height-100-percent">
-<!--          <a-menu-item key="1">
-            <a-space :size="10">
-              <a-badge dot color="green" :offset="[-5,33]">
-                <a-avatar :src="require('../assets/avatar/男生-紫.png')" />
-              </a-badge>
-              <span>{{ this.principal.details.username }}</span>
-            </a-space>
-          </a-menu-item>
-          <a-menu-item key="2">
-            <a-space :size="10">
-              <a-badge dot color="green" :offset="[-5,33]">
+      <a-layout-sider class="main-aside border-right" :width="250">
+        <a-row class="height-100-percent">
+          <a-col :span="6" class="tool-bar border-right">
+            <div class="text-center margin-top-15">
               <a-avatar :src="require('../assets/avatar/男生-紫.png')" />
-              </a-badge>
-              <span>{{ this.principal.details.username }}</span>
-            </a-space>
-          </a-menu-item>
-          <a-menu-item key="3">
-            <a-space :size="10">
-              <a-badge dot color="green" :offset="[-5,33]">
-                <a-avatar :src="require('../assets/avatar/男生-紫.png')" />
-              </a-badge>
-              <span>{{ this.principal.details.username }}</span>
-            </a-space>
-          </a-menu-item>-->
-        </a-menu>
+              <a-menu mode="vertical">
+                <a-menu-item key="1" @click="this.chat.tab = 'message'">
+                  <a-badge :count="this.chat.messageCount">
+                  <icon-font class="icon" type="icon-message" />
+                  </a-badge>
+                </a-menu-item>
+                <a-menu-item key="2" @click="this.chat.tab = 'group'">
+                  <icon-font class="icon" type="icon-group" />
+                </a-menu-item>
+              </a-menu>
+            </div>
+          </a-col>
+          <a-col :span="18">
+            <div class="search">
+              <a-input placeholder="搜索用户" />
+            </div>
+            <a-menu v-if="this.chat.tab === 'message'" @click="selectContact" mode="vertical">
+              <a-menu-item v-for="c of this.chat.contacts" :key="c.id" >
+                <a-space :size="10">
+                  <a-badge dot :color="c.status" :offset="[-5,33]">
+                    <a-avatar :src="c.icon" />
+                  </a-badge>
+                  <a-typography-text :style="{width: '120px'}" :ellipsis="true" :content="c.username" />
+                </a-space>
+              </a-menu-item>
+            </a-menu>
+            <a-tree v-if="this.chat.tab === 'group'" :replaceFields="{title:'title', key:'id'}" :tree-data="this.chat.groupData" show-icon>
+
+            </a-tree>
+          </a-col>
+        </a-row>
       </a-layout-sider>
       <a-layout>
-        <a-layout-header>
-<!--          <a-space :size="10">
-            <a-badge dot color="green" :offset="[-5,45]">
-              <a-avatar :src="require('../assets/avatar/男生-紫.png')" />
-            </a-badge>
-            <span>{{ this.principal.details.username }}</span>
-          </a-space>-->
+        <a-layout-header class="border-bottom">
+          <a-row>
+            <a-col :span="20">
+              <a-space v-if="this.chat.current" :size="10" :color="this.chat.current.status">
+                <a-avatar :src="this.chat.current.icon" />
+                <span>{{ this.chat.current.username }}</span>
+              </a-space>
+            </a-col>
+            <a-col :span="4" class="text-right">
+              <a-button type="text">
+                <icon-font class="icon" type="icon-all" />
+              </a-button>
+            </a-col>
+          </a-row>
         </a-layout-header>
         <a-layout-content class="height-100-percent">
           <div class="message">
-<!--            <a-space :size="15" align="start">
-              <a-avatar :src="require('../assets/avatar/男生-紫.png')" class="basic-box-shadow" />
-              <div class="message-content">
-                <a-card class="border-radius-4 basic-box-shadow">
-                  三大发送到了附近阿斯顿发了空间阿斯顿款礼服阿斯顿了附近as
-                </a-card>
-
-                <a-card class="border-radius-4 basic-box-shadow">
-                  三大发送到了附近阿斯顿发了空间阿斯顿款礼服阿斯顿了附近as三大发送到了附近阿斯顿发了空间阿斯顿款礼服阿斯顿了附近as
-                </a-card>
+            <template v-if="this.chat.current">
+              <div v-for="m of this.chat.current.messages" :key="m.id" :class="m.id !== (this.principal.details.id + '') ? '' : 'text-right'">
+                <a-space :size="15" align="start" >
+                  <template v-if="m.id !== this.principal.details.id + ''">
+                    <a-avatar :src="m.icon" class="basic-box-shadow" />
+                    <div class="message-content">
+                      <a-card v-for="c of m.content" :key="c" class="border-radius-4 basic-box-shadow">
+                        {{ c }}
+                      </a-card>
+                    </div>
+                  </template>
+                  <template v-else>
+                    <div class="message-content">
+                      <a-card v-for="c of m.content" :key="c" class="border-radius-4 basic-box-shadow self">
+                        {{ c }}
+                      </a-card>
+                    </div>
+                    <a-avatar :src="m.icon" class="basic-box-shadow" />
+                  </template>
+                </a-space>
               </div>
-            </a-space>
-            <a-space :size="15" align="start">
-              <div class="message-content">
-                <a-card class="border-radius-4 basic-box-shadow self">
-                  三大发送到了附近阿斯顿发了空间阿斯顿款礼服阿斯顿了附近as
-                </a-card>
-
-                <a-card class="border-radius-4 basic-box-shadow self">
-                  三大发送到了附近阿斯顿发了空间阿斯顿款礼服阿斯顿了附近as三大发送到了附近阿斯顿发了空间阿斯顿款礼服阿斯顿了附近as
-                </a-card>
-              </div>
-              <a-avatar :src="require('../assets/avatar/男生-紫.png')" class="basic-box-shadow" />
-            </a-space>-->
+            </template>
           </div>
-          <div class="input" >
-            <QuillEditor theme="snow" v-model:content="this.chat.content" content-type="html" />
+          <div class="input border-top">
+            <QuillEditor theme="snow" v-model:content="this.chat.inputContent" content-type="html" />
           </div>
         </a-layout-content>
       </a-layout>
@@ -90,7 +96,9 @@
               <icon-font class="icon" :type="this.menu.collapsed ? 'icon-arrow-right-circle' : 'icon-arrow-left-circle'" />
             </a-menu-item>
             <a-menu-item key="2" v-if="this.connected" @click="this.chat.visible = !this.chat.visible">
+              <a-badge :count="this.chat.messageCount">
               <icon-font class="icon" type="icon-message" />
+              </a-badge>
             </a-menu-item>
           </a-menu>
         </a-col>
@@ -160,7 +168,7 @@
 import RecursionMenu from '@/components/RecursionMenu.vue'
 
 import { PRINCIPAL_MUTATION_TYPE } from "@/store/principal"
-import { SOCKET_IO_ACTION_TYPE } from "@/store/socketIo"
+import {SOCKET_EVENT_TYPE, SOCKET_IO_ACTION_TYPE} from "@/store/socketIo"
 import { mapState } from 'vuex'
 
 import { QuillEditor } from '@vueup/vue-quill'
@@ -205,6 +213,14 @@ export default {
         .catch(() => _this.$router.push(process.env.VUE_APP_LOGIN_PAGE));
   },
   methods: {
+    selectContact(record){
+
+      if (this.chat.current && this.chat.current.id === record.key) {
+        return ;
+      }
+
+      this.chat.current = this.chat.contacts.find(c => c.id === record.key);
+    },
     postPrepare(r) {
       let data = r.data.data;
 
@@ -241,6 +257,16 @@ export default {
           username:this.principal.details.username,
           password:this.principal.details.token
         }
+      }).then((socket) => {
+        socket.on(SOCKET_EVENT_TYPE.Connect, () => {
+          this
+              .$http
+              .post("/authentication/group/find")
+              .then(r => {
+                this.chat.groupData = r.data.data;
+                console.log(this.chat);
+              });
+        });
       });
 
     },
@@ -301,9 +327,32 @@ export default {
       screenWidth: document.body.clientWidth,
       spinning: false,
       chat:{
+        messageCount:0,
         visible: false,
-        title:"聊天频道",
-        content:""
+        current: undefined,
+        contacts:[{
+          id:"2",
+          username:"admin",
+          icon:"../assets/avatar/男生-紫.png",
+          status:"green",
+          messages:[{
+            id:"2",
+            creationTime:"",
+            content:["你好","在吗？"]
+          },{
+            id:"1",
+            creationTime:"",
+            content:["在","怎么了"]
+          },{
+            id:"2",
+            creationTime:"",
+            content:["没什么"]
+          }],
+          lastMessage:"没什么",
+        }],
+        inputContent:"",
+        tab:"message",
+        groupData:[]
       },
       menu: {
         collapsed: document.body.clientWidth <= 768,
