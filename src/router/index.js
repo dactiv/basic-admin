@@ -119,7 +119,7 @@ router.beforeEach((to, from, next) => {
       next();
     });
 
-    store.dispatch(SOCKET_IO_ACTION_TYPE.Disconnect);
+    store.dispatch(SOCKET_IO_ACTION_TYPE.DISCONNECT);
 
   } else if (!store.state.principal.authentication) {
     next(process.env.VUE_APP_LOGIN_PAGE);

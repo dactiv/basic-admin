@@ -7,17 +7,21 @@ const defaultStatus = {
 };
 
 export const SOCKET_EVENT_TYPE = {
-    Connect:"connect",
-    Disconnect:"disconnect",
-    Error:"error",
-    ConnectError:"connect_error",
-    ConnectTimeout:"connect_timeout",
-    ClientDisconnect: "client_disconnect"
+    CONNECT:"connect",
+    DISCONNECT:"disconnect",
+    ERROR:"error",
+    CONNECT_ERROR:"connect_error",
+    CONNECT_TIMEOUT:"connect_timeout",
+    CLIENT_DISCONNECT: "client_disconnect",
+    SAVE_GROUP:"save_group",
+    DELETE_GROUP:"delete_group",
+    SAVE_CONSOLE_USER:"save_console_user",
+    DELETE_CONSOLE_USER:"delete_console_user"
 }
 
 export const SOCKET_IO_ACTION_TYPE = {
-    Connect:"socketIo/connect",
-    Disconnect:"socketIo/disconnect"
+    CONNECT:"socketIo/connect",
+    DISCONNECT:"socketIo/disconnect"
 }
 
 export default {
@@ -43,14 +47,14 @@ export default {
                 }
                 let socket = io(process.env.VUE_APP_SERVER_URL, options);
                 socket.open();
-                socket.on(SOCKET_EVENT_TYPE.Connect, () => {
+                socket.on(SOCKET_EVENT_TYPE.CONNECT, () => {
                     context.commit("setConnected", true);
                     context.commit("setClientConnected", false);
                 });
-                socket.on(SOCKET_EVENT_TYPE.Disconnect, () => {
+                socket.on(SOCKET_EVENT_TYPE.DISCONNECT, () => {
                     context.commit("setConnected", false);
                 });
-                socket.on(SOCKET_EVENT_TYPE.ClientDisconnect, () => {
+                socket.on(SOCKET_EVENT_TYPE.CLIENT_DISCONNECT, () => {
                     context.commit("setConnected", false);
                     context.commit("setClientConnected", true);
                     socket.disconnect();

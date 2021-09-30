@@ -125,7 +125,7 @@ export default {
 
         this
             .$store
-            .dispatch(PRINCIPAL_ACTION_TYPE.Login, _this.formUrlencoded(_this.form))
+            .dispatch(PRINCIPAL_ACTION_TYPE.LOGIN, _this.formUrlencoded(_this.form))
             .then(() => _this.$router.push("/"))
             .catch((r) => {
               _this.prepare(r);

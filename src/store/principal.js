@@ -15,18 +15,18 @@ const defaultStatus = {
 };
 
 export const PRINCIPAL_MUTATION_TYPE = {
-    SetPrincipal:"principal/setPrincipal",
-    ClearPrincipal:"principal/clearPrincipal"
+    SET_PRINCIPAL:"principal/setPrincipal",
+    CLEAR_PRINCIPAL:"principal/clearPrincipal"
 }
 
 export const PRINCIPAL_ACTION_TYPE = {
-    Login:"principal/login",
+    LOGIN:"principal/login",
     Logout:"principal/logout"
 }
 
 export const PRINCIPAL_GETTER_TYPE = {
-    HasPermission:"principal/hasPermission",
-    HasRole:"principal/hasRole"
+    HAS_PERMISSION:"principal/hasPermission",
+    HAS_ROLE:"principal/hasRole"
 }
 
 export default {

@@ -15,8 +15,6 @@ import '@/assets/css/basic.css';
 
 import '@/assets/less/responsive-utilities.less'
 
-import '@/assets/css/quill.css'
-
 import {
     Drawer,
     DatePicker,
@@ -54,6 +52,7 @@ import {
     Progress,
     Switch,
     Tree,
+    Radio,
     notification,
     message
 } from "ant-design-vue";
@@ -182,8 +181,8 @@ application.component('IconFont', IconFont);
 
 application.config.globalProperties.principal = {
     details: store.state.principal,
-    hasPermission: store.getters[PRINCIPAL_GETTER_TYPE.HasPermission],
-    hasRole: store.getters[PRINCIPAL_GETTER_TYPE.HasRole]
+    hasPermission: store.getters[PRINCIPAL_GETTER_TYPE.HAS_PERMISSION],
+    hasRole: store.getters[PRINCIPAL_GETTER_TYPE.HAS_ROLE]
 }
 
 application.config.globalProperties.$message = message;
@@ -279,4 +278,5 @@ application
     .use(Switch)
     .use(Drawer)
     .use(Tree)
+    .use(Radio)
     .mount('#app');

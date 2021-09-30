@@ -11,7 +11,7 @@ export const router = [{
     component: () => import("@/views/message/batch/Detail.vue"),
     name: "message_batch_detail",
     meta: {
-        title: "批量消息校庆",
+        title: "批量消息明细",
         parent: "message",
         selectMenu: process.env.VUE_APP_SITE_ROOT + "/message/batch"
     }

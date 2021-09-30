@@ -262,6 +262,16 @@ body {
   padding: 16px 10px;
 }
 
+.chat .left-content {
+  height: calc(100% - 64px);
+  overflow: auto;
+}
+
+.chat .group-tool-bar {
+  padding: 5px 10px;
+  background-color: #f5f5f5;
+}
+
 .chat .input .ql-container {
   height: 124px;
 }

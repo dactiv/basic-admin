@@ -3,7 +3,7 @@ import zhCn from 'ant-design-vue/es/locale/zh_CN'
 import moment from "moment";
 
 export const LOCALE_MUTATION_TYPE = {
-    SetLocal:"locale/setLocale"
+    SET_LOCAL:"locale/setLocale"
 }
 
 export const LOCALE_TYPE = [

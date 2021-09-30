@@ -1,98 +1,7 @@
 <template>
-  <a-drawer :width="950" placement="right" :closable="false" v-model:visible="this.chat.visible" class="chat">
-    <a-layout class="height-100-percent">
-      <a-layout-sider class="main-aside border-right" :width="250">
-        <a-row class="height-100-percent">
-          <a-col :span="6" class="tool-bar border-right">
-            <div class="text-center margin-top-15">
-              <a-avatar :src="require('../assets/avatar/男生-紫.png')" />
-              <a-menu mode="vertical">
-                <a-menu-item key="1" @click="this.chat.tab = 'message'">
-                  <a-badge :count="this.chat.messageCount">
-                  <icon-font class="icon" type="icon-message" />
-                  </a-badge>
-                </a-menu-item>
-                <a-menu-item key="2" @click="this.chat.tab = 'group'">
-                  <icon-font class="icon" type="icon-group" />
-                </a-menu-item>
-              </a-menu>
-            </div>
-          </a-col>
-          <a-col :span="18">
-            <div class="search">
-              <a-input placeholder="搜索用户" />
-            </div>
-            <a-menu v-if="this.chat.tab === 'message'" @click="selectContact" mode="vertical">
-              <a-menu-item v-for="c of this.chat.contacts" :key="c.id" >
-                <a-space :size="10">
-                  <a-badge dot :color="c.status" :offset="[-5,33]">
-                    <a-avatar :src="c.icon" />
-                  </a-badge>
-                  <div>
-                    <a-typography-text :style="{width: '120px'}" :ellipsis="true" strong class="contacts-name display-block">{{ c.username }}</a-typography-text>
-                    <a-typography-text :style="{width: '120px'}" :ellipsis="true" type="secondary" class="contacts-message display-block">{{ c.lastMessage }}</a-typography-text>
-                  </div>
-                </a-space>
-              </a-menu-item>
-            </a-menu>
-            <a-tree v-if="this.chat.tab === 'group'" :replaceFields="{title:'title', key:'id'}" :tree-data="this.chat.groupData" show-icon>
 
-            </a-tree>
-          </a-col>
-        </a-row>
-      </a-layout-sider>
-      <a-layout>
-        <a-layout-header class="border-bottom">
-          <a-row>
-            <a-col :span="20">
-              <a-space v-if="this.chat.current" :size="10" :color="this.chat.current.status">
-                <a-avatar :src="this.chat.current.icon" />
-                <a-typography-text strong>{{ this.chat.current.username }}</a-typography-text>
-              </a-space>
-            </a-col>
-            <a-col :span="4" class="text-right">
-              <a-button type="text">
-                <icon-font class="icon" type="icon-all" />
-              </a-button>
-            </a-col>
-          </a-row>
-        </a-layout-header>
-        <a-layout-content class="height-100-percent">
-          <div class="message">
-            <template v-if="this.chat.current">
-              <div v-for="m of this.chat.current.messages" :key="m.id" :class="m.id !== (this.principal.details.id + '') ? '' : 'text-right'">
-                <a-space :size="15" align="start" >
-                  <template v-if="m.id !== this.principal.details.id + ''">
-                    <a-avatar :src="m.icon" class="basic-box-shadow" />
-                    <div class="message-content">
-                      <div v-for="c of m.content" :key="c">
-                        <a-card class="border-radius-4 basic-box-shadow">
-                          {{ c }}
-                        </a-card>
-                      </div>
-                    </div>
-                  </template>
-                  <template v-else>
-                    <div class="message-content">
-                      <div v-for="c of m.content" :key="c" >
-                        <a-card class="border-radius-4 basic-box-shadow self">
-                          {{ c }}
-                        </a-card>
-                      </div>
-                    </div>
-                    <a-avatar :src="m.icon" class="basic-box-shadow" />
-                  </template>
-                </a-space>
-              </div>
-            </template>
-          </div>
-          <div class="input border-top">
-            <QuillEditor theme="snow" v-model:content="this.chat.inputContent" content-type="html" />
-          </div>
-        </a-layout-content>
-      </a-layout>
-    </a-layout>
-  </a-drawer>
+  <chat ref="chat" />
+
   <a-layout class="height-100-percent">
 
     <a-layout-header :class="menu.collapsed ? 'header-navbar basic-box-shadow toggle' : 'header-navbar basic-box-shadow'">
@@ -102,9 +11,9 @@
             <a-menu-item key="1" @click="toggleCollapsed" class="hidden-xs">
               <icon-font class="icon" :type="this.menu.collapsed ? 'icon-arrow-right-circle' : 'icon-arrow-left-circle'" />
             </a-menu-item>
-            <a-menu-item key="2" v-if="this.connected" @click="this.chat.visible = !this.chat.visible">
-              <a-badge :count="this.chat.messageCount">
-              <icon-font class="icon" type="icon-message" />
+            <a-menu-item key="2" v-if="this.connected" @click="visible">
+              <a-badge :count="messageCount">
+                <icon-font class="icon" type="icon-message" />
               </a-badge>
             </a-menu-item>
           </a-menu>
@@ -122,9 +31,7 @@
               <template #title>
                 <a-space :size="20">
                   <span>{{ this.principal.details.username }}</span>
-                  <a-badge dot :status="this.connected ? 'success' : 'default'" :offset="[-5,45]">
-                    <a-avatar :src="require('../assets/avatar/男生-紫.png')" />
-                  </a-badge>
+                  <a-avatar :src="require('../assets/avatar/男生-紫.png')" />
                 </a-space>
               </template>
               <a-menu-item key="3-2"><a-button type="text" @click="profile()"><icon-font class="icon" type="icon-setting" /> 系统设置</a-button> </a-menu-item>
@@ -172,23 +79,22 @@
 <script>
 
 import RecursionMenu from '@/components/RecursionMenu.vue'
+import Chat from '@/components/Chat.vue'
 
 import { PRINCIPAL_MUTATION_TYPE } from "@/store/principal"
-import {SOCKET_EVENT_TYPE, SOCKET_IO_ACTION_TYPE} from "@/store/socketIo"
-import { mapState } from 'vuex'
-
-import { QuillEditor } from '@vueup/vue-quill'
-
-import '@vueup/vue-quill/dist/vue-quill.snow.css';
+import { SOCKET_IO_ACTION_TYPE } from "@/store/socketIo"
 
 export default {
   name: "Index",
-  components:{RecursionMenu, QuillEditor},
-  computed:mapState({
-    connected: state => {
-      return state.socketIo.connected
+  components:{RecursionMenu, Chat},
+  computed:{
+    connected() {
+      return this.$store.state.socketIo.connected;
+    },
+    messageCount() {
+      return this.$refs['chat'].messageCount;
     }
-  }),
+  },
   created() {
 
     let _this = this;
@@ -219,13 +125,9 @@ export default {
         .catch(() => _this.$router.push(process.env.VUE_APP_LOGIN_PAGE));
   },
   methods: {
-    selectContact(record){
-
-      if (this.chat.current && this.chat.current.id === record.key) {
-        return ;
-      }
-
-      this.chat.current = this.chat.contacts.find(c => c.id === record.key);
+    visible() {
+      this.$refs['chat'].visible = !this.$refs['chat'].visible;
+      return this.$refs['chat'].visible;
     },
     postPrepare(r) {
       let data = r.data.data;
@@ -238,10 +140,10 @@ export default {
           details.rememberMe = true;
         }
 
-        this.$store.commit(PRINCIPAL_MUTATION_TYPE.SetPrincipal, details);
+        this.$store.commit(PRINCIPAL_MUTATION_TYPE.SET_PRINCIPAL, details);
 
       } else {
-        this.$store.commit(PRINCIPAL_MUTATION_TYPE.ClearPrincipal);
+        this.$store.commit(PRINCIPAL_MUTATION_TYPE.CLEAR_PRINCIPAL);
       }
 
       if (this.principal.details.rememberMe === true && this.$route.meta.authentication) {
@@ -255,7 +157,7 @@ export default {
 
       let id = this.saveDeviceIdentified(r);
 
-      this.$store.dispatch(SOCKET_IO_ACTION_TYPE.Connect,{
+      this.$store.dispatch(SOCKET_IO_ACTION_TYPE.CONNECT,{
         transports:["websocket"],
         query:{
           did:id,
@@ -263,13 +165,6 @@ export default {
           username:this.principal.details.username,
           password:this.principal.details.token
         }
-      }).then((socket) => {
-        socket.on(SOCKET_EVENT_TYPE.Connect, () => {
-          this
-              .$http
-              .post("/authentication/group/find")
-              .then(r => this.chat.groupData = r.data.data);
-        });
       });
 
     },
@@ -291,8 +186,9 @@ export default {
       let details = JSON.parse(JSON.stringify(this.principal.details));
 
       details.menus = response.data.data;
+      details.menus.sort((a,b) => a.sort > b.sort ? 1 : -1);
 
-      this.$store.commit(PRINCIPAL_MUTATION_TYPE.SetPrincipal, details);
+      this.$store.commit(PRINCIPAL_MUTATION_TYPE.SET_PRINCIPAL, details);
 
       this.spinning = false;
 
@@ -305,7 +201,6 @@ export default {
 
     },
     getMenus() {
-
       if (this.principal.details.menus.length === 0) {
         this.spinning = true;
         this.$http
@@ -329,34 +224,6 @@ export default {
     return {
       screenWidth: document.body.clientWidth,
       spinning: false,
-      chat:{
-        messageCount:0,
-        visible: false,
-        current: undefined,
-        contacts:[{
-          id:"2",
-          username:"admin",
-          icon:"../assets/avatar/男生-紫.png",
-          status:"green",
-          messages:[{
-            id:"2",
-            creationTime:"",
-            content:["你好","在吗？。。。"]
-          },{
-            id:"1",
-            creationTime:"",
-            content:["在","怎么了，发送到发撒地方"]
-          },{
-            id:"2",
-            creationTime:"",
-            content:["没什么，撒发送到发送到发撒地方阿"]
-          }],
-          lastMessage:"没什么",
-        }],
-        inputContent:"",
-        tab:"message",
-        groupData:[]
-      },
       menu: {
         collapsed: document.body.clientWidth <= 768,
         selectedKeys:[this.$route.meta.selectMenu ? this.$route.meta.selectMenu : this.$route.path],

@@ -38,7 +38,7 @@
 export default {
   name:"AuthenticationGroupTable",
   props:["enableDisabledCheckbox"],
-  emits: ['searching', 'search'],
+  emits: ["searching", "search"],
   data() {
     return {
       columns:[
