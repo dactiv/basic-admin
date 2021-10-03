@@ -82,30 +82,40 @@
         <a-layout-content class="height-100-percent">
           <div class="message">
             <template v-if="this.current">
-              <div v-for="m of this.current.messages" :key="m.id" :class="m.id !== (this.principal.details.id + '') ? '' : 'text-right'">
-                <a-space :size="15" align="start" >
-                  <template v-if="m.id !== this.principal.details.id + ''">
-                    <a-avatar :src="m.avatar" class="basic-box-shadow" >
-                    </a-avatar>
-                    <div class="message-content">
-                      <div v-for="c of m.content" :key="c">
-                        <a-card class="border-radius-4 basic-box-shadow">
-                          {{ c }}
-                        </a-card>
+              <div v-for="m of this.current.messages" :key="m.id">
+
+                <div class="text-center margin-top-10 margin-bottom-10">
+                  <a-typography-text type="secondary">{{this.timestampFormat(m.creationTime)}}</a-typography-text>
+                </div>
+
+                <div :class="m.id !== (this.principal.details.id + '') ? '' : 'text-right'">
+                  <a-space :size="15" align="start" >
+                    <template v-if="m.id !== this.principal.details.id + ''">
+                      <a-avatar :src="m.avatar" class="basic-box-shadow" >
+                        {{this.current.title.substring(0,1)}}
+                      </a-avatar>
+                      <div class="message-content">
+                        <div v-for="c of m.content" :key="c">
+                          <a-card class="border-radius-4 basic-box-shadow">
+                            {{ c }}
+                          </a-card>
+                        </div>
                       </div>
-                    </div>
-                  </template>
-                  <template v-else>
-                    <div class="message-content">
-                      <div v-for="c of m.content" :key="c" >
-                        <a-card class="border-radius-4 basic-box-shadow self">
-                          {{ c }}
-                        </a-card>
+                    </template>
+                    <template v-else>
+                      <div class="message-content">
+                        <div v-for="c of m.content" :key="c" >
+                          <a-card class="border-radius-4 basic-box-shadow self">
+                            {{ c }}
+                          </a-card>
+                        </div>
                       </div>
-                    </div>
-                    <a-avatar :src="m.icon" class="basic-box-shadow" />
-                  </template>
-                </a-space>
+                      <a-avatar :src="m.icon" class="basic-box-shadow">
+                        我
+                      </a-avatar>
+                    </template>
+                  </a-space>
+                </div>
               </div>
             </template>
           </div>
@@ -219,7 +229,26 @@ export default {
       messageCount:0,
       current: undefined,
       visible: false,
-      contacts:[],
+      contacts:[{
+        id:"2",
+        type:"friend",
+        title:"admin",
+        avatar:"../assets/avatar/男生-紫.png",
+        messages:[{
+          id:"2",
+          creationTime:1633241541973,
+          content:["你好","在吗？。。。"]
+        },{
+          id:"1",
+          creationTime:1633241641973,
+          content:["在","怎么了，发送到发撒地方"]
+        },{
+          id:"2",
+          creationTime:1633241741973,
+          content:["没什么，撒发送到发送到发撒地方阿"]
+        }],
+        lastMessage:"没什么"
+      }],
       inputContent:"",
       tab:"message",
       groupData:[{ name: '联系人', id: 'root', slots : { icon: 'root' }}]
