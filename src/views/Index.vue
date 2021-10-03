@@ -30,8 +30,10 @@
             <a-sub-menu key="3">
               <template #title>
                 <a-space :size="20">
-                  <span>{{ this.principal.details.username }}</span>
-                  <a-avatar :src="require('../assets/avatar/男生-紫.png')" />
+                  <span>{{ this.principal.details.realName || this.principal.details.username }}</span>
+                  <a-avatar :src="this.principal.details.avatar">
+                    {{ (this.principal.details.realName || this.principal.details.username).substring(0, 1) }}
+                  </a-avatar>
                 </a-space>
               </template>
               <a-menu-item key="3-2"><a-button type="text" @click="profile()"><icon-font class="icon" type="icon-setting" /> 系统设置</a-button> </a-menu-item>
@@ -186,7 +188,7 @@ export default {
       let details = JSON.parse(JSON.stringify(this.principal.details));
 
       details.menus = response.data.data;
-      details.menus.sort((a,b) => a.sort > b.sort ? 1 : -1);
+      //details.menus.sort((a,b) => a.sort > b.sort ? 1 : -1);
 
       this.$store.commit(PRINCIPAL_MUTATION_TYPE.SET_PRINCIPAL, details);
 

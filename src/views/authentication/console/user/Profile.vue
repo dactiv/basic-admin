@@ -12,9 +12,10 @@
     </template>
 
     <div class="text-center">
-      <a-avatar :size="64" :src="require('@/assets/avatar/男生-紫.png')">
+      <a-avatar size="large" :src="this.principal.details.avatar">
+        {{ (this.principal.details.realName || this.principal.details.username).substring(0, 1) }}
       </a-avatar>
-      <a-typography-title class="margin-top-15" :level="4" type="secondary">{{ this.principal.details.username }}</a-typography-title>
+      <a-typography-title class="margin-top-15" :level="4" type="secondary">{{ this.principal.details.realName || this.principal.details.username }}</a-typography-title>
       <a-typography-title class="margin-top-15" :level="5" disabled>所在组:{{ this.principal.details.roleAuthorityStrings }}</a-typography-title>
     </div>
 

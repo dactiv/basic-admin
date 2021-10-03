@@ -297,3 +297,15 @@ body {
   font-size: 12px;
   line-height: 18px;
 }
+
+.chat .ant-tree li .ant-tree-node-content-wrapper {
+  height: auto;
+}
+
+.chat .ant-tree li .ant-tree-node-content-wrapper .group-user {
+  margin-left: -15px;
+}
+
+.chat .ant-tree li .ant-tree-node-content-wrapper .ant-avatar {
+  margin-right: 10px;
+}

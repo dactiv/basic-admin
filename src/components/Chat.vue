@@ -5,7 +5,9 @@
         <a-row class="height-100-percent">
           <a-col :span="6" class="tool-bar border-right">
             <div class="text-center margin-top-15">
-              <a-avatar :src="'../assets/avatar/男生-紫.png'" />
+              <a-avatar :src="this.principal.details.avatar">
+                {{ (this.principal.details.realName || this.principal.details.username).substring(0, 1) }}
+              </a-avatar>
               <a-menu mode="vertical" class="margin-top-10" @select="toolbarSelect" :selectedKeys="selectedToolBar">
                 <a-menu-item key="message">
                   <a-badge :count="this.messageCount">
@@ -26,7 +28,9 @@
               <a-menu v-if="this.tab === 'message'" @click="selectContact" mode="vertical">
                 <a-menu-item v-for="c of this.contacts" :key="c.id" >
                   <a-space :size="10">
-                    <a-avatar :src="c.avatar" />
+                    <a-avatar :src="c.avatar" >
+                      {{ c.title.substring(0, 1) }}
+                    </a-avatar>
                     <div>
                       <a-typography-text :style="{width: '120px'}" :ellipsis="true" strong class="contacts-name display-block">{{ c.title }}</a-typography-text>
                       <a-typography-text :style="{width: '120px'}" :ellipsis="true" type="secondary" class="contacts-message display-block">{{ c.lastMessage }}</a-typography-text>
@@ -42,8 +46,14 @@
                   <template #root>
                     <icon-font class="icon" type="icon-profile" />
                   </template>
-                  <template #user>
-                    <icon-font class="icon" type="icon-user" />
+                  <template #title="{name, id, avatar}">
+                    <div v-if="id.includes('user-')" class="group-user">
+                      <a-avatar size="small" :src="avatar">
+                        {{name.substring(0,1)}}
+                      </a-avatar>
+                      <a-typography-text strong>{{ name }}</a-typography-text>
+                    </div>
+                    <a-typography-text v-else>{{ name }}</a-typography-text>
                   </template>
                 </a-tree>
               </div>
@@ -56,7 +66,9 @@
           <a-row>
             <a-col :span="20">
               <a-space v-if="this.current" :size="10" :color="this.current.status">
-                <a-avatar :src="this.current.icon" />
+                <a-avatar :src="this.current.avatar" >
+                  {{ this.current.title.substring(0,1) }}
+                </a-avatar>
                 <a-typography-text strong>{{ this.current.title }}</a-typography-text>
               </a-space>
             </a-col>
@@ -73,7 +85,8 @@
               <div v-for="m of this.current.messages" :key="m.id" :class="m.id !== (this.principal.details.id + '') ? '' : 'text-right'">
                 <a-space :size="15" align="start" >
                   <template v-if="m.id !== this.principal.details.id + ''">
-                    <a-avatar :src="m.icon" class="basic-box-shadow" />
+                    <a-avatar :src="m.avatar" class="basic-box-shadow" >
+                    </a-avatar>
                     <div class="message-content">
                       <div v-for="c of m.content" :key="c">
                         <a-card class="border-radius-4 basic-box-shadow">
@@ -142,13 +155,14 @@ export default {
               if (treeNode.dataRef.children.length > 0) {
                 treeNode.dataRef.children.forEach(c => {
                   c.slots = { icon: 'group' };
+                  c.id = "group-" + c.id;
                 });
               }
 
               if (treeNode.eventKey !== "root") {
                 this
                     .$http
-                    .get("/authentication/console/user/findByGroup?groupId=" + treeNode.eventKey)
+                    .get("/authentication/console/user/findByGroup?groupId=" + treeNode.eventKey.replace("group-",""))
                     .then(u => {
                       let users = u.data.data;
                       users.forEach(u => {
@@ -159,7 +173,6 @@ export default {
                           name : u.realName || u.username,
                           id: "user-" + u.id,
                           avatar: u.avatar,
-                          slots : {icon: "user"},
                           isLeaf: true,
                         });
                       });
@@ -180,7 +193,6 @@ export default {
         type:"friend",
         title: info.node.dataRef.name,
         avatar: info.node.dataRef.avatar,
-        status:"green",
         messages:[],
         lastMessage:"",
       }
@@ -207,27 +219,7 @@ export default {
       messageCount:0,
       current: undefined,
       visible: false,
-      contacts:[{
-        id:"2",
-        type:"friend",
-        title:"admin",
-        avatar:"../assets/avatar/男生-紫.png",
-        status:"green",
-        messages:[{
-          id:"2",
-          creationTime:"",
-          content:["你好","在吗？。。。"]
-        },{
-          id:"1",
-          creationTime:"",
-          content:["在","怎么了，发送到发撒地方"]
-        },{
-          id:"2",
-          creationTime:"",
-          content:["没什么，撒发送到发送到发撒地方阿"]
-        }],
-        lastMessage:"没什么"
-      }],
+      contacts:[],
       inputContent:"",
       tab:"message",
       groupData:[{ name: '联系人', id: 'root', slots : { icon: 'root' }}]
