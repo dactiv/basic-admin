@@ -142,6 +142,9 @@ export default {
       this.tab = info.key;
       this.selectedToolBar = [info.key];
     },
+    send() {
+      this.$http.post()
+    },
     loadGroupData(treeNode) {
       return new Promise((resolve) => {
         if (treeNode.dataRef.children) {

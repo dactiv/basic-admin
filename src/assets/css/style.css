@@ -276,6 +276,10 @@ body {
   height: 124px;
 }
 
+.chat .input .ql-container.ql-snow {
+  border: none;
+}
+
 .chat .input .ql-container .ql-editor {
   min-height: 124px;
 }
@@ -287,6 +291,11 @@ body {
 
 .chat .input .ql-toolbar, .chat .input .ql-container {
   border-left: none;
+}
+
+.chat .input .send-bar {
+  padding: 8px 15px;
+  background-color: #ffffff;
 }
 
 .chat .contacts-name {
