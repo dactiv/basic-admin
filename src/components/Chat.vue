@@ -1,4 +1,4 @@
-<template>
+<template >
   <a-drawer :width="950" placement="right" :closable="false" v-model:visible="this.visible" class="chat">
     <a-layout class="height-100-percent">
       <a-layout-sider class="main-aside border-right" :width="250">
@@ -143,16 +143,17 @@
 </template>
 
 <script>
+
 import {QuillEditor} from "@vueup/vue-quill";
 import { SOCKET_EVENT_TYPE, SOCKET_IO_ACTION_TYPE } from "@/store/socketIo"
 
 import '@vueup/vue-quill/dist/vue-quill.snow.css';
 import '@/assets/css/quill.css'
 
-
 export default {
   name: "Chat",
   components: {QuillEditor},
+  emits: ['messageCountChange'],
   computed:{
     messageCount() {
       return this.contacts.reduce((sum, o) => sum + o.messages.filter(m => m.status === "unread").length, 0);
@@ -162,16 +163,32 @@ export default {
 
     let _this = this;
 
+    window.onfocus = () => {
+      _this.hasFocus = true;
+      if (!_this.current && !_this.visible) {
+        return ;
+      }
+      _this.readMessage(_this.current.id);
+    };
+
+    this.$emit('messageCountChange', _this.messageCount);
+
+    window.onblur = () => _this.hasFocus = false;
+
     _this.$store.dispatch(SOCKET_IO_ACTION_TYPE.SUBSCRIBE, {
       name: SOCKET_EVENT_TYPE.CHAT_READ_MESSAGE,
       callback:(data) => {
         let json = JSON.parse(data);
         let contact = _this.contacts.find(c => c.id === json.data.id);
         let index = _this.contacts.indexOf(contact);
+
         json.data.messageIds.forEach(id => {
           _this.contacts[index].messages.find(m => m.id === id).status = "read";
           _this.contacts[index].tooltip = "已阅";
         });
+
+        localStorage.setItem(process.env.VUE_APP_LOCAL_STORAGE_CHAT_CONTACT_NAME, JSON.stringify(_this.contacts));
+        this.$emit('messageCountChange', _this.messageCount);
       }
     })
 
@@ -185,6 +202,13 @@ export default {
 
         if (contact) {
           json.data.messages.forEach(m => contact.messages.push(m));
+          contact.lastMessage = json.data.lastMessage;
+          localStorage.setItem(process.env.VUE_APP_LOCAL_STORAGE_CHAT_CONTACT_NAME, JSON.stringify(_this.contacts));
+          _this.$nextTick(() => this.$refs["message-content"].scrollTop = this.$refs["message-content"].scrollHeight);
+          this.$emit('messageCountChange', _this.messageCount);
+          if (_this.current && contact.id === _this.current.id && _this.hasFocus && _this.visible) {
+            _this.readMessage(_this.current.id)
+          }
         } else {
           _this
               .$http
@@ -193,6 +217,12 @@ export default {
                 json.data.title = r.data.data.username || r.data.data.realName;
                 json.data.avatar = r.data.data.avatar;
                 _this.contacts.unshift(json.data);
+                localStorage.setItem(process.env.VUE_APP_LOCAL_STORAGE_CHAT_CONTACT_NAME, JSON.stringify(_this.contacts));
+                _this.$nextTick(() => this.$refs["message-content"].scrollTop = this.$refs["message-content"].scrollHeight);
+                this.$emit('messageCountChange', _this.messageCount);
+                if (_this.current && contact.id === _this.current.id && _this.hasFocus && _this.visible) {
+                  _this.readMessage(_this.current.id);
+                }
               });
         }
       }
@@ -227,10 +257,12 @@ export default {
             contact.messages[index].id = r.data.data;
             contact.messages[index].status = "success";
             contact.messages[index].tooltip = "待查阅";
+            localStorage.setItem(process.env.VUE_APP_LOCAL_STORAGE_CHAT_CONTACT_NAME, JSON.stringify(this.contacts));
           })
           .catch((r) => {
             contact.messages[index].status = "fail";
             contact.messages[index].tooltip = r.data.message;
+            localStorage.setItem(process.env.VUE_APP_LOCAL_STORAGE_CHAT_CONTACT_NAME, JSON.stringify(this.contacts));
           });
 
       this.$refs["editor"].setContents("");
@@ -319,31 +351,42 @@ export default {
         return ;
       }
 
-      this.current = this.contacts.find(c => c.id === record.key);
+      this.$nextTick(() => this.$refs["message-content"].scrollTop = this.$refs["message-content"].scrollHeight);
+      this.readMessage(record.key);
+    },
+    readMessage(id) {
+      this.current = this.contacts.find(c => c.id === id);
       this.$nextTick(() => this.$refs["message-content"].scrollTop = this.$refs["message-content"].scrollHeight);
 
-      let unreadMessageIds = [];
       let unreadMessages = this.current.messages.filter(m => m.status === "unread")
-      unreadMessages.forEach(m => unreadMessageIds.push(m.id));
-      let param = {senderId:this.current.id,messageIds:unreadMessageIds};
+      if (unreadMessages.length > 0) {
+        let unreadMessageIds = [];
 
-      this
-          .$http
-          .post("/socket-server/chat/readMessage",this.formUrlencoded(param))
-          .then(() => {
-            unreadMessages.forEach(m => {
-              m.status = "read";
-              m.tooltip = "已阅";
+        unreadMessages.forEach(m => unreadMessageIds.push(m.id));
+        let param = {senderId:this.current.id,messageIds:unreadMessageIds};
+
+        this
+            .$http
+            .post("/socket-server/chat/readMessage", this.formUrlencoded(param))
+            .then(() => {
+              unreadMessages.forEach(m => {
+                m.status = "read";
+                m.tooltip = "已阅";
+              });
+              localStorage.setItem(process.env.VUE_APP_LOCAL_STORAGE_CHAT_CONTACT_NAME, JSON.stringify(this.contacts));
+              this.$emit('messageCountChange', this.messageCount);
             })
-          })
-    },
+
+      }
+    }
   },
   data() {
     return {
+      hasFocus:true,
       selectedToolBar:["message"],
       current: undefined,
       visible: false,
-      contacts:[],
+      contacts:JSON.parse(localStorage.getItem(process.env.VUE_APP_LOCAL_STORAGE_CHAT_CONTACT_NAME)),
       inputContent:"",
       tab:"message",
       groupData:[{ name: '联系人', id: 'root', slots : { icon: 'root' }}]

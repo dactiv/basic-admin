@@ -37,9 +37,15 @@ export default {
         },
         setConnected(state, value) {
             state.connected = value;
+            if (!state.connected) {
+                state.socket.disconnect();
+            }
         },
         setClientConnected(state, value) {
             state.clientDisconnect = value;
+            if (state.clientDisconnect) {
+                state.socket.disconnect();
+            }
         },
         subscribe(state, options) {
             state.socket.on(options.name, options.callback);
@@ -109,14 +115,6 @@ export default {
                     socket.disconnect();
                 });
 
-                /*if (context.state.onEvent.length > 0) {
-                    context.state.onEvent.forEach(e => socket.on(e.event, e.callback));
-                }
-
-                if (context.state.offEvent.length > 0) {
-                    context.state.offEvent.forEach(e => socket.off(e));
-                }*/
-
                 socket.open();
             });
         },
@@ -126,7 +124,6 @@ export default {
                     resolve();
                     return;
                 }
-                context.state.socket.disconnect();
                 context.commit("setSocket", JSON.parse(JSON.stringify(defaultStatus)));
                 context.commit("setConnected", false);
                 resolve();

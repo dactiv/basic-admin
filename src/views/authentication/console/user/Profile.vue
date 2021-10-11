@@ -12,9 +12,17 @@
     </template>
 
     <div class="text-center">
-      <a-avatar size="large" :src="this.principal.details.avatar">
+      <a-avatar :size="64" :src="this.principal.details.avatar">
         {{ (this.principal.details.realName || this.principal.details.username).substring(0, 1) }}
       </a-avatar>
+      <p class="margin-top-15">
+      <a-upload :showUploadList="false" :multiple="true" v-model:file-list="fileList" action="/file-manager/upload/user.avatar" @change="fileListChange">
+        <a-button size="small">
+          <icon-font class="icon" type="icon-caps-lock" />
+          <span class="hidden-xs">上传头像</span>
+        </a-button>
+      </a-upload>
+      </p>
       <a-typography-title class="margin-top-15" :level="4" type="secondary">{{ this.principal.details.realName || this.principal.details.username }}</a-typography-title>
       <a-typography-title class="margin-top-15" :level="5" disabled>所在组:{{ this.principal.details.roleAuthorityStrings }}</a-typography-title>
     </div>
@@ -68,6 +76,25 @@
 export default {
   name: "AuthenticationConsoleUserProfile",
   methods:{
+    fileListChange(info) {
+
+      if (info.file.status === "done") {
+
+        let avatar = {
+          name: info.file.name,
+          contentType: info.file.type,
+          uid: info.file.uid,
+          meta: {
+            link:info.file.response.data.url,
+            bucket:info.file.response.data.bucket
+          }
+        };
+
+        this.avatarList.push(avatar);
+
+      }
+
+    },
     submitForm:function() {
       let _this = this;
 
@@ -99,6 +126,8 @@ export default {
   },
   data() {
     return {
+      fileList:[],
+      avatarList:[],
       spinning:false,
       form: {
         oldPassword:"",

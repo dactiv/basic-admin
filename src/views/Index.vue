@@ -1,6 +1,6 @@
 <template>
 
-  <chat ref="chat" />
+  <chat ref="chat" @messageCountChange="messageCountChange"/>
 
   <a-layout class="height-100-percent">
 
@@ -12,7 +12,7 @@
               <icon-font class="icon" :type="this.menu.collapsed ? 'icon-arrow-right-circle' : 'icon-arrow-left-circle'" />
             </a-menu-item>
             <a-menu-item key="2" v-if="this.connected" @click="visible">
-              <a-badge :count="0">
+              <a-badge :count="this.messageCount">
                 <icon-font class="icon" type="icon-message" />
               </a-badge>
             </a-menu-item>
@@ -124,6 +124,9 @@ export default {
         .catch(() => _this.$router.push(process.env.VUE_APP_LOGIN_PAGE));
   },
   methods: {
+    messageCountChange(count) {
+      this.messageCount = count;
+    },
     visible() {
       this.$refs['chat'].visible = !this.$refs['chat'].visible;
       return this.$refs['chat'].visible;
@@ -226,6 +229,7 @@ export default {
   data() {
     return {
       screenWidth: document.body.clientWidth,
+      messageCount:0,
       spinning: false,
       menu: {
         collapsed: document.body.clientWidth <= 768,
