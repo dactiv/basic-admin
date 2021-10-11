@@ -104,7 +104,6 @@ export default {
       }
 
       this.form.deviceIdentified = this.saveDeviceIdentified(r);
-
     },
     getPictureCaptchaField() {
       this.form["_pictureCaptcha"] = this.form.captcha;

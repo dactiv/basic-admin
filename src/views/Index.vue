@@ -12,7 +12,7 @@
               <icon-font class="icon" :type="this.menu.collapsed ? 'icon-arrow-right-circle' : 'icon-arrow-left-circle'" />
             </a-menu-item>
             <a-menu-item key="2" v-if="this.connected" @click="visible">
-              <a-badge :count="messageCount">
+              <a-badge :count="0">
                 <icon-font class="icon" type="icon-message" />
               </a-badge>
             </a-menu-item>
@@ -92,9 +92,6 @@ export default {
   computed:{
     connected() {
       return this.$store.state.socketIo.connected;
-    },
-    messageCount() {
-      return this.$refs['chat'].messageCount;
     }
   },
   created() {
@@ -147,6 +144,10 @@ export default {
       } else {
         this.$store.commit(PRINCIPAL_MUTATION_TYPE.CLEAR_PRINCIPAL);
       }
+
+      this.currentTimeStamp = r.data.timeStamp;
+
+      setTimeout(() => this.currentTimeStamp = this.currentTimeStamp + 1000, 1000)
 
       if (this.principal.details.rememberMe === true && this.$route.meta.authentication) {
         sessionStorage.setItem(process.env.VUE_APP_SESSION_STORAGE_REQUEST_PATH_NAME, this.$route.path);

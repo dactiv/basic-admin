@@ -171,7 +171,7 @@ application.config.globalProperties.getFileIcon = function(filename) {
 const IconFont = createFromIconfontCN({
     scriptUrl: [
         // commons-icon
-        "//at.alicdn.com/t/font_2732722_90fxtlj180i.js",
+        "//at.alicdn.com/t/font_2732722_txaxkaasdb.js",
         // file-icon
         "//at.alicdn.com/t/font_2783178_o30jvdzd5vo.js"
     ]
@@ -186,6 +186,8 @@ application.config.globalProperties.principal = {
 }
 
 application.config.globalProperties.$message = message;
+
+application.config.globalProperties.currentTimeStamp = 0;
 
 application.config.globalProperties.$notification = notification;
 
