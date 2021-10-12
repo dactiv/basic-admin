@@ -59,14 +59,14 @@ import {
 
 const application = createApp(App);
 
-application.config.globalProperties.timestampFormat = function (timestamp) {
+application.config.globalProperties.timestampFormat = (timestamp) => {
     if (!timestamp) {
         return "";
     }
     return moment(timestamp).format(process.env.VUE_APP_TIMESTAMP_FORMAT);
 }
 
-application.config.globalProperties.convertFormUrlencoded = function (val) {
+application.config.globalProperties.convertFormUrlencoded = (val) => {
 
     if (this.$moment.isMoment(val)) {
         return val.format(process.env.VUE_APP_POST_DATE_FORMAT);
@@ -75,7 +75,7 @@ application.config.globalProperties.convertFormUrlencoded = function (val) {
     return val;
 }
 
-application.config.globalProperties.formUrlencoded = function(json, ignoreProperties, valueConvert) {
+application.config.globalProperties.formUrlencoded = (json, ignoreProperties, valueConvert) => {
 
     let param = new URLSearchParams();
 
@@ -114,11 +114,11 @@ application.config.globalProperties.formUrlencoded = function(json, ignoreProper
     return param;
 }
 
-application.config.globalProperties.loadConfig = function(params, callback) {
+application.config.globalProperties.loadConfig = (params, callback) => {
     this.$http.get(process.env.VUE_APP_SERVER_CONFIG_URI_SUFFIX,{params: params}).then(callback);
 }
 
-application.config.globalProperties.saveDeviceIdentified = function(r) {
+application.config.globalProperties.saveDeviceIdentified = (r) => {
     let deviceIdentified = localStorage.getItem(process.env.VUE_APP_LOCAL_STORAGE_DEVICE_IDENTIFIED_NAME);
 
     if (!deviceIdentified) {
@@ -129,7 +129,7 @@ application.config.globalProperties.saveDeviceIdentified = function(r) {
     return deviceIdentified;
 }
 
-application.config.globalProperties.confirm = function(config, ok, cancel) {
+application.config.globalProperties.confirm = (config, ok, cancel) => {
 
     let props = {
         icon: createVNode(ExclamationCircleOutlined),
@@ -149,7 +149,7 @@ application.config.globalProperties.confirm = function(config, ok, cancel) {
 
 };
 
-application.config.globalProperties.getFileIcon = function(filename) {
+application.config.globalProperties.getFileIcon = (filename) => {
 
     let index = filename.lastIndexOf(".");
 
@@ -183,6 +183,10 @@ application.config.globalProperties.principal = {
     details: store.state.principal,
     hasPermission: store.getters[PRINCIPAL_GETTER_TYPE.HAS_PERMISSION],
     hasRole: store.getters[PRINCIPAL_GETTER_TYPE.HAS_ROLE]
+}
+
+application.config.globalProperties.getUserAvatar = (filename) => {
+    return process.env.VUE_APP_USER_AVATAR_PREFIX + filename + "?date=" + moment().unix();
 }
 
 application.config.globalProperties.$message = message;

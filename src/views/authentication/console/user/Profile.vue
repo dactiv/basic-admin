@@ -12,11 +12,18 @@
     </template>
 
     <div class="text-center">
+
+      <a-image-preview-group>
+        <a-image :width="64" :height="64" v-for="v of historyAvatar.values" :key="v" :src="this.getUserAvatar(v)" />
+      </a-image-preview-group>
+
+      <a-divider v-if="historyAvatar.values.length > 0" />
+
       <a-avatar :size="64" :src="this.principal.details.avatar">
         {{ (this.principal.details.realName || this.principal.details.username).substring(0, 1) }}
       </a-avatar>
       <p class="margin-top-15">
-      <a-upload :showUploadList="false" :multiple="true" v-model:file-list="fileList" action="/file-manager/upload/user.avatar" @change="fileListChange">
+      <a-upload :showUploadList="false" action="/file-manager/user/avatar/upload" @change="fileListChange" :before-upload="beforeUpload">
         <a-button size="small">
           <icon-font class="icon" type="icon-caps-lock" />
           <span class="hidden-xs">上传头像</span>
@@ -25,6 +32,7 @@
       </p>
       <a-typography-title class="margin-top-15" :level="4" type="secondary">{{ this.principal.details.realName || this.principal.details.username }}</a-typography-title>
       <a-typography-title class="margin-top-15" :level="5" disabled>所在组:{{ this.principal.details.roleAuthorityStrings }}</a-typography-title>
+
     </div>
 
     <a-tabs>
@@ -73,25 +81,38 @@
 
 <script>
 
+
+import {PRINCIPAL_MUTATION_TYPE} from "@/store/principal";
+
 export default {
   name: "AuthenticationConsoleUserProfile",
+  created() {
+    this
+        .$http
+        .get("/file-manager/user/avatar/history")
+        .then(r => this.historyAvatar = r.data.data);
+  },
   methods:{
+    beforeUpload(file) {
+      let isTypeValid = file.type === 'image/jpeg' || file.type === 'image/png';
+
+      if (!isTypeValid) {
+        this.$message.error("仅支持上传 jpeg 或 png 的图片");
+      }
+
+      let isSizeValid = file.size / 1024 / 1024 < 1;
+
+      if (!isSizeValid) {
+        this.$message.error('图片必须小于 1MB!');
+      }
+
+      return isTypeValid && isSizeValid;
+    },
     fileListChange(info) {
 
       if (info.file.status === "done") {
-
-        let avatar = {
-          name: info.file.name,
-          contentType: info.file.type,
-          uid: info.file.uid,
-          meta: {
-            link:info.file.response.data.url,
-            bucket:info.file.response.data.bucket
-          }
-        };
-
-        this.avatarList.push(avatar);
-
+        this.$store.commit(PRINCIPAL_MUTATION_TYPE.SET_AVATAR, process.env.VUE_APP_USER_AVATAR_PREFIX  + "current_" + this.principal.details.id + "?date=" + this.$moment().unix());
+        this.historyAvatar.values.push(info.file.name);
       }
 
     },
@@ -126,8 +147,11 @@ export default {
   },
   data() {
     return {
-      fileList:[],
-      avatarList:[],
+      historyAvatar:{
+        bucketName:"",
+        filename:"",
+        values:[]
+      },
       spinning:false,
       form: {
         oldPassword:"",
