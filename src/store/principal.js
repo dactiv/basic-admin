@@ -17,7 +17,7 @@ const defaultStatus = {
 
 export const PRINCIPAL_MUTATION_TYPE = {
     SET_PRINCIPAL:"principal/setPrincipal",
-    SET_AVATAR:"principal/setAvatar",
+    REFRESH_AVATAR:"principal/refreshAvatar",
     CLEAR_PRINCIPAL:"principal/clearPrincipal"
 }
 
@@ -43,8 +43,8 @@ export default {
         }
     },
     mutations: {
-        setAvatar(state, avatar) {
-            state.avatar = avatar;
+        refreshAvatar(state) {
+            state.avatar = process.env.VUE_APP_USER_AVATAR_PREFIX  + "current_" + state.id + "?date=" + new Date().getTime();
         },
         setPrincipal(state, principal) {
 

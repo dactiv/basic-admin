@@ -14,7 +14,19 @@
     <div class="text-center">
 
       <a-image-preview-group>
-        <a-image :width="64" :height="64" v-for="v of historyAvatar.values" :key="v" :src="this.getUserAvatar(v)" />
+        <a-space :size="10">
+          <div v-for="v of historyAvatar.values" :key="v" class="border padding-10">
+            <a-image :width="100" :height="100" :src="this.getUserAvatar(v)" />
+            <p class="margin-top-5">
+              <a-button type="text" @click="selectAvatar(v)">
+                <icon-font class="icon" type="icon-success" />
+              </a-button>
+              <a-button type="text" @click="deleteAvatar(v)">
+                <icon-font class="icon" type="icon-ashbin" />
+              </a-button>
+            </p>
+          </div>
+        </a-space>
       </a-image-preview-group>
 
       <a-divider v-if="historyAvatar.values.length > 0" />
@@ -90,9 +102,28 @@ export default {
     this
         .$http
         .get("/file-manager/user/avatar/history")
-        .then(r => this.historyAvatar = r.data.data);
+        .then((r) => this.historyAvatar = r.data.data);
   },
   methods:{
+    selectAvatar(name) {
+      this
+          .$http
+          .post("/file-manager/user/avatar/select",this.formUrlencoded({filename:name}))
+          .then(r => {
+            this.$store.commit(PRINCIPAL_MUTATION_TYPE.REFRESH_AVATAR);
+            this.$message.success(r.data.message);
+          });
+    },
+    deleteAvatar(name) {
+      console.log(name);
+      this
+          .$http
+          .post("/file-manager/user/avatar/delete",this.formUrlencoded({filename:name}))
+          .then((r) => {
+            this.historyAvatar.values.splice(name, 1);
+            this.$message.success(r.data.message);
+          });
+    },
     beforeUpload(file) {
       let isTypeValid = file.type === 'image/jpeg' || file.type === 'image/png';
 
@@ -111,7 +142,7 @@ export default {
     fileListChange(info) {
 
       if (info.file.status === "done") {
-        this.$store.commit(PRINCIPAL_MUTATION_TYPE.SET_AVATAR, process.env.VUE_APP_USER_AVATAR_PREFIX  + "current_" + this.principal.details.id + "?date=" + this.$moment().unix());
+        this.$store.commit(PRINCIPAL_MUTATION_TYPE.REFRESH_AVATAR);
         this.historyAvatar.values.push(info.file.name);
       }
 

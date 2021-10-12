@@ -37,13 +37,13 @@ export default {
         },
         setConnected(state, value) {
             state.connected = value;
-            if (!state.connected) {
+            if (!state.connected && state.socket) {
                 state.socket.disconnect();
             }
         },
         setClientConnected(state, value) {
             state.clientDisconnect = value;
-            if (state.clientDisconnect) {
+            if (state.clientDisconnect && state.socket) {
                 state.socket.disconnect();
             }
         },
@@ -124,7 +124,7 @@ export default {
                     resolve();
                     return;
                 }
-                context.commit("setSocket", JSON.parse(JSON.stringify(defaultStatus)));
+                context.commit("setSocket", undefined);
                 context.commit("setConnected", false);
                 resolve();
             });
