@@ -39,12 +39,14 @@ export default {
             state.connected = value;
             if (!state.connected && state.socket) {
                 state.socket.disconnect();
+                state.socket = undefined;
             }
         },
         setClientConnected(state, value) {
             state.clientDisconnect = value;
             if (state.clientDisconnect && state.socket) {
                 state.socket.disconnect();
+                state.socket = undefined;
             }
         },
         subscribe(state, options) {
@@ -124,7 +126,6 @@ export default {
                     resolve();
                     return;
                 }
-                context.commit("setSocket", undefined);
                 context.commit("setConnected", false);
                 resolve();
             });

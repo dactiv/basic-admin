@@ -349,10 +349,14 @@ export default {
         return ;
       }
 
-      this.$nextTick(() => this.$refs["message-content"].scrollTop = this.$refs["message-content"].scrollHeight);
       this.readMessage(record.key);
     },
     readMessage(id) {
+
+      if (!this.visible) {
+        return ;
+      }
+
       this.current = this.contacts.find(c => c.id === id);
       this.$nextTick(() => this.$refs["message-content"].scrollTop = this.$refs["message-content"].scrollHeight);
 
