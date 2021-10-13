@@ -1,5 +1,5 @@
 <template >
-  <a-drawer :width="950" placement="right" :closable="false" v-model:visible="this.visible" class="chat">
+  <a-drawer :width="950" placement="right" :closable="false" :afterVisibleChange="visibleChange" v-model:visible="this.visible" class="chat">
     <a-layout class="height-100-percent">
       <a-layout-sider class="main-aside border-right" :width="250">
         <a-row class="height-100-percent">
@@ -202,13 +202,15 @@ export default {
 
         if (contact) {
           json.data.messages.forEach(m => contact.messages.push(m));
+
           contact.lastMessage = json.data.lastMessage;
           localStorage.setItem(process.env.VUE_APP_LOCAL_STORAGE_CHAT_CONTACT_NAME, JSON.stringify(_this.contacts));
-          _this.$nextTick(() => this.$refs["message-content"].scrollTop = this.$refs["message-content"].scrollHeight);
-          this.$emit('messageCountChange', _this.messageCount);
+
           if (_this.current && contact.id === _this.current.id && _this.hasFocus && _this.visible) {
             _this.readMessage(_this.current.id)
           }
+
+          this.$emit('messageCountChange', _this.messageCount);
         } else {
           _this
               .$http
@@ -216,19 +218,26 @@ export default {
               .then((r) => {
                 json.data.title = r.data.data.username || r.data.data.realName;
                 json.data.avatar = r.data.data.avatar;
+
                 _this.contacts.unshift(json.data);
                 localStorage.setItem(process.env.VUE_APP_LOCAL_STORAGE_CHAT_CONTACT_NAME, JSON.stringify(_this.contacts));
-                _this.$nextTick(() => this.$refs["message-content"].scrollTop = this.$refs["message-content"].scrollHeight);
-                this.$emit('messageCountChange', _this.messageCount);
+
                 if (_this.current && contact.id === _this.current.id && _this.hasFocus && _this.visible) {
                   _this.readMessage(_this.current.id);
                 }
+
+                this.$emit('messageCountChange', _this.messageCount);
               });
         }
       }
     });
   },
   methods:{
+    visibleChange(visible) {
+      if (visible && this.current) {
+        this.readMessage(this.current.id);
+      }
+    },
     send() {
       let param = {
         recipientId:this.current.id,
