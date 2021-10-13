@@ -185,8 +185,12 @@ application.config.globalProperties.principal = {
     hasRole: store.getters[PRINCIPAL_GETTER_TYPE.HAS_ROLE]
 }
 
-application.config.globalProperties.getUserAvatar = (filename) => {
-    return process.env.VUE_APP_USER_AVATAR_PREFIX + filename + "?date=" + moment().unix();
+application.config.globalProperties.getUserAvatar = function(filename) {
+    return process.env.VUE_APP_USER_AVATAR_PREFIX + filename;
+}
+
+application.config.globalProperties.getUserAvatarByUserId = function(userId) {
+    return this.getUserAvatar("current_" + userId);
 }
 
 application.config.globalProperties.$message = message;

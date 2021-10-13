@@ -29,7 +29,7 @@
                 <a-menu-item v-for="c of this.contacts" :key="c.id" >
                   <a-space :size="10">
                     <a-badge :count="c.messages.filter(m => m.status === 'unread').length" :offset="[x=-25, y=0]">
-                      <a-avatar :src="c.avatar" >
+                      <a-avatar :src="this.getUserAvatarByUserId(c.id)" >
                         {{ c.title.substring(0, 1) }}
                       </a-avatar>
                     </a-badge>
@@ -48,9 +48,9 @@
                   <template #root>
                     <icon-font class="icon" type="icon-profile" />
                   </template>
-                  <template #title="{name, id, avatar}">
+                  <template #title="{name, id}">
                     <div v-if="id.includes('user-')" class="group-user">
-                      <a-avatar size="small" :src="avatar">
+                      <a-avatar size="small" :src="this.getUserAvatarByUserId(id.replace('user-',''))">
                         {{name.substring(0,1)}}
                       </a-avatar>
                       <a-typography-text strong>{{ name }}</a-typography-text>
@@ -68,7 +68,7 @@
           <a-row>
             <a-col :span="20">
               <a-space v-if="this.current" :size="10" :color="this.current.status">
-                <a-avatar :src="this.current.avatar" >
+                <a-avatar :src="this.getUserAvatarByUserId(this.current.id)" >
                   {{ this.current.title.substring(0,1) }}
                 </a-avatar>
                 <a-typography-text strong>{{ this.current.title }}</a-typography-text>
@@ -93,7 +93,7 @@
                 <div :class="m.senderId !== this.principal.details.id ? '' : 'text-right'">
                   <a-space :size="15" align="start" >
                     <template v-if="m.senderId !== this.principal.details.id">
-                      <a-avatar :src="m.avatar" class="basic-box-shadow" >
+                      <a-avatar :src="this.getUserAvatarByUserId(this.current.id)" class="basic-box-shadow" >
                         {{this.current.title.substring(0,1)}}
                       </a-avatar>
                       <div class="message-content">
@@ -124,7 +124,7 @@
                           </a-space>
 <!--                    </div>-->
                       </div>
-                      <a-avatar :src="m.icon" class="basic-box-shadow">
+                      <a-avatar :src="this.principal.details.avatar" class="basic-box-shadow">
                         我
                       </a-avatar>
                     </template>
@@ -313,7 +313,6 @@ export default {
                         treeNode.dataRef.children.push({
                           name : u.realName || u.username,
                           id: "user-" + u.id,
-                          avatar: u.avatar,
                           isLeaf: true,
                         });
                       });
@@ -332,7 +331,6 @@ export default {
       let contact = {
         id:selectedKeys[0].replaceAll("user-","") * 1,
         title: info.node.dataRef.name,
-        avatar: info.node.dataRef.avatar,
         messages:[],
         lastMessage:"",
       }
@@ -386,7 +384,7 @@ export default {
       selectedToolBar:["message"],
       current: undefined,
       visible: false,
-      contacts:JSON.parse(localStorage.getItem(process.env.VUE_APP_LOCAL_STORAGE_CHAT_CONTACT_NAME)),
+      contacts: JSON.parse(localStorage.getItem(process.env.VUE_APP_LOCAL_STORAGE_CHAT_CONTACT_NAME)) || [],
       inputContent:"",
       tab:"message",
       groupData:[{ name: '联系人', id: 'root', slots : { icon: 'root' }}]

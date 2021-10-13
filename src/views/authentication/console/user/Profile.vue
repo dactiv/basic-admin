@@ -18,7 +18,7 @@
           <div v-for="v of historyAvatar.values" :key="v" class="border padding-10">
             <a-image :width="100" :height="100" :src="this.getUserAvatar(v)" />
             <p class="margin-top-5">
-              <a-button type="text" @click="selectAvatar(v)">
+              <a-button type="text" v-if="v !== historyAvatar.currentAvatarFilename" @click="selectAvatar(v)">
                 <icon-font class="icon" type="icon-success" />
               </a-button>
               <a-button type="text" @click="deleteAvatar(v)">
@@ -102,7 +102,10 @@ export default {
     this
         .$http
         .get("/file-manager/user/avatar/history")
-        .then((r) => this.historyAvatar = r.data.data);
+        .then((r) => {
+          this.historyAvatar = r.data.data;
+          this.historyAvatar.values = this.historyAvatar.values || [];
+        });
   },
   methods:{
     selectAvatar(name) {
@@ -111,16 +114,16 @@ export default {
           .post("/file-manager/user/avatar/select",this.formUrlencoded({filename:name}))
           .then(r => {
             this.$store.commit(PRINCIPAL_MUTATION_TYPE.REFRESH_AVATAR);
+            this.historyAvatar.currentAvatarFilename = name;
             this.$message.success(r.data.message);
           });
     },
     deleteAvatar(name) {
-      console.log(name);
       this
           .$http
           .post("/file-manager/user/avatar/delete",this.formUrlencoded({filename:name}))
           .then((r) => {
-            this.historyAvatar.values.splice(name, 1);
+            this.historyAvatar.values.splice(this.historyAvatar.values.indexOf(name), 1);
             this.$message.success(r.data.message);
           });
     },
@@ -144,6 +147,7 @@ export default {
       if (info.file.status === "done") {
         this.$store.commit(PRINCIPAL_MUTATION_TYPE.REFRESH_AVATAR);
         this.historyAvatar.values.push(info.file.name);
+        this.historyAvatar.currentAvatarFilename = info.file.name;
       }
 
     },
@@ -180,7 +184,8 @@ export default {
     return {
       historyAvatar:{
         bucketName:"",
-        filename:"",
+        historyFilename:"",
+        currentAvatarFilename:"",
         values:[]
       },
       spinning:false,
