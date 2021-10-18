@@ -188,7 +188,9 @@ export default {
         });
 
         localStorage.setItem(process.env.VUE_APP_LOCAL_STORAGE_CHAT_CONTACT_NAME, JSON.stringify(_this.contacts));
-        this.$emit('messageCountChange', _this.messageCount);
+        if (this.visible) {
+          this.$nextTick(() => this.$refs["message-content"].scrollTop = this.$refs["message-content"].scrollHeight);
+        }
       }
     })
 
@@ -206,7 +208,7 @@ export default {
           contact.lastMessage = json.data.lastMessage;
           localStorage.setItem(process.env.VUE_APP_LOCAL_STORAGE_CHAT_CONTACT_NAME, JSON.stringify(_this.contacts));
 
-          if (_this.current && contact.id === _this.current.id && _this.hasFocus && _this.visible) {
+          if (_this.current && contact.id === _this.current.id && _this.hasFocus) {
             _this.readMessage(_this.current.id)
           }
 
@@ -222,12 +224,16 @@ export default {
                 _this.contacts.unshift(json.data);
                 localStorage.setItem(process.env.VUE_APP_LOCAL_STORAGE_CHAT_CONTACT_NAME, JSON.stringify(_this.contacts));
 
-                if (_this.current && contact.id === _this.current.id && _this.hasFocus && _this.visible) {
+                if (_this.current && contact.id === _this.current.id && _this.hasFocus) {
                   _this.readMessage(_this.current.id);
                 }
 
                 this.$emit('messageCountChange', _this.messageCount);
               });
+        }
+
+        if (this.visible) {
+          this.$nextTick(() => this.$refs["message-content"].scrollTop = this.$refs["message-content"].scrollHeight);
         }
       }
     });
@@ -263,19 +269,23 @@ export default {
           .$http
           .post("/socket-server/chat/sendMessage", this.formUrlencoded(param))
           .then((r) =>{
-            contact.messages[index].id = r.data.data;
+            contact.messages[index] = r.data.data;
             contact.messages[index].status = "success";
             contact.messages[index].tooltip = "待查阅";
             localStorage.setItem(process.env.VUE_APP_LOCAL_STORAGE_CHAT_CONTACT_NAME, JSON.stringify(this.contacts));
+            this.$nextTick(() => this.$refs["message-content"].scrollTop = this.$refs["message-content"].scrollHeight);
           })
           .catch((r) => {
             contact.messages[index].status = "fail";
             contact.messages[index].tooltip = r.data.message;
             localStorage.setItem(process.env.VUE_APP_LOCAL_STORAGE_CHAT_CONTACT_NAME, JSON.stringify(this.contacts));
+
+            this.$nextTick(() => this.$refs["message-content"].scrollTop = this.$refs["message-content"].scrollHeight);
           });
 
       this.$refs["editor"].setContents("");
       this.inputContent = "";
+
       this.$nextTick(() => this.$refs["message-content"].scrollTop = this.$refs["message-content"].scrollHeight);
     },
     toolbarSelect(info) {
@@ -369,16 +379,16 @@ export default {
       this.current = this.contacts.find(c => c.id === id);
       this.$nextTick(() => this.$refs["message-content"].scrollTop = this.$refs["message-content"].scrollHeight);
 
-      let unreadMessages = this.current.messages.filter(m => m.status === "unread")
+      let unreadMessages = this.current.messages.filter(m => m.status === "unread");
       if (unreadMessages.length > 0) {
-        let unreadMessageIds = [];
+        let messages = {};
 
-        unreadMessages.forEach(m => unreadMessageIds.push(m.id));
-        let param = {senderId:this.current.id,messageIds:unreadMessageIds};
+        unreadMessages.forEach(m => messages[m.filename] = m.id);
+        let param = {senderId:this.current.id,messages:messages};
 
         this
             .$http
-            .post("/socket-server/chat/readMessage", this.formUrlencoded(param))
+            .post("/socket-server/chat/readMessage", param)
             .then(() => {
               unreadMessages.forEach(m => {
                 m.status = "read";
@@ -386,7 +396,7 @@ export default {
               });
               localStorage.setItem(process.env.VUE_APP_LOCAL_STORAGE_CHAT_CONTACT_NAME, JSON.stringify(this.contacts));
               this.$emit('messageCountChange', this.messageCount);
-            })
+            });
 
       }
     }

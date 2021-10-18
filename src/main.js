@@ -186,7 +186,7 @@ application.config.globalProperties.principal = {
 }
 
 application.config.globalProperties.getUserAvatar = function(filename) {
-    return process.env.VUE_APP_USER_AVATAR_PREFIX + filename;
+    return process.env.VUE_APP_USER_AVATAR_URI_PREFIX + filename;
 }
 
 application.config.globalProperties.getUserAvatarByUserId = function(userId) {

@@ -31,7 +31,12 @@
       </a-space>
 
       <a-table class="ant-table-striped" :row-selection="{ selectedRowKeys: selectedIds, onChange:selectChange }" :rowKey="record=>record.id" :scroll="{ x: 1575 }" :pagination="false" :data-source="page.content" :columns="columns" bordered>
-
+        <template #successTime="{ text:successTime }">
+          {{ this.timestampFormat(successTime)}}
+        </template>
+        <template #lastSendTime="{ text:lastSendTime }">
+          {{ this.timestampFormat(lastSendTime)}}
+        </template>
         <template #action="{ record }">
           <div class="text-center">
             <a-space :size="10">
@@ -178,11 +183,13 @@ export default {
           title: "最后发送时间",
           dataIndex: "lastSendTime",
           ellipsis: true,
+          slots: { customRender: "lastSendTime" },
           width: 200
         },{
           title: "发送成功时间",
           dataIndex: "successTime",
           ellipsis: true,
+          slots: { customRender: "successTime" },
           width: 200
         },{
           title: "操作",

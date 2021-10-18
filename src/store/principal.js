@@ -44,7 +44,7 @@ export default {
     },
     mutations: {
         refreshAvatar(state) {
-            state.avatar = process.env.VUE_APP_USER_AVATAR_PREFIX  + "current_" + state.id + "?date=" + new Date().getTime();
+            state.avatar = process.env.VUE_APP_USER_AVATAR_URI_PREFIX  + "current_" + state.id + "?date=" + new Date().getTime();
         },
         setPrincipal(state, principal) {
 
@@ -56,7 +56,7 @@ export default {
 
             }
 
-            state.avatar = process.env.VUE_APP_USER_AVATAR_PREFIX  + "current_" + state.id + "?date=" + new Date().getTime();
+            state.avatar = process.env.VUE_APP_USER_AVATAR_URI_PREFIX  + "current_" + state.id + "?date=" + new Date().getTime();
 
         },
         clearPrincipal(state) {

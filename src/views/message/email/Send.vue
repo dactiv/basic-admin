@@ -86,7 +86,7 @@
           <span class="hidden-xs">发送</span>
         </a-button>
 
-        <a-upload v-if="this.principal.hasPermission('perms[message:send]')" :showUploadList="false" :multiple="true" v-model:file-list="fileList" action="/file-manager/upload/attachment.email" @change="fileListChange">
+        <a-upload v-if="this.principal.hasPermission('perms[message:send]')" :showUploadList="false" :multiple="true" v-model:file-list="fileList" action="/message/attachment/upload/email" @change="fileListChange">
           <a-button>
             <icon-font class="icon" type="icon-attachment" />
             <span class="hidden-xs">上传附件</span>
@@ -294,7 +294,7 @@ export default {
 
     },
     fileListChange(info) {
-
+      // FIXME 上传文件错误后没有现实错误信息展示
       if (info.file.status === "done") {
 
         let attachment = {
@@ -302,7 +302,7 @@ export default {
           contentType: info.file.type,
           uid: info.file.uid,
           meta: {
-            link:info.file.response.data.url,
+            link:info.file.response.data.link,
             bucket:info.file.response.data.bucket
           }
         };
