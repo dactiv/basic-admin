@@ -84,7 +84,7 @@ import RecursionMenu from '@/components/RecursionMenu.vue'
 import Chat from '@/components/Chat.vue'
 
 import { PRINCIPAL_MUTATION_TYPE } from "@/store/principal"
-/*import { SOCKET_IO_ACTION_TYPE } from "@/store/socketIo"*/
+import { SOCKET_IO_ACTION_TYPE } from "@/store/socketIo"
 
 export default {
   name: "Index",
@@ -161,9 +161,9 @@ export default {
         this.$router.push(process.env.VUE_APP_LOGIN_PAGE);
       }
 
-      /*let id = */this.saveDeviceIdentified(r);
+      let id = this.saveDeviceIdentified(r);
 
-      /*this.$store.dispatch(SOCKET_IO_ACTION_TYPE.CONNECT,{
+      this.$store.dispatch(SOCKET_IO_ACTION_TYPE.CONNECT,{
         transports:["websocket"],
         query:{
           did:id,
@@ -171,7 +171,7 @@ export default {
           username:this.principal.details.username,
           password:this.principal.details.token
         }
-      });*/
+      });
 
     },
     profile() {

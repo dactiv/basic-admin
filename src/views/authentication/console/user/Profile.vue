@@ -35,7 +35,7 @@
         {{ (this.principal.details.realName || this.principal.details.username).substring(0, 1) }}
       </a-avatar>
       <p class="margin-top-15">
-      <a-upload :showUploadList="false" action="/file-manager/user/avatar/upload" @change="fileListChange" :before-upload="beforeUpload">
+      <a-upload :showUploadList="false" action="/authentication/user/avatar/upload" @change="fileListChange" :before-upload="beforeUpload">
         <a-button size="small">
           <icon-font class="icon" type="icon-caps-lock" />
           <span class="hidden-xs">上传头像</span>
@@ -101,7 +101,7 @@ export default {
   created() {
     this
         .$http
-        .get("/file-manager/user/avatar/history")
+        .get("/authentication/user/avatar/history")
         .then((r) => {
           this.historyAvatar = r.data.data;
           this.historyAvatar.values = this.historyAvatar.values || [];
@@ -111,7 +111,7 @@ export default {
     selectAvatar(name) {
       this
           .$http
-          .post("/file-manager/user/avatar/select",this.formUrlencoded({filename:name}))
+          .post("/authentication/user/avatar/select",this.formUrlencoded({filename:name}))
           .then(r => {
             this.$store.commit(PRINCIPAL_MUTATION_TYPE.REFRESH_AVATAR);
             this.historyAvatar.currentAvatarFilename = name;
@@ -121,7 +121,7 @@ export default {
     deleteAvatar(name) {
       this
           .$http
-          .post("/file-manager/user/avatar/delete",this.formUrlencoded({filename:name}))
+          .post("/authentication/user/avatar/delete",this.formUrlencoded({filename:name}))
           .then((r) => {
             this.historyAvatar.values.splice(this.historyAvatar.values.indexOf(name), 1);
             this.$message.success(r.data.message);
