@@ -30,9 +30,9 @@
             <a-sub-menu key="3">
               <template #title>
                 <a-space :size="20">
-                  <span>{{ this.principal.details.realName || this.principal.details.username }}</span>
+                  <span>{{ this.principal.getName(this.principal.details) }}</span>
                   <a-avatar :src="this.principal.details.avatar">
-                    {{ (this.principal.details.realName || this.principal.details.username).substring(0, 1) }}
+                    {{ this.principal.getName(this.principal.details).substring(0, 1) }}
                   </a-avatar>
                 </a-space>
               </template>

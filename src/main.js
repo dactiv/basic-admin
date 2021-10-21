@@ -181,6 +181,9 @@ application.component('IconFont', IconFont);
 
 application.config.globalProperties.principal = {
     details: store.state.principal,
+    getName:function(details) {
+        return details.realName || details.username;
+    },
     hasPermission: store.getters[PRINCIPAL_GETTER_TYPE.HAS_PERMISSION],
     hasRole: store.getters[PRINCIPAL_GETTER_TYPE.HAS_ROLE]
 }

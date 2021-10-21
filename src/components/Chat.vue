@@ -6,7 +6,7 @@
           <a-col :span="6" class="tool-bar border-right">
             <div class="text-center margin-top-15">
               <a-avatar :src="this.principal.details.avatar">
-                {{ (this.principal.details.realName || this.principal.details.username).substring(0, 1) }}
+                {{ this.principal.getName(this.principal.details).substring(0, 1) }}
               </a-avatar>
               <a-menu mode="vertical" class="margin-top-10" @select="toolbarSelect" :selectedKeys="selectedToolBar">
                 <a-menu-item key="message">
@@ -163,6 +163,18 @@ export default {
 
     let _this = this;
 
+    _this
+        .$http
+        .get("/socket-server/chat/getRecentContacts")
+        .then((r) => {
+
+          let data = r.data.data;
+          if (!data || data.length <= 0) {
+            return ;
+          }
+          this.getRecentContactsProfile(data);
+        });
+
     window.onfocus = () => {
       _this.hasFocus = true;
       if (!_this.current && !_this.visible) {
@@ -170,8 +182,6 @@ export default {
       }
       _this.readMessage(_this.current.id);
     };
-
-    this.$emit('messageCountChange', _this.messageCount);
 
     window.onblur = () => _this.hasFocus = false;
 
@@ -187,7 +197,7 @@ export default {
           _this.contacts[index].tooltip = "已阅";
         });
 
-        localStorage.setItem(process.env.VUE_APP_LOCAL_STORAGE_CHAT_CONTACT_NAME, JSON.stringify(_this.contacts));
+        localStorage.setItem(this.getLocalStorageContactName(this.principal.details.id), JSON.stringify(_this.contacts));
         if (this.visible) {
           this.$nextTick(() => this.$refs["message-content"].scrollTop = this.$refs["message-content"].scrollHeight);
         }
@@ -206,7 +216,7 @@ export default {
           json.data.messages.forEach(m => contact.messages.push(m));
 
           contact.lastMessage = json.data.lastMessage;
-          localStorage.setItem(process.env.VUE_APP_LOCAL_STORAGE_CHAT_CONTACT_NAME, JSON.stringify(_this.contacts));
+          localStorage.setItem(this.getLocalStorageContactName(this.principal.details.id), JSON.stringify(_this.contacts));
 
           if (_this.current && contact.id === _this.current.id && _this.hasFocus) {
             _this.readMessage(_this.current.id)
@@ -216,13 +226,14 @@ export default {
         } else {
           _this
               .$http
-              .get("/authentication/getPrincipalProfile?type=Console&id=" + json.data.id)
+              .get("/authentication/getPrincipalProfile?type=Console&ids=" + json.data.id)
               .then((r) => {
-                json.data.title = r.data.data.username || r.data.data.realName;
-                json.data.avatar = r.data.data.avatar;
+                let data = r.data.data[0];
+                json.data.title = this.principal.getName(data);
+                json.data.avatar = data.avatar;
 
                 _this.contacts.unshift(json.data);
-                localStorage.setItem(process.env.VUE_APP_LOCAL_STORAGE_CHAT_CONTACT_NAME, JSON.stringify(_this.contacts));
+                localStorage.setItem(this.getLocalStorageContactName(this.principal.details.id), JSON.stringify(_this.contacts));
 
                 if (_this.current && contact.id === _this.current.id && _this.hasFocus) {
                   _this.readMessage(_this.current.id);
@@ -239,6 +250,68 @@ export default {
     });
   },
   methods:{
+    getRecentContactsProfile(data) {
+      let param = {
+        type:"Console",
+        ids:data
+      }
+      this
+          .$http
+          .post("/authentication/getPrincipalProfile",this.formUrlencoded(param))
+          .then(r => {
+            let data = r.data.data;
+            data.forEach(d => {
+              this.contacts = this.contacts || [];
+              let current = this.contacts.find(c => c.id === d.id);
+              if (current) {
+                let index = this.contacts.indexOf(current);
+                this.contacts[index].title = this.principal.getName(d);
+              } else {
+                this.contacts.push({
+                  id:d.id,
+                  title:this.principal.getName(d),
+                  messages:[],
+                  lastMessage:""
+                })
+              }
+              localStorage.setItem(this.getLocalStorageContactName(this.principal.details.id), JSON.stringify(this.contacts));
+              this.getUnreadMessages();
+            })
+          })
+    },
+    getLocalStorageContactName(id) {
+      return process.env.VUE_APP_LOCAL_STORAGE_CHAT_CONTACT_NAME +"_" + id;
+    },
+    getUnreadMessages() {
+      this
+          .$http
+          .get("/socket-server/chat/getUnreadMessages")
+          .then(r => {
+            let messages = r.data.data;
+            messages.forEach(m => {
+              let exist = this.contacts.find(c => c.id === m.id);
+              if (exist) {
+                let index = this.contacts.indexOf(exist);
+                m.messages.forEach(record => {
+                  let currentMessages = this.contacts[index].messages;
+                  if (currentMessages.find(cm => cm.id === record.id)) {
+                    return ;
+                  }
+                  record.status = "unread";
+                  record.tooltip = "待查阅";
+                  this.contacts[index].messages.push(record);
+
+                });
+                this.contacts[index].lastMessage = m.lastMessage;
+                this.contacts[index].lastSendTime = m.lastSendTime;
+              } else {
+                this.contacts.unshift(m);
+              }
+              this.$emit('messageCountChange', this.messageCount);
+              localStorage.setItem(this.getLocalStorageContactName(this.principal.details.id), JSON.stringify(this.contacts));
+            });
+          });
+    },
     visibleChange(visible) {
       if (visible && this.current) {
         this.readMessage(this.current.id);
@@ -272,13 +345,13 @@ export default {
             contact.messages[index] = r.data.data;
             contact.messages[index].status = "success";
             contact.messages[index].tooltip = "待查阅";
-            localStorage.setItem(process.env.VUE_APP_LOCAL_STORAGE_CHAT_CONTACT_NAME, JSON.stringify(this.contacts));
+            localStorage.setItem(this.getLocalStorageContactName(this.principal.details.id), JSON.stringify(this.contacts));
             this.$nextTick(() => this.$refs["message-content"].scrollTop = this.$refs["message-content"].scrollHeight);
           })
           .catch((r) => {
             contact.messages[index].status = "fail";
             contact.messages[index].tooltip = r.data.message;
-            localStorage.setItem(process.env.VUE_APP_LOCAL_STORAGE_CHAT_CONTACT_NAME, JSON.stringify(this.contacts));
+            localStorage.setItem(this.getLocalStorageContactName(this.principal.details.id), JSON.stringify(this.contacts));
 
             this.$nextTick(() => this.$refs["message-content"].scrollTop = this.$refs["message-content"].scrollHeight);
           });
@@ -330,7 +403,7 @@ export default {
                           return ;
                         }
                         treeNode.dataRef.children.push({
-                          name : u.realName || u.username,
+                          name : this.principal.getName(u),
                           id: "user-" + u.id,
                           isLeaf: true,
                         });
@@ -356,7 +429,7 @@ export default {
 
       if (this.contacts.filter(c => c.id === contact.id).length === 0) {
         this.contacts.unshift(contact);
-        localStorage.setItem(process.env.VUE_APP_LOCAL_STORAGE_CHAT_CONTACT_NAME, JSON.stringify(this.contacts));
+        localStorage.setItem(this.getLocalStorageContactName(this.principal.details.id), JSON.stringify(this.contacts));
       }
       this.current = contact;
       this.tab = "message";
@@ -383,7 +456,8 @@ export default {
       if (unreadMessages.length > 0) {
         let messages = {};
 
-        unreadMessages.forEach(m => messages[m.filename] = m.id);
+        unreadMessages.forEach(m => messages[m.id] = m.filenames);
+
         let param = {senderId:this.current.id,messages:messages};
 
         this
@@ -394,7 +468,7 @@ export default {
                 m.status = "read";
                 m.tooltip = "已阅";
               });
-              localStorage.setItem(process.env.VUE_APP_LOCAL_STORAGE_CHAT_CONTACT_NAME, JSON.stringify(this.contacts));
+              localStorage.setItem(this.getLocalStorageContactName(this.principal.details.id), JSON.stringify(this.contacts));
               this.$emit('messageCountChange', this.messageCount);
             });
 
@@ -407,7 +481,7 @@ export default {
       selectedToolBar:["message"],
       current: undefined,
       visible: false,
-      contacts: JSON.parse(localStorage.getItem(process.env.VUE_APP_LOCAL_STORAGE_CHAT_CONTACT_NAME)) || [],
+      contacts: JSON.parse(localStorage.getItem(this.getLocalStorageContactName(this.principal.details.id))) || [],
       inputContent:"",
       tab:"message",
       groupData:[{ name: '联系人', id: 'root', slots : { icon: 'root' }}]

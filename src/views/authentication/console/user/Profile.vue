@@ -32,7 +32,7 @@
       <a-divider v-if="historyAvatar.values.length > 0" />
 
       <a-avatar :size="64" :src="this.principal.details.avatar">
-        {{ (this.principal.details.realName || this.principal.details.username).substring(0, 1) }}
+        {{ this.principal.getName(this.principal.details).substring(0, 1) }}
       </a-avatar>
       <p class="margin-top-15">
       <a-upload :showUploadList="false" action="/authentication/user/avatar/upload" @change="fileListChange" :before-upload="beforeUpload">
@@ -42,7 +42,7 @@
         </a-button>
       </a-upload>
       </p>
-      <a-typography-title class="margin-top-15" :level="4" type="secondary">{{ this.principal.details.realName || this.principal.details.username }}</a-typography-title>
+      <a-typography-title class="margin-top-15" :level="4" type="secondary">{{ this.principal.getName(this.principal.details) }}</a-typography-title>
       <a-typography-title class="margin-top-15" :level="5" disabled>所在组:{{ this.principal.details.roleAuthorityStrings }}</a-typography-title>
 
     </div>
