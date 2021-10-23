@@ -60,9 +60,14 @@ import {
 const application = createApp(App);
 
 application.config.globalProperties.timestampFormat = function(timestamp) {
-    if (!timestamp) {
+    if (!timestamp || timestamp === "") {
         return "";
     }
+
+    if (this.$moment.isMoment(timestamp)) {
+        return timestamp.format(process.env.VUE_APP_TIMESTAMP_FORMAT);
+    }
+
     return moment(timestamp).format(process.env.VUE_APP_TIMESTAMP_FORMAT);
 }
 

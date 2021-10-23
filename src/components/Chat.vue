@@ -37,11 +37,11 @@
                     </a-col>
                     <a-col :span="20">
                       <a-row>
-                        <a-col :span="14">
+                        <a-col :span="16">
                           <a-typography-text :ellipsis="true" strong class="contacts-name display-block" :content="c.title" />
                         </a-col>
-                        <a-col :span="10" class="text-right">
-                          <a-typography-text type="secondary" class="contacts-name display-block font-size-12" :content="this.$moment(c.lastSendTime).fromNow()" />
+                        <a-col :span="8" class="text-right">
+                          <a-typography-text v-if="c.lastSendTime" type="secondary" class="contacts-name display-block font-size-12" :content="this.$moment(c.lastSendTime).fromNow()" />
                         </a-col>
                       </a-row>
                       <a-row type="flex" justify="space-around" align="middle">
@@ -54,7 +54,7 @@
                 </a-menu-item>
               </a-menu>
               <div v-if="this.tab === 'group'">
-                <a-tree @select="addContact" show-icon :load-data="loadGroupData" :replaceFields="{title:'name', key:'id'}" :tree-data="this.groupData">
+                <a-tree @select="selectTreeContact" show-icon :load-data="loadGroupData" :replaceFields="{title:'name', key:'id'}" :tree-data="this.groupData">
                   <template #group>
                     <icon-font class="icon" type="icon-folder-close" />
                   </template>
@@ -95,8 +95,13 @@
           </a-row>
         </a-layout-header>
         <a-layout-content class="height-100-percent">
-          <div class="message" ref="message-content">
+          <div class="message" ref="message-content" @scroll="messageContentScroll">
             <template v-if="this.current">
+              <a-divider class="font-size-12 no-margin" v-if="!this.current.lastLoadMessage">
+                <a-typography-text type="secondary">
+                  <icon-font spin class="icon" type="icon-refresh" /> 数据加载中...
+                </a-typography-text>
+              </a-divider>
               <div v-for="m of this.current.messages" :key="m.id">
 
                 <div class="text-center margin-top-10 margin-bottom-10">
@@ -218,6 +223,7 @@ export default {
           json.data.messages.forEach(m => this.addMessage(contact, m));
 
           contact.lastMessage = json.data.lastMessage;
+          contact.lastSendTime = json.data.lastSendTime;
           localStorage.setItem(this.getLocalStorageContactName(this.principal.details.id), JSON.stringify(_this.contacts));
 
           if (_this.current && contact.id === _this.current.id && _this.hasFocus) {
@@ -233,6 +239,7 @@ export default {
                 let data = r.data.data[0];
                 json.data.title = this.principal.getName(data);
                 json.data.avatar = data.avatar;
+                json.data.lastLoadMessage = false;
 
                 let messages = json.data.messages
                 delete json.data.messages;
@@ -256,10 +263,43 @@ export default {
     });
   },
   methods:{
+    messageContentScroll(d) {
+      if (d.target.scrollTop !== 0) {
+        return ;
+      }
+      this.loadHistoryMessage(this.current);
+    },
+    loadHistoryMessage(contact) {
+
+      if (contact.lastLoadMessage) {
+        return ;
+      }
+
+      let time = contact.messages.length > 0 ? this.$moment(contact.messages[0].creationTime) :this.$moment.now();
+      let param = {
+        targetId: contact.id,
+        time: time,
+        size: 50
+      };
+
+      this
+          .$http
+          .post("/socket-server/chat/getHistoryMessagePage", this.formUrlencoded(param))
+          .then((r) => {
+            let data = r.data.data;
+            let c = this.contacts.find(c => c.id === contact.id);
+            if (c) {
+              c.lastLoadMessage = data.last;
+              if (data.content) {
+                data.content.forEach(d => this.addMessage(this.current, d, true));
+              }
+            }
+          });
+    },
     retrySend(current, content) {
       console.log(current, content);
     },
-    addMessage(contact, message) {
+    addMessage(contact, message, unshift) {
 
       let content = {
         senderId:message.senderId,
@@ -276,23 +316,45 @@ export default {
         content.id = message.id;
       }
 
+      let creationTime = this.$moment.isMoment(message.creationTime) ?
+          message.creationTime :
+          this.$moment(message.creationTime)
+
       let result = {
-        creationTime:message.creationTime,
+        creationTime:creationTime,
         contents:[content],
         currentIndex:0,
       };
 
       if (contact.messages.length <= 0) {
-        contact.messages.push(result);
+        if (unshift) {
+          contact.messages.unshift(result)
+        } else {
+          contact.messages.push(result);
+        }
       } else {
-        let lastMessage = contact.messages[contact.messages.length - 1];
+        let lastMessage = unshift ? contact.messages[0] : contact.messages[contact.messages.length - 1];
+        let intervalTimeUnit = process.env.VUE_APP_SOCKET_CHAT_MESSAGE_GROUP_INTERVAL_TIME_UNIT;
+        let currentIntervalTime = unshift ?
+            lastMessage.creationTime.diff(message.creationTime, intervalTimeUnit) :
+            message.creationTime.diff(lastMessage.creationTime, intervalTimeUnit);
+
         let intervalTime = process.env.VUE_APP_SOCKET_CHAT_MESSAGE_GROUP_INTERVAL_TIME * 1;
 
-        if (message.creationTime - lastMessage.creationTime > intervalTime) {
-          contact.messages.push(result);
+        if (currentIntervalTime > intervalTime) {
+          if (unshift) {
+            contact.messages.unshift(result)
+          } else {
+            contact.messages.push(result);
+          }
         } else {
-          lastMessage.contents.push(result.contents[0]);
-          result.currentIndex = lastMessage.contents.length - 1;
+          if (unshift) {
+            lastMessage.contents.unshift(result.contents[0]);
+            result.currentIndex = 0;
+          } else {
+            lastMessage.contents.push(result.contents[0]);
+            result.currentIndex = lastMessage.contents.length - 1;
+          }
         }
       }
 
@@ -311,20 +373,10 @@ export default {
           .then(r => {
             let data = r.data.data;
             data.forEach(d => {
-              this.contacts = this.contacts || [];
-              let current = this.contacts.find(c => c.id === d.id);
-              if (current) {
-                let index = this.contacts.indexOf(current);
-                this.contacts[index].title = this.principal.getName(d);
-              } else {
-                this.contacts.push({
-                  id:d.id,
-                  title:this.principal.getName(d),
-                  messages:[],
-                  lastMessage:""
-                })
-              }
-              localStorage.setItem(this.getLocalStorageContactName(this.principal.details.id), JSON.stringify(this.contacts));
+              this.addContact({
+                id:d.id,
+                title:this.principal.getName(d),
+              });
               this.getUnreadMessages();
             })
           })
@@ -469,22 +521,33 @@ export default {
             });
       });
     },
-    addContact(selectedKeys, info) {
+    addContact(contact) {
+      let currentContact = this.contacts.find(c => c.id === contact.id);
+      if (currentContact) {
+        this.contacts.splice(this.contacts.indexOf(currentContact),1);
+        currentContact.title = contact.title;
+      } else {
+        currentContact = contact;
+        currentContact.lastLoadMessage = false;
+        currentContact.messages = [];
+        currentContact.lastMessage = "";
+        currentContact.lastSendTime = "";
+        this.loadHistoryMessage(currentContact);
+      }
+      this.contacts.unshift(currentContact);
+      localStorage.setItem(this.getLocalStorageContactName(this.principal.details.id), JSON.stringify(this.contacts));
+    },
+    selectTreeContact(selectedKeys, info) {
       if (!info.node.dataRef.isLeaf) {
         return ;
       }
       let contact = {
         id:selectedKeys[0].replaceAll("user-","") * 1,
         title: info.node.dataRef.name,
-        messages:[],
-        lastSendTime:"",
-        lastMessage:"",
       }
 
-      if (this.contacts.filter(c => c.id === contact.id).length === 0) {
-        this.contacts.unshift(contact);
-        localStorage.setItem(this.getLocalStorageContactName(this.principal.details.id), JSON.stringify(this.contacts));
-      }
+      this.addContact(contact);
+
       this.current = contact;
       this.tab = "message";
       this.selectedToolBar = ["message"];
@@ -504,8 +567,13 @@ export default {
       }
 
       this.current = this.contacts.find(c => c.id === id);
-      this.$nextTick(() => this.$refs["message-content"].scrollTop = this.$refs["message-content"].scrollHeight);
+
       let unreadMessages = this.current.messages.flatMap(m => m.contents).filter(m => m.status === "unread");
+
+      if (this.$refs["message-content"].scrollTop === 0 || unreadMessages.length > 0) {
+        this.$nextTick(() => this.$refs["message-content"].scrollTop = this.$refs["message-content"].scrollHeight);
+      }
+
       if (unreadMessages.length > 0) {
         let messages = [];
 
@@ -524,7 +592,6 @@ export default {
               localStorage.setItem(this.getLocalStorageContactName(this.principal.details.id), JSON.stringify(this.contacts));
               this.$emit('messageCountChange', this.messageCount);
             });
-
       }
     }
   },
