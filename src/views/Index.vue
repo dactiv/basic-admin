@@ -169,9 +169,10 @@ export default {
         }
       });
 
-      window.currentTimestamp = r.data.timestamp;
+      let _this = this;
 
-      setInterval(() => window.currentTimestamp = window.currentTimestamp + 1000, 1000);
+      let offset = _this.$moment(r.data.timestamp).valueOf() - Date.now();
+      _this.$moment.now = function() { return _this.$moment(Date.now() + offset); }
 
     },
     profile() {

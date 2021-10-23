@@ -1,9 +1,9 @@
 <template >
   <a-drawer :width="950" placement="right" :closable="false" :afterVisibleChange="visibleChange" v-model:visible="this.visible" class="chat">
     <a-layout class="height-100-percent">
-      <a-layout-sider class="main-aside border-right" :width="250">
+      <a-layout-sider class="main-aside border-right" :width="300">
         <a-row class="height-100-percent">
-          <a-col :span="5" class="tool-bar border-right">
+          <a-col :span="4" class="tool-bar border-right">
             <div class="text-center margin-top-15">
               <a-avatar :src="this.principal.details.avatar">
                 {{ this.principal.getName(this.principal.details).substring(0, 1) }}
@@ -20,24 +20,37 @@
               </a-menu>
             </div>
           </a-col>
-          <a-col :span="19" class="height-100-percent">
+          <a-col :span="20" class="height-100-percent">
             <div class="search">
               <a-input placeholder="搜索" />
             </div>
             <div class="left-content">
               <a-menu v-if="this.tab === 'message'" @click="selectContact" mode="vertical">
                 <a-menu-item v-for="c of this.contacts" :key="c.id" >
-                  <a-space>
-                    <a-badge :count="c.messages.reduce((s, m) => s + m.contents.filter(c => c.status === 'unread').length, 0)" :offset="[x=-25, y=0]">
-                      <a-avatar :src="this.getUserAvatarByUserId(c.id)" >
-                        {{ c.title.substring(0, 1) }}
-                      </a-avatar>
-                    </a-badge>
-                    <div>
-                      <a-typography-text :style="{width: '120px'}" :ellipsis="true" strong class="contacts-name display-block" :content="c.title" />
-                      <a-typography-text :style="{width: '120px'}" :ellipsis="true" type="secondary" class="contacts-message display-block" :content="c.lastMessage" />
-                    </div>
-                  </a-space>
+                  <a-row type="flex" justify="space-around" align="middle">
+                    <a-col :span="4">
+                      <a-badge :count="c.messages.reduce((s, m) => s + m.contents.filter(c => c.status === 'unread').length, 0)" :offset="[x=-25, y=0]">
+                        <a-avatar :src="this.getUserAvatarByUserId(c.id)" >
+                          {{ c.title.substring(0, 1) }}
+                        </a-avatar>
+                      </a-badge>
+                    </a-col>
+                    <a-col :span="20">
+                      <a-row>
+                        <a-col :span="14">
+                          <a-typography-text :ellipsis="true" strong class="contacts-name display-block" :content="c.title" />
+                        </a-col>
+                        <a-col :span="10" class="text-right">
+                          <a-typography-text type="secondary" class="contacts-name display-block font-size-12" :content="this.$moment(c.lastSendTime).fromNow()" />
+                        </a-col>
+                      </a-row>
+                      <a-row type="flex" justify="space-around" align="middle">
+                        <a-col :span="24">
+                          <a-typography-text :ellipsis="true" type="secondary" class="contacts-message display-block" :content="c.lastMessage" />
+                        </a-col>
+                      </a-row>
+                    </a-col>
+                  </a-row>
                 </a-menu-item>
               </a-menu>
               <div v-if="this.tab === 'group'">
@@ -367,7 +380,7 @@ export default {
 
       let content = this.addMessage(contact, {
         senderId: this.principal.details.id,
-        creationTime: window.currentTimestamp,
+        creationTime: this.$moment.now(),
         status: "sending",
         tooltip:"发送中...",
         content:param.content,
