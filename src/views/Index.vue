@@ -148,10 +148,6 @@ export default {
         this.$store.commit(PRINCIPAL_MUTATION_TYPE.CLEAR_PRINCIPAL);
       }
 
-      this.currentTimeStamp = r.data.timeStamp;
-
-      setTimeout(() => this.currentTimeStamp = this.currentTimeStamp + 1000, 1000)
-
       if (this.principal.details.rememberMe === true && this.$route.meta.authentication) {
         sessionStorage.setItem(process.env.VUE_APP_SESSION_STORAGE_REQUEST_PATH_NAME, this.$route.path);
         this.$router.push(process.env.VUE_APP_LOGIN_PAGE);
@@ -173,6 +169,10 @@ export default {
         }
       });
 
+      window.currentTimestamp = r.data.timestamp;
+
+      setInterval(() => window.currentTimestamp = window.currentTimestamp + 1000, 1000);
+
     },
     profile() {
       this.$router.push({name:"profile"});
@@ -192,7 +192,6 @@ export default {
       let details = JSON.parse(JSON.stringify(this.principal.details));
 
       details.menus = response.data.data;
-      //details.menus.sort((a,b) => a.sort > b.sort ? 1 : -1);
 
       this.$store.commit(PRINCIPAL_MUTATION_TYPE.SET_PRINCIPAL, details);
 

@@ -198,8 +198,6 @@ application.config.globalProperties.getUserAvatarByUserId = function(userId) {
 
 application.config.globalProperties.$message = message;
 
-application.config.globalProperties.currentTimeStamp = 0;
-
 application.config.globalProperties.$notification = notification;
 
 application.config.globalProperties.$moment = moment;

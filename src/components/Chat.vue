@@ -3,7 +3,7 @@
     <a-layout class="height-100-percent">
       <a-layout-sider class="main-aside border-right" :width="250">
         <a-row class="height-100-percent">
-          <a-col :span="6" class="tool-bar border-right">
+          <a-col :span="5" class="tool-bar border-right">
             <div class="text-center margin-top-15">
               <a-avatar :src="this.principal.details.avatar">
                 {{ this.principal.getName(this.principal.details).substring(0, 1) }}
@@ -20,15 +20,15 @@
               </a-menu>
             </div>
           </a-col>
-          <a-col :span="18" class="height-100-percent">
+          <a-col :span="19" class="height-100-percent">
             <div class="search">
               <a-input placeholder="搜索" />
             </div>
             <div class="left-content">
               <a-menu v-if="this.tab === 'message'" @click="selectContact" mode="vertical">
                 <a-menu-item v-for="c of this.contacts" :key="c.id" >
-                  <a-space :size="10">
-                    <a-badge :count="c.messages.filter(m => m.status === 'unread').length" :offset="[x=-25, y=0]">
+                  <a-space>
+                    <a-badge :count="c.messages.reduce((s, m) => s + m.contents.filter(c => c.status === 'unread').length, 0)" :offset="[x=-25, y=0]">
                       <a-avatar :src="this.getUserAvatarByUserId(c.id)" >
                         {{ c.title.substring(0, 1) }}
                       </a-avatar>
@@ -90,47 +90,32 @@
                   <a-typography-text type="secondary">{{this.timestampFormat(m.creationTime)}}</a-typography-text>
                 </div>
 
-                <div :class="m.senderId !== this.principal.details.id ? '' : 'text-right'">
-                  <a-space :size="15" align="start" >
-                    <template v-if="m.senderId !== this.principal.details.id">
-                      <a-avatar :src="this.getUserAvatarByUserId(this.current.id)" class="basic-box-shadow" >
+                <div v-for="c of m.contents" :key="c" :class="c.senderId !== this.principal.details.id ? 'margin-bottom-15' : 'margin-bottom-15 text-right'">
+                  <a-space align="start">
+                      <a-avatar v-if="c.senderId !== this.principal.details.id" :src="this.getUserAvatarByUserId(this.current.id)" class="basic-box-shadow" >
                         {{this.current.title.substring(0,1)}}
                       </a-avatar>
-                      <div class="message-content">
-<!--                    <div v-for="c of m.content" :key="c">-->
-                        <a-space>
-                          <a-card class="border-radius-4 basic-box-shadow" v-html="m.content">
-                          </a-card>
-                          <a-tooltip :title="m.tooltip">
-                            <a-typography-text :type="m.status === 'sending' || m.status === 'success' || m.status === 'unread' ? 'secondary' : m.status === 'read' ? 'success' : 'warning'">
-                              <icon-font :spin="m.status === 'sending'" class="icon" :type="m.status === 'sending' ? 'icon-refresh' : m.status === 'fail' ? 'icon-error' :  'icon-success'" />
-                            </a-typography-text>
-                          </a-tooltip>
-                        </a-space>
-<!--                    </div>-->
-                      </div>
-                    </template>
-                    <template v-else>
-                      <div class="message-content">
-<!--                    <div v-for="c of m.content" :key="c">-->
-                          <a-space>
-                            <a-tooltip :title="m.tooltip">
-                              <a-typography-text :type="m.status === 'sending' || m.status === 'success' ? 'secondary' : m.status === 'read' ? 'success' : 'warning'">
-                                <icon-font :spin="m.status === 'sending'" class="icon" :type="m.status === 'sending' ? 'icon-refresh' : m.status === 'fail' ? 'icon-error' : 'icon-success'" />
-                              </a-typography-text>
-                            </a-tooltip>
-                            <a-card class="border-radius-4 basic-box-shadow self" v-html="m.content">
-                            </a-card>
-                          </a-space>
-<!--                    </div>-->
-                      </div>
-                      <a-avatar :src="this.principal.details.avatar" class="basic-box-shadow">
+                      <a-space>
+                        <a-tooltip :title="c.tooltip" v-if="c.senderId === this.principal.details.id">
+                          <a-typography-text :type="c.status === 'sending' || c.status === 'success' || c.status === 'unread' ? 'secondary' : c.status === 'read' ? 'success' : 'danger'">
+                            <icon-font :spin="c.status === 'sending'" class="icon" :type="c.status === 'sending' ? 'icon-refresh' : c.status === 'fail' ? 'icon-error' :  'icon-success'" />
+                          </a-typography-text>
+                        </a-tooltip>
+                        <a-card :class="c.senderId === this.principal.details.id ? 'border-radius-4 basic-box-shadow self' : 'border-radius-4 basic-box-shadow'" v-html="c.content">
+                        </a-card>
+                        <a-tooltip :title="c.tooltip" v-if="c.senderId !== this.principal.details.id">
+                          <a-typography-text :type="c.status === 'sending' || c.status === 'success' || c.status === 'unread' ? 'secondary' : c.status === 'read' ? 'success' : 'danger'">
+                            <icon-font :spin="c.status === 'sending'" class="icon" :type="c.status === 'sending' ? 'icon-refresh' : c.status === 'fail' ? 'icon-error' :  'icon-success'" />
+                          </a-typography-text>
+                        </a-tooltip>
+                      </a-space>
+                      <a-avatar v-if="c.senderId === this.principal.details.id" :src="this.principal.details.avatar" class="basic-box-shadow">
                         我
                       </a-avatar>
-                    </template>
                   </a-space>
                 </div>
               </div>
+
             </template>
           </div>
           <div class="input border-top" v-if="this.current">
@@ -156,13 +141,11 @@ export default {
   emits: ['messageCountChange'],
   computed:{
     messageCount() {
-      return this.contacts.reduce((sum, o) => sum + o.messages.filter(m => m.status === "unread").length, 0);
+      return this.contacts.reduce((sum, o) => sum + o.messages.reduce((s, m) => s + m.contents.filter(c => c.status === "unread").length, 0), 0);
     }
   },
   mounted() {
-
     let _this = this;
-
     _this
         .$http
         .get("/socket-server/chat/getRecentContacts")
@@ -190,11 +173,14 @@ export default {
       callback:(data) => {
         let json = JSON.parse(data);
         let contact = _this.contacts.find(c => c.id === json.data.id);
-        let index = _this.contacts.indexOf(contact);
+        let contents = contact.messages.flatMap(m => m.contents)
 
         json.data.messageIds.forEach(id => {
-          _this.contacts[index].messages.find(m => m.id === id).status = "read";
-          _this.contacts[index].tooltip = "已阅";
+          let content = contents.find(m => m.id === id);
+          if (content) {
+            content.status = "read";
+            content.tooltip = "已阅";
+          }
         });
 
         localStorage.setItem(this.getLocalStorageContactName(this.principal.details.id), JSON.stringify(_this.contacts));
@@ -210,10 +196,13 @@ export default {
         let json = JSON.parse(data);
         let contact = _this.contacts.find(c => c.id === json.data.id);
 
-        json.data.messages.forEach(m => m.status = "unread");
+        json.data.messages.forEach(m => {
+          m.status = "unread";
+          m.tooltip = "待查阅";
+        });
 
         if (contact) {
-          json.data.messages.forEach(m => contact.messages.push(m));
+          json.data.messages.forEach(m => this.addMessage(contact, m));
 
           contact.lastMessage = json.data.lastMessage;
           localStorage.setItem(this.getLocalStorageContactName(this.principal.details.id), JSON.stringify(_this.contacts));
@@ -232,7 +221,11 @@ export default {
                 json.data.title = this.principal.getName(data);
                 json.data.avatar = data.avatar;
 
+                let messages = json.data.messages
+                delete json.data.messages;
+
                 _this.contacts.unshift(json.data);
+                messages.forEach(m => _this.addMessage(json.data, m));
                 localStorage.setItem(this.getLocalStorageContactName(this.principal.details.id), JSON.stringify(_this.contacts));
 
                 if (_this.current && contact.id === _this.current.id && _this.hasFocus) {
@@ -250,6 +243,50 @@ export default {
     });
   },
   methods:{
+    retrySend(current, content) {
+      console.log(current, content);
+    },
+    addMessage(contact, message) {
+
+      let content = {
+        senderId:message.senderId,
+        content:message.content,
+        tooltip:message.tooltip,
+        status:message.status
+      };
+
+      if (message.id) {
+        let currentContents = contact.messages.flatMap(m => m.contents);
+        if (currentContents.find(c => c.id === message.id)) {
+          return ;
+        }
+        content.id = message.id;
+      }
+
+      let result = {
+        creationTime:message.creationTime,
+        contents:[content],
+        currentIndex:0,
+      };
+
+      if (contact.messages.length <= 0) {
+        contact.messages.push(result);
+      } else {
+        let lastMessage = contact.messages[contact.messages.length - 1];
+        let intervalTime = process.env.VUE_APP_SOCKET_CHAT_MESSAGE_GROUP_INTERVAL_TIME * 1;
+
+        if (message.creationTime - lastMessage.creationTime > intervalTime) {
+          contact.messages.push(result);
+        } else {
+          lastMessage.contents.push(result.contents[0]);
+          result.currentIndex = lastMessage.contents.length - 1;
+        }
+      }
+
+      result.messageIndex = contact.messages.length - 1;
+
+      return result;
+    },
     getRecentContactsProfile(data) {
       let param = {
         type:"Console",
@@ -288,6 +325,9 @@ export default {
           .get("/socket-server/chat/getUnreadMessages")
           .then(r => {
             let messages = r.data.data;
+            if (!messages || messages.length <= 0) {
+              return ;
+            }
             messages.forEach(m => {
               let exist = this.contacts.find(c => c.id === m.id);
               if (exist) {
@@ -299,8 +339,7 @@ export default {
                   }
                   record.status = "unread";
                   record.tooltip = "待查阅";
-                  this.contacts[index].messages.push(record);
-
+                  this.addMessage(this.contacts[index], record);
                 });
                 this.contacts[index].lastMessage = m.lastMessage;
                 this.contacts[index].lastSendTime = m.lastSendTime;
@@ -326,33 +365,34 @@ export default {
       let contact = this.contacts.find(c => c.id === param.recipientId);
       contact.messages = contact.messages || [];
 
-      let msg = {
+      let content = this.addMessage(contact, {
         senderId: this.principal.details.id,
-        creationTime: this.currentTimeStamp,
+        creationTime: window.currentTimestamp,
         status: "sending",
-        tooltip:"发送中。。",
+        tooltip:"发送中...",
         content:param.content,
-      }
+      });
 
-      contact.messages.push(msg);
-
-      let index = contact.messages.indexOf(msg);
+      let current = contact.messages[content.messageIndex].contents[content.currentIndex];
 
       this
           .$http
           .post("/socket-server/chat/sendMessage", this.formUrlencoded(param))
           .then((r) =>{
-            contact.messages[index] = r.data.data;
-            contact.messages[index].status = "success";
-            contact.messages[index].tooltip = "待查阅";
+            current.id = r.data.data.id;
+            current.status = "success";
+            current.tooltip = "待查阅";
+
+            contact.lastMessage = param.content.replace(/<[^<>]+>/g, '');
+            contact.lastSendTime = content.creationTime;
+
             localStorage.setItem(this.getLocalStorageContactName(this.principal.details.id), JSON.stringify(this.contacts));
             this.$nextTick(() => this.$refs["message-content"].scrollTop = this.$refs["message-content"].scrollHeight);
           })
           .catch((r) => {
-            contact.messages[index].status = "fail";
-            contact.messages[index].tooltip = r.data.message;
+            current.status = "fail";
+            current.tooltip = r.data.message;
             localStorage.setItem(this.getLocalStorageContactName(this.principal.details.id), JSON.stringify(this.contacts));
-
             this.$nextTick(() => this.$refs["message-content"].scrollTop = this.$refs["message-content"].scrollHeight);
           });
 
@@ -424,6 +464,7 @@ export default {
         id:selectedKeys[0].replaceAll("user-","") * 1,
         title: info.node.dataRef.name,
         messages:[],
+        lastSendTime:"",
         lastMessage:"",
       }
 
@@ -451,14 +492,13 @@ export default {
 
       this.current = this.contacts.find(c => c.id === id);
       this.$nextTick(() => this.$refs["message-content"].scrollTop = this.$refs["message-content"].scrollHeight);
-
-      let unreadMessages = this.current.messages.filter(m => m.status === "unread");
+      let unreadMessages = this.current.messages.flatMap(m => m.contents).filter(m => m.status === "unread");
       if (unreadMessages.length > 0) {
-        let messages = {};
+        let messages = [];
 
-        unreadMessages.forEach(m => messages[m.id] = m.filenames);
+        unreadMessages.forEach(m => messages.push(m.id));
 
-        let param = {senderId:this.current.id,messages:messages};
+        let param = {senderId:this.current.id, messageIds:messages};
 
         this
             .$http
