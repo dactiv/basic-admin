@@ -176,7 +176,7 @@ application.config.globalProperties.getFileIcon = function(filename) {
 const IconFont = createFromIconfontCN({
     scriptUrl: [
         // commons-icon
-        "//at.alicdn.com/t/font_2732722_txaxkaasdb.js",
+        "//at.alicdn.com/t/font_2732722_0tk3o424mxjb.js",
         // file-icon
         "//at.alicdn.com/t/font_2783178_o30jvdzd5vo.js"
     ]

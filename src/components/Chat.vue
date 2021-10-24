@@ -25,35 +25,52 @@
               <a-input placeholder="搜索" />
             </div>
             <div class="left-content">
-              <a-menu v-if="this.tab === 'message'" @click="selectContact" mode="vertical">
+              <a-menu v-show="this.tab === 'message'" @click="selectContact" mode="vertical">
                 <a-menu-item v-for="c of this.contacts" :key="c.id" >
-                  <a-row type="flex" justify="space-around" align="middle">
-                    <a-col :span="4">
-                      <a-badge :count="c.messages.reduce((s, m) => s + m.contents.filter(c => c.status === 'unread').length, 0)" :offset="[x=-25, y=0]">
-                        <a-avatar :src="this.getUserAvatarByUserId(c.id)" >
-                          {{ c.title.substring(0, 1) }}
-                        </a-avatar>
-                      </a-badge>
-                    </a-col>
-                    <a-col :span="20">
-                      <a-row>
-                        <a-col :span="16">
-                          <a-typography-text :ellipsis="true" strong class="contacts-name display-block" :content="c.title" />
-                        </a-col>
-                        <a-col :span="8" class="text-right">
-                          <a-typography-text v-if="c.lastSendTime" type="secondary" class="contacts-name display-block font-size-12" :content="this.$moment(c.lastSendTime).fromNow()" />
-                        </a-col>
-                      </a-row>
-                      <a-row type="flex" justify="space-around" align="middle">
-                        <a-col :span="24">
-                          <a-typography-text :ellipsis="true" type="secondary" class="contacts-message display-block" :content="c.lastMessage" />
-                        </a-col>
-                      </a-row>
-                    </a-col>
-                  </a-row>
+                  <a-dropdown :trigger="['contextmenu']">
+                    <a-row type="flex" justify="space-around" align="middle">
+                      <a-col :span="4">
+                        <a-badge :count="c.messages.reduce((s, m) => s + m.contents.filter(c => c.status === 'unread').length, 0)" :offset="[x=-25, y=0]">
+                          <a-avatar :src="this.getUserAvatarByUserId(c.id)" >
+                            {{ c.title.substring(0, 1) }}
+                          </a-avatar>
+                        </a-badge>
+                      </a-col>
+                      <a-col :span="20">
+                        <a-row>
+                          <a-col :span="16">
+                            <a-typography-text :ellipsis="true" strong class="contacts-name display-block" >
+                              <icon-font v-if="c.top" class="icon" type="icon-star" />
+                              <icon-font v-else-if="c.disturb" class="icon" type="icon-stop" />
+                              {{c.title}}
+                            </a-typography-text>
+                          </a-col>
+                          <a-col :span="8" class="text-right">
+                            <a-typography-text v-if="c.lastSendTime" type="secondary" class="contacts-name display-block font-size-12" :content="this.$moment(c.lastSendTime).fromNow()" />
+                          </a-col>
+                        </a-row>
+                        <a-row type="flex" justify="space-around" align="middle">
+                          <a-col :span="24">
+                            <a-typography-text :ellipsis="true" type="secondary" class="contacts-message display-block" :content="c.lastMessage" />
+                          </a-col>
+                        </a-row>
+                      </a-col>
+                    </a-row>
+                    <template #overlay>
+                      <a-menu @click="contextMenuClick">
+                        <a-menu-item :key="c.id + '-top'"><icon-font class="icon" :type="c.top ? 'icon-unstar' : 'icon-star'" /> {{c.top ? '取消置顶' : '置顶'}}</a-menu-item>
+                        <a-menu-item :key="c.id + '-read'"><icon-font class="icon" type="icon-survey" /> 设置为已读</a-menu-item>
+                        <a-menu-item v-if="!c.top" :key="c.id + '-disturb'">
+                          <icon-font class="icon" :type="c.disturb ? 'icon-success' : 'icon-stop'" /> {{c.disturb ? '取消免打扰' : '消息免打扰'}}
+                        </a-menu-item>
+                        <a-menu-divider />
+                        <a-menu-item :key="c.id + '-delete'"><icon-font class="icon" type="icon-error" /> 删除</a-menu-item>
+                      </a-menu>
+                    </template>
+                  </a-dropdown>
                 </a-menu-item>
               </a-menu>
-              <div v-if="this.tab === 'group'">
+              <div v-show="this.tab === 'group'">
                 <a-tree @select="selectTreeContact" show-icon :load-data="loadGroupData" :replaceFields="{title:'name', key:'id'}" :tree-data="this.groupData">
                   <template #group>
                     <icon-font class="icon" type="icon-folder-close" />
@@ -137,7 +154,7 @@
             </template>
           </div>
           <div class="input border-top" v-if="this.current">
-            <QuillEditor ref="editor" theme="snow" v-model:content="this.inputContent" @keyup.ctrl.enter="send()" content-type="html" />
+            <QuillEditor :toolbar="[{ 'header': [1, 2, 3, 4, false] }, 'bold', 'italic', 'strike', 'link', 'image', { 'list': 'ordered'}, { 'list': 'bullet' }, { 'color': [] }, { 'background': [] }]" ref="editor" theme="snow" v-model:content="this.inputContent" @keyup.ctrl.enter="send()" content-type="html" />
           </div>
         </a-layout-content>
       </a-layout>
@@ -263,6 +280,39 @@ export default {
     });
   },
   methods:{
+    contextMenuClick(o) {
+      let id = o.key.substring(0, o.key.indexOf("-")) * 1;
+      let key = o.key.substring(o.key.indexOf("-") + 1, o.key.length);
+
+      let target = this.contacts.find(c => c.id === id);
+      if (!target) {
+        return ;
+      }
+
+      if (key === "delete") {
+
+
+        let index = this.contacts.indexOf(target);
+        this.contacts.splice(index, 1);
+
+        if (this.current && this.current.id === id) {
+          this.current = undefined;
+        }
+
+        localStorage.setItem(this.getLocalStorageContactName(this.principal.details.id), JSON.stringify(this.contacts));
+      } else if (key === "read") {
+        this.readMessage(id);
+      } else if (key === "disturb") {
+        target.disturb = !target.disturb;
+        localStorage.setItem(this.getLocalStorageContactName(this.principal.details.id), JSON.stringify(this.contacts));
+      } else if (key === "top") {
+        target.top = !target.top;
+        if (target.top) {
+          target.disturb = false;
+        }
+        localStorage.setItem(this.getLocalStorageContactName(this.principal.details.id), JSON.stringify(this.contacts));
+      }
+    },
     messageContentScroll(d) {
       if (d.target.scrollTop !== 0) {
         return ;
@@ -293,6 +343,7 @@ export default {
               if (data.content) {
                 data.content.forEach(d => this.addMessage(this.current, d, true));
               }
+              localStorage.setItem(this.getLocalStorageContactName(this.principal.details.id), JSON.stringify(this.contacts));
             }
           });
     },
@@ -532,6 +583,8 @@ export default {
         currentContact.messages = [];
         currentContact.lastMessage = "";
         currentContact.lastSendTime = "";
+        currentContact.disturb = false;
+        currentContact.top = false;
         this.loadHistoryMessage(currentContact);
       }
       this.contacts.unshift(currentContact);
