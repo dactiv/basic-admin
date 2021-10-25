@@ -34,7 +34,7 @@
 
       <a-divider><a-typography-text type="secondary"><icon-font class="icon" :type="form.type === 10 ? 'icon-notification' : form.type === 20 ? 'icon-email' : 'icon-sms'" /> {{ form.typeName }}数据</a-typography-text></a-divider>
 
-      <a-table class="ant-table-striped" :rowKey="record=>record.id" :scroll="{ x: tableScrollX }" :pagination="false" :data-source="page.content" :columns="columns" bordered>
+      <a-table class="ant-table-striped" :rowKey="record=>record.id" :scroll="{ x: tableScrollX }" :pagination="false" :data-source="page.elements" :columns="columns" bordered>
 
         <template #lastSendTime="{ text:lastSendTime }">
           <span :title="this.timestampFormat(lastSendTime)">{{ this.timestampFormat(lastSendTime)}}</span>
@@ -185,7 +185,7 @@ export default {
   data() {
     return {
       page:{
-        content:[],
+        elements:[],
         first:false,
         last:false,
         number:1

@@ -340,8 +340,12 @@ export default {
             let c = this.contacts.find(c => c.id === contact.id);
             if (c) {
               c.lastLoadMessage = data.last;
-              if (data.content) {
-                data.content.forEach(d => this.addMessage(this.current, d, true));
+              if (data.elements) {
+                data.elements.forEach(d => {
+                  d.status = d.read ? "read" : "success";
+                  d.tooltip = d.read ? "已阅" : "待查阅";
+                  this.addMessage(this.current, d, true);
+                });
               }
               localStorage.setItem(this.getLocalStorageContactName(this.principal.details.id), JSON.stringify(this.contacts));
             }

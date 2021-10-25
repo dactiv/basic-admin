@@ -21,7 +21,7 @@
         </a-button>
       </a-space>
 
-      <a-table class="ant-table-striped" :rowKey="record=>record.id" :scroll="{ x: 775 }" :pagination="false" :data-source="page.content" :columns="columns" bordered>
+      <a-table class="ant-table-striped" :rowKey="record=>record.id" :scroll="{ x: 775 }" :pagination="false" :data-source="page.elements" :columns="columns" bordered>
 
         <template #timestamp="{ text:timestamp }">
           {{ this.timestampFormat(timestamp.toString().replace(".","") * 1)}}
@@ -134,7 +134,7 @@ export default {
         after:""
       },
       page: {
-        content:[],
+        elements:[],
         first:false,
         last:false,
         number:1

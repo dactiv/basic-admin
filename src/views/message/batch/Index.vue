@@ -32,7 +32,7 @@
         </a-button>
       </a-space>
 
-      <a-table class="ant-table-striped" :row-selection="{ selectedRowKeys: selectedIds, onChange:selectChange }" :rowKey="record=>record.id" :scroll="{ x: 1375 }" :pagination="false" :data-source="page.content" :columns="columns" bordered>
+      <a-table class="ant-table-striped" :row-selection="{ selectedRowKeys: selectedIds, onChange:selectChange }" :rowKey="record=>record.id" :scroll="{ x: 1375 }" :pagination="false" :data-source="page.elements" :columns="columns" bordered>
 
         <template #creationTime="{ text:creationTime }">
           {{ this.timestampFormat(creationTime)}}
@@ -174,7 +174,7 @@ export default {
         "filter_[complete_time_between]":[]
       },
       page: {
-        content:[],
+        elements:[],
         first:false,
         last:false,
         number:1

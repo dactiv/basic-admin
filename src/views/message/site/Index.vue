@@ -30,7 +30,7 @@
         </a-button>
       </a-space>
 
-      <a-table class="ant-table-striped" :row-selection="{ selectedRowKeys: selectedIds, onChange:selectChange }" :rowKey="record=>record.id" :scroll="{ x: 1575 }" :pagination="false" :data-source="page.content" :columns="columns" bordered>
+      <a-table class="ant-table-striped" :row-selection="{ selectedRowKeys: selectedIds, onChange:selectChange }" :rowKey="record=>record.id" :scroll="{ x: 1575 }" :pagination="false" :data-source="page.elements" :columns="columns" bordered>
         <template #successTime="{ text:successTime }">
           {{ this.timestampFormat(successTime)}}
         </template>
@@ -208,7 +208,7 @@ export default {
         "filter_[creation_time_between]":[]
       },
       page: {
-        content:[],
+        elements:[],
         first:false,
         last:false,
         number:1

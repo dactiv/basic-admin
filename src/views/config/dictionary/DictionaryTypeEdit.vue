@@ -155,7 +155,7 @@ export default {
           slots: { customRender: "action" },
         }],
         page: {
-          content:[],
+          elements:[],
           first:false,
           last:false,
           number:1
