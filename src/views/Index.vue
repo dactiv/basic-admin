@@ -123,6 +123,20 @@ export default {
         .then(_this.postPrepare)
         .catch(() => _this.$router.push(process.env.VUE_APP_LOGIN_PAGE));
   },
+  mounted() {
+    let id = localStorage.getItem(process.env.VUE_APP_LOCAL_STORAGE_DEVICE_IDENTIFIED_NAME);
+    if (id) {
+      this.$store.dispatch(SOCKET_IO_ACTION_TYPE.CONNECT,{
+        transports:["websocket"],
+        query:{
+          did:id,
+          uid:this.principal.details.id,
+          username:this.principal.details.username,
+          password:this.principal.details.token
+        }
+      });
+    }
+  },
   methods: {
     messageCountChange(count) {
       this.messageCount = count;
@@ -157,17 +171,7 @@ export default {
         this.$router.push(process.env.VUE_APP_LOGIN_PAGE);
       }
 
-      let id = this.saveDeviceIdentified(r);
-
-      this.$store.dispatch(SOCKET_IO_ACTION_TYPE.CONNECT,{
-        transports:["websocket"],
-        query:{
-          did:id,
-          uid:this.principal.details.id,
-          username:this.principal.details.username,
-          password:this.principal.details.token
-        }
-      });
+      this.saveDeviceIdentified(r);
 
       let _this = this;
 

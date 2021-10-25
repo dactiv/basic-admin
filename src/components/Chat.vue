@@ -39,7 +39,7 @@
                       <a-col :span="20">
                         <a-row>
                           <a-col :span="16">
-                            <a-typography-text :ellipsis="true" strong class="contacts-name display-block" >
+                            <a-typography-text strong :ellipsis="true" class="contacts-name display-block" >
                               <icon-font v-if="c.top" class="icon" type="icon-star" />
                               <icon-font v-else-if="c.disturb" class="icon" type="icon-stop" />
                               {{c.title}}
@@ -179,19 +179,21 @@ export default {
       return this.contacts.reduce((sum, o) => sum + o.messages.reduce((s, m) => s + m.contents.filter(c => c.status === "unread").length, 0), 0);
     }
   },
+  created() {
+    this.$store.dispatch(SOCKET_IO_ACTION_TYPE.IS_CONNECTED).then(this.onSocketConnect);
+
+    this.$store.dispatch(SOCKET_IO_ACTION_TYPE.SUBSCRIBE, {
+      name: SOCKET_EVENT_TYPE.CHAT_READ_MESSAGE,
+      callback:this.onReadMessage
+    })
+
+    this.$store.dispatch(SOCKET_IO_ACTION_TYPE.SUBSCRIBE,{
+      name:SOCKET_EVENT_TYPE.CHAT_MESSAGE,
+      callback:this.onChatMessage
+    });
+  },
   mounted() {
     let _this = this;
-    _this
-        .$http
-        .get("/socket-server/chat/getRecentContacts")
-        .then((r) => {
-
-          let data = r.data.data;
-          if (!data || data.length <= 0) {
-            return ;
-          }
-          this.getRecentContactsProfile(data);
-        });
 
     window.onfocus = () => {
       _this.hasFocus = true;
@@ -202,84 +204,89 @@ export default {
     };
 
     window.onblur = () => _this.hasFocus = false;
-
-    _this.$store.dispatch(SOCKET_IO_ACTION_TYPE.SUBSCRIBE, {
-      name: SOCKET_EVENT_TYPE.CHAT_READ_MESSAGE,
-      callback:(data) => {
-        let json = JSON.parse(data);
-        let contact = _this.contacts.find(c => c.id === json.data.id);
-        let contents = contact.messages.flatMap(m => m.contents)
-
-        json.data.messageIds.forEach(id => {
-          let content = contents.find(m => m.id === id);
-          if (content) {
-            content.status = "read";
-            content.tooltip = "已阅";
-          }
-        });
-
-        localStorage.setItem(this.getLocalStorageContactName(this.principal.details.id), JSON.stringify(_this.contacts));
-        if (this.visible) {
-          this.$nextTick(() => this.$refs["message-content"].scrollTop = this.$refs["message-content"].scrollHeight);
-        }
-      }
-    })
-
-    _this.$store.dispatch(SOCKET_IO_ACTION_TYPE.SUBSCRIBE,{
-      name:SOCKET_EVENT_TYPE.CHAT_MESSAGE,
-      callback:(data) => {
-        let json = JSON.parse(data);
-        let contact = _this.contacts.find(c => c.id === json.data.id);
-
-        json.data.messages.forEach(m => {
-          m.status = "unread";
-          m.tooltip = "待查阅";
-        });
-
-        if (contact) {
-          json.data.messages.forEach(m => this.addMessage(contact, m));
-
-          contact.lastMessage = json.data.lastMessage;
-          contact.lastSendTime = json.data.lastSendTime;
-          localStorage.setItem(this.getLocalStorageContactName(this.principal.details.id), JSON.stringify(_this.contacts));
-
-          if (_this.current && contact.id === _this.current.id && _this.hasFocus) {
-            _this.readMessage(_this.current.id)
-          }
-
-          this.$emit('messageCountChange', _this.messageCount);
-        } else {
-          _this
-              .$http
-              .get("/authentication/getPrincipalProfile?type=Console&ids=" + json.data.id)
-              .then((r) => {
-                let data = r.data.data[0];
-                json.data.title = this.principal.getName(data);
-                json.data.avatar = data.avatar;
-                json.data.lastLoadMessage = false;
-
-                let messages = json.data.messages
-                delete json.data.messages;
-
-                _this.contacts.unshift(json.data);
-                messages.forEach(m => _this.addMessage(json.data, m));
-                localStorage.setItem(this.getLocalStorageContactName(this.principal.details.id), JSON.stringify(_this.contacts));
-
-                if (_this.current && contact.id === _this.current.id && _this.hasFocus) {
-                  _this.readMessage(_this.current.id);
-                }
-
-                this.$emit('messageCountChange', _this.messageCount);
-              });
-        }
-
-        if (this.visible) {
-          this.$nextTick(() => this.$refs["message-content"].scrollTop = this.$refs["message-content"].scrollHeight);
-        }
-      }
-    });
   },
   methods:{
+    onSocketConnect() {
+      this
+          .$http
+          .get("/socket-server/chat/getRecentContacts")
+          .then((r) => {
+
+            let data = r.data.data;
+            if (!data || data.length <= 0) {
+              return ;
+            }
+            this.getRecentContactsProfile(data);
+          });
+    },
+    onReadMessage(data) {
+      let json = JSON.parse(data);
+      let contact = this.contacts.find(c => c.id === json.data.id);
+      let contents = contact.messages.flatMap(m => m.contents)
+
+      json.data.messageIds.forEach(id => {
+        let content = contents.find(m => m.id === id);
+        if (content) {
+          content.status = "read";
+          content.tooltip = "已阅";
+        }
+      });
+
+      localStorage.setItem(this.getLocalStorageContactName(this.principal.details.id), JSON.stringify(this.contacts));
+      if (this.visible) {
+        this.$nextTick(() => this.$refs["message-content"].scrollTop = this.$refs["message-content"].scrollHeight);
+      }
+    },
+    onChatMessage(data) {
+      let json = JSON.parse(data);
+      let contact = this.contacts.find(c => c.id === json.data.id);
+
+      json.data.messages.forEach(m => {
+        m.status = "unread";
+        m.tooltip = "待查阅";
+      });
+
+      if (contact) {
+        json.data.messages.forEach(m => this.addMessage(contact, m));
+
+        contact.lastMessage = json.data.lastMessage;
+        contact.lastSendTime = json.data.lastSendTime;
+        localStorage.setItem(this.getLocalStorageContactName(this.principal.details.id), JSON.stringify(this.contacts));
+
+        if (this.current && contact.id === this.current.id && this.hasFocus) {
+          this.readMessage(this.current)
+        }
+
+        this.$emit('messageCountChange', this.messageCount);
+      } else {
+        this
+            .$http
+            .get("/authentication/getPrincipalProfile?type=Console&ids=" + json.data.id)
+            .then((r) => {
+              let data = r.data.data[0];
+              json.data.title = this.principal.getName(data);
+              json.data.avatar = data.avatar;
+              json.data.lastLoadMessage = false;
+
+              let messages = json.data.messages
+              delete json.data.messages;
+
+              this.contacts.unshift(json.data);
+              messages.forEach(m => this.addMessage(json.data, m));
+              localStorage.setItem(this.getLocalStorageContactName(this.principal.details.id), JSON.stringify(this.contacts));
+
+              if (this.current && contact.id === this.current.id && this.hasFocus) {
+                this.readMessage(this.current);
+              }
+
+              this.$emit('messageCountChange', this.messageCount);
+            });
+      }
+
+      if (this.visible) {
+        this.$nextTick(() => this.$refs["message-content"].scrollTop = this.$refs["message-content"].scrollHeight);
+      }
+    },
     contextMenuClick(o) {
       let id = o.key.substring(0, o.key.indexOf("-")) * 1;
       let key = o.key.substring(o.key.indexOf("-") + 1, o.key.length);
@@ -291,7 +298,6 @@ export default {
 
       if (key === "delete") {
 
-
         let index = this.contacts.indexOf(target);
         this.contacts.splice(index, 1);
 
@@ -301,7 +307,7 @@ export default {
 
         localStorage.setItem(this.getLocalStorageContactName(this.principal.details.id), JSON.stringify(this.contacts));
       } else if (key === "read") {
-        this.readMessage(id);
+        this.readMessage(target);
       } else if (key === "disturb") {
         target.disturb = !target.disturb;
         localStorage.setItem(this.getLocalStorageContactName(this.principal.details.id), JSON.stringify(this.contacts));
@@ -340,12 +346,17 @@ export default {
             let c = this.contacts.find(c => c.id === contact.id);
             if (c) {
               c.lastLoadMessage = data.last;
-              if (data.elements) {
+              if (data.elements && data.elements.length > 0) {
                 data.elements.forEach(d => {
                   d.status = d.read ? "read" : "success";
                   d.tooltip = d.read ? "已阅" : "待查阅";
-                  this.addMessage(this.current, d, true);
+                  this.addMessage(c, d, true);
                 });
+
+                if (c.lastSendTime === "") {
+                  c.lastSendTime = this.$moment(data.lastSendTime);
+                  c.lastMessage = data.lastMessage;
+                }
               }
               localStorage.setItem(this.getLocalStorageContactName(this.principal.details.id), JSON.stringify(this.contacts));
             }
@@ -473,7 +484,7 @@ export default {
     },
     visibleChange(visible) {
       if (visible && this.current) {
-        this.readMessage(this.current.id);
+        this.readMessage(this.current);
       }
     },
     send() {
@@ -615,17 +626,23 @@ export default {
         return ;
       }
 
-      this.readMessage(record.key);
+      this.current = this.contacts.find(c => c.id === record.key * 1);
+
+      if (!this.current.lastLoadMessage) {
+        this.loadHistoryMessage(this.current);
+      }
+
+      this.readMessage(this.current);
     },
-    readMessage(id) {
+    readMessage(contact) {
 
       if (!this.visible) {
         return ;
       }
 
-      this.current = this.contacts.find(c => c.id === id);
+      //this.current = this.contacts.find(c => c.id === id);
 
-      let unreadMessages = this.current.messages.flatMap(m => m.contents).filter(m => m.status === "unread");
+      let unreadMessages = contact.messages.flatMap(m => m.contents).filter(m => m.status === "unread");
 
       if (this.$refs["message-content"].scrollTop === 0 || unreadMessages.length > 0) {
         this.$nextTick(() => this.$refs["message-content"].scrollTop = this.$refs["message-content"].scrollHeight);
@@ -636,7 +653,7 @@ export default {
 
         unreadMessages.forEach(m => messages.push(m.id));
 
-        let param = {senderId:this.current.id, messageIds:messages};
+        let param = {senderId:contact.id, messageIds:messages};
 
         this
             .$http

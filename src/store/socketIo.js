@@ -23,6 +23,7 @@ export const SOCKET_EVENT_TYPE = {
 
 export const SOCKET_IO_ACTION_TYPE = {
     CONNECT:"socketIo/connect",
+    IS_CONNECTED:"socketIo/isConnected",
     DISCONNECT:"socketIo/disconnect",
     SUBSCRIBE:"socketIo/subscribe",
     UNSUBSCRIBE:"socketIo/unsubscribe"
@@ -57,6 +58,24 @@ export default {
         }
     },
     actions: {
+        isConnected(context) {
+            return new Promise((resolve, reject) => {
+                let count = 0;
+                let timeout = setTimeout(function() {
+                    if (context.state.connected) {
+                        resolve(context.state.socket);
+                    } else {
+                        count++;
+                    }
+
+                    if (count >= process.env.VUE_APP_SOCKET_RETRY_COUNT) {
+                        clearTimeout(timeout);
+                        reject(count);
+                    }
+                }, process.env.VUE_APP_SOCKET_RETRY_TIMEOUT * 1);
+            });
+
+        },
         subscribe(context, options) {
             let count = 0;
             let timeout = setTimeout(function() {
@@ -65,11 +84,11 @@ export default {
                     if (options.success && typeof options.success === "function") {
                         options.success();
                     }
-                } {
+                } else {
+                    count++;
                     if (options.fail && typeof options.fail === "function") {
                         options.fail(count);
                     }
-                    count++;
                 }
 
                 if (count >= process.env.VUE_APP_SOCKET_RETRY_COUNT) {
@@ -82,7 +101,7 @@ export default {
             let timeout = setTimeout(function() {
                 if (context.state.socket) {
                     context.commit("unsubscribe", name);
-                } {
+                } else {
                     count++;
                 }
 
