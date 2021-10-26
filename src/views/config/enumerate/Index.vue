@@ -19,7 +19,7 @@
 
       <a-tabs>
 
-        <a-tab-pane class="width-100-percent" v-for="(value, key) of enumData" :key="key" :tab="key + ' 服务'">
+        <a-tab-pane class="width-100-percent" v-for="(value, key) of enumData" :key="key" :tab="key">
           <a-collapse>
             <a-collapse-panel v-for="(enumValue, name) of value" :key="name" :header="'枚举名: ' + name">
               <a-descriptions bordered :column="{ xxl: 1, xl: 1, lg: 1, md: 1, sm: 1, xs: 1 }">

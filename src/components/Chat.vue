@@ -181,11 +181,15 @@ export default {
   },
   created() {
     this.$store.dispatch(SOCKET_IO_ACTION_TYPE.IS_CONNECTED).then(this.onSocketConnect);
+    this.$store.dispatch(SOCKET_IO_ACTION_TYPE.SUBSCRIBE, {
+      name: SOCKET_EVENT_TYPE.CONNECT,
+      callback:this.onSocketConnect
+    });
 
     this.$store.dispatch(SOCKET_IO_ACTION_TYPE.SUBSCRIBE, {
       name: SOCKET_EVENT_TYPE.CHAT_READ_MESSAGE,
       callback:this.onReadMessage
-    })
+    });
 
     this.$store.dispatch(SOCKET_IO_ACTION_TYPE.SUBSCRIBE,{
       name:SOCKET_EVENT_TYPE.CHAT_MESSAGE,
@@ -200,27 +204,34 @@ export default {
       if (!_this.current && !_this.visible) {
         return ;
       }
-      _this.readMessage(_this.current.id);
+      _this.readMessage(_this.current);
     };
 
     window.onblur = () => _this.hasFocus = false;
   },
   methods:{
     onSocketConnect() {
-      this
-          .$http
-          .get("/socket-server/chat/getRecentContacts")
-          .then((r) => {
+      if (!this.contacts || this.contacts.length <= 0) {
+        this
+            .$http
+            .get("/socket-server/chat/getRecentContacts")
+            .then((r) => {
 
-            let data = r.data.data;
-            if (!data || data.length <= 0) {
-              return ;
-            }
-            this.getRecentContactsProfile(data);
-          });
+              let data = r.data.data;
+              if (!data || data.length <= 0) {
+                return ;
+              }
+              this.getRecentContactsProfile(data);
+            });
+      } else {
+        this.getSocketTempMessages()
+      }
     },
     onReadMessage(data) {
-      let json = JSON.parse(data);
+      let json = data;
+      if (typeof(data) === 'string') {
+        json = JSON.parse(data);
+      }
       let contact = this.contacts.find(c => c.id === json.data.id);
       let contents = contact.messages.flatMap(m => m.contents)
 
@@ -238,7 +249,10 @@ export default {
       }
     },
     onChatMessage(data) {
-      let json = JSON.parse(data);
+      let json = data;
+      if (typeof(data) === 'string') {
+        json = JSON.parse(data);
+      }
       let contact = this.contacts.find(c => c.id === json.data.id);
 
       json.data.messages.forEach(m => {
@@ -323,7 +337,9 @@ export default {
       if (d.target.scrollTop !== 0) {
         return ;
       }
-      this.loadHistoryMessage(this.current);
+      if (this.current) {
+        this.loadHistoryMessage(this.current);
+      }
     },
     loadHistoryMessage(contact) {
 
@@ -331,11 +347,19 @@ export default {
         return ;
       }
 
-      let time = contact.messages.length > 0 ? this.$moment(contact.messages[0].creationTime) :this.$moment.now();
+      let time = this.$moment.now();
+
+      if (contact.messages.length > 0) {
+        let message = contact.messages[0];
+        if (message.contents.length > 0) {
+          time = this.$moment(message.contents[0].creationTime);
+        }
+      }
+
       let param = {
         targetId: contact.id,
         time: time,
-        size: 50
+        size: 10
       };
 
       this
@@ -346,7 +370,15 @@ export default {
             let c = this.contacts.find(c => c.id === contact.id);
             if (c) {
               c.lastLoadMessage = data.last;
+
+              let beforeHeight = 0;
+
+              if (this.visible) {
+                beforeHeight = this.$refs["message-content"].scrollHeight;
+              }
+
               if (data.elements && data.elements.length > 0) {
+
                 data.elements.forEach(d => {
                   d.status = d.read ? "read" : "success";
                   d.tooltip = d.read ? "已阅" : "待查阅";
@@ -358,6 +390,11 @@ export default {
                   c.lastMessage = data.lastMessage;
                 }
               }
+
+              if (this.visible) {
+                this.$nextTick(() => this.$refs["message-content"].scrollTop = this.$refs["message-content"].scrollHeight - beforeHeight);
+              }
+
               localStorage.setItem(this.getLocalStorageContactName(this.principal.details.id), JSON.stringify(this.contacts));
             }
           });
@@ -382,28 +419,24 @@ export default {
         content.id = message.id;
       }
 
-      let creationTime = this.$moment.isMoment(message.creationTime) ?
+      content.creationTime = this.$moment.isMoment(message.creationTime) ?
           message.creationTime :
-          this.$moment(message.creationTime)
+          this.$moment(message.creationTime);
 
       let result = {
-        creationTime:creationTime,
+        creationTime:content.creationTime,
         contents:[content],
         currentIndex:0,
       };
 
       if (contact.messages.length <= 0) {
-        if (unshift) {
-          contact.messages.unshift(result)
-        } else {
           contact.messages.push(result);
-        }
       } else {
         let lastMessage = unshift ? contact.messages[0] : contact.messages[contact.messages.length - 1];
         let intervalTimeUnit = process.env.VUE_APP_SOCKET_CHAT_MESSAGE_GROUP_INTERVAL_TIME_UNIT;
         let currentIntervalTime = unshift ?
-            lastMessage.creationTime.diff(message.creationTime, intervalTimeUnit) :
-            message.creationTime.diff(lastMessage.creationTime, intervalTimeUnit);
+            this.$moment(lastMessage.creationTime).diff(content.creationTime, intervalTimeUnit) :
+            content.creationTime.diff(this.$moment(lastMessage.creationTime), intervalTimeUnit);
 
         let intervalTime = process.env.VUE_APP_SOCKET_CHAT_MESSAGE_GROUP_INTERVAL_TIME * 1;
 
@@ -443,43 +476,34 @@ export default {
                 id:d.id,
                 title:this.principal.getName(d),
               });
-              this.getUnreadMessages();
+              this.getSocketTempMessages();
             })
           })
     },
     getLocalStorageContactName(id) {
       return process.env.VUE_APP_LOCAL_STORAGE_CHAT_CONTACT_NAME +"_" + id;
     },
-    getUnreadMessages() {
+    getSocketTempMessages() {
+      let param = {types:[SOCKET_EVENT_TYPE.CHAT_READ_MESSAGE, SOCKET_EVENT_TYPE.CHAT_MESSAGE]};
       this
           .$http
-          .get("/socket-server/chat/getUnreadMessages")
-          .then(r => {
-            let messages = r.data.data;
-            if (!messages || messages.length <= 0) {
+          .post("/socket-server/getTempMessageMap", this.formUrlencoded(param))
+          .then((r) => {
+            let data = r.data.data;
+
+            if (!data) {
               return ;
             }
-            messages.forEach(m => {
-              let exist = this.contacts.find(c => c.id === m.id);
-              if (exist) {
-                let index = this.contacts.indexOf(exist);
-                m.messages.forEach(record => {
-                  let currentMessages = this.contacts[index].messages;
-                  if (currentMessages.find(cm => cm.id === record.id)) {
-                    return ;
-                  }
-                  record.status = "unread";
-                  record.tooltip = "待查阅";
-                  this.addMessage(this.contacts[index], record);
-                });
-                this.contacts[index].lastMessage = m.lastMessage;
-                this.contacts[index].lastSendTime = m.lastSendTime;
-              } else {
-                this.contacts.unshift(m);
-              }
-              this.$emit('messageCountChange', this.messageCount);
-              localStorage.setItem(this.getLocalStorageContactName(this.principal.details.id), JSON.stringify(this.contacts));
-            });
+
+            let chatMessages = data[SOCKET_EVENT_TYPE.CHAT_MESSAGE];
+            if (chatMessages && chatMessages.length > 0) {
+              chatMessages.forEach(m => this.onChatMessage(m));
+            }
+
+            let readMessages = data[SOCKET_EVENT_TYPE.CHAT_READ_MESSAGE];
+            if (readMessages && readMessages.length > 0) {
+              readMessages.forEach(m => this.onReadMessage(m));
+            }
           });
     },
     visibleChange(visible) {
@@ -600,10 +624,13 @@ export default {
         currentContact.lastSendTime = "";
         currentContact.disturb = false;
         currentContact.top = false;
+
         this.loadHistoryMessage(currentContact);
       }
       this.contacts.unshift(currentContact);
       localStorage.setItem(this.getLocalStorageContactName(this.principal.details.id), JSON.stringify(this.contacts));
+
+      return currentContact;
     },
     selectTreeContact(selectedKeys, info) {
       if (!info.node.dataRef.isLeaf) {
@@ -614,9 +641,8 @@ export default {
         title: info.node.dataRef.name,
       }
 
-      this.addContact(contact);
-
-      this.current = contact;
+      this.current = this.addContact(contact);
+      this.readMessage(this.current);
       this.tab = "message";
       this.selectedToolBar = ["message"];
     },
@@ -628,7 +654,7 @@ export default {
 
       this.current = this.contacts.find(c => c.id === record.key * 1);
 
-      if (!this.current.lastLoadMessage) {
+      if (this.current.messages.length <= 0 && !this.current.lastLoadMessage) {
         this.loadHistoryMessage(this.current);
       }
 
@@ -636,11 +662,9 @@ export default {
     },
     readMessage(contact) {
 
-      if (!this.visible) {
+      if (!this.visible || !contact.messages) {
         return ;
       }
-
-      //this.current = this.contacts.find(c => c.id === id);
 
       let unreadMessages = contact.messages.flatMap(m => m.contents).filter(m => m.status === "unread");
 
