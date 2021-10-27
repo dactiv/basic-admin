@@ -93,7 +93,7 @@
           </a-col>
         </a-row>
       </a-layout-sider>
-      <a-layout>
+      <a-layout class="overflow-hidden">
         <a-layout-header class="border-bottom">
           <a-row>
             <a-col :span="20">
@@ -113,7 +113,7 @@
         </a-layout-header>
         <a-layout>
           <a-layout-content class="height-100-percent">
-            <div class="message" ref="message-content" @scroll="messageContentScroll">
+            <div id="message-content" class="message" ref="message-content" @scroll="messageContentScroll">
               <template v-if="this.current">
                 <a-divider class="font-size-12 no-margin" v-if="!this.current.lastLoadMessage">
                   <a-typography-text type="secondary">
@@ -155,28 +155,28 @@
               </template>
             </div>
             <div class="input border-top" v-if="this.current">
-                  <QuillEditor toolbar="#chat-toolbar" ref="editor" v-model:content="this.inputContent" @keyup.ctrl.enter="send()" content-type="html">
-                    <template #toolbar>
-                      <div id="chat-toolbar" class="border-bottom">
-                        <a-row>
-                          <a-col :span="18">
-                            <button class="ql-bold" />
-                            <button class="ql-italic" />
-                            <button class="ql-link" />
-                            <button class="ql-image" />
-                            <button class="ql-video" />
-                            <button class="ql-list" value="ordered" />
-                          </a-col>
-                          <a-col :span="6" class="text-right">
-                            <button class="custom ql-contact-history" @click="showContactHistory">
-                              <icon-font class="icon" type="icon-time" />
-                            </button>
-                          </a-col>
-                        </a-row>
-                      </div>
-                    </template>
-                  </QuillEditor>
-                </div>
+              <QuillEditor toolbar="#chat-toolbar" ref="editor" v-model:content="this.inputContent" @keyup.ctrl.enter="send()" content-type="html">
+                <template #toolbar>
+                  <div id="chat-toolbar" class="border-bottom">
+                    <a-row>
+                      <a-col :span="18">
+                        <button class="ql-bold" />
+                        <button class="ql-italic" />
+                        <button class="ql-link" />
+                        <button class="ql-image" />
+                        <button class="ql-video" />
+                        <button class="ql-list" value="ordered" />
+                      </a-col>
+                      <a-col :span="6" class="text-right">
+                        <button class="custom ql-contact-history" @click="showContactHistory">
+                          <icon-font class="icon" type="icon-time" />
+                        </button>
+                      </a-col>
+                    </a-row>
+                  </div>
+                </template>
+              </QuillEditor>
+            </div>
           </a-layout-content>
           <a-layout-sider v-if="contactHistoryView" class="contact-history height-100-percent border-left" :width="300">
             <a-input class="padding-10">
@@ -185,9 +185,16 @@
               </template>
             </a-input>
             <a-divider class="font-size-12"><icon-font class="icon" type="icon-calendar" /> 消息内容</a-divider>
-            <div class="history-content padding-10">
+            <div id="history-content" class="history padding-10" ref="history-content" @scroll="messageContentScroll">
+              <a-divider class="font-size-12 no-margin" v-if="!this.current.lastLoadMessage">
+                <a-typography-text type="secondary">
+                  <icon-font spin class="icon" type="icon-refresh" /> 数据加载中...
+                </a-typography-text>
+              </a-divider>
               <div v-for="c of this.current.messages.flatMap(m => m.contents)" :key="c.id">
-                <a-typography-text class="display-block font-size-12" :content="c.senderId  + ' ' + this.timestampFormat(c.creationTime)" />
+                <p>
+                  <a-typography-text class="display-block font-size-12" :content="this.getUsernameById(c.senderId)  + ' ' + this.timestampFormat(c.creationTime)" />
+                </p>
                 <div class="margin-left-5" v-html="c.content"></div>
               </div>
             </div>
@@ -238,7 +245,7 @@ export default {
 
     window.onfocus = () => {
       _this.hasFocus = true;
-      if (!_this.current && !_this.visible) {
+      if (!_this.current || !_this.visible) {
         return ;
       }
       _this.readMessage(_this.current);
@@ -252,6 +259,7 @@ export default {
       if (!this.contactHistoryView || !this.current) {
         return ;
       }
+      this.$nextTick(() => this.$refs["history-content"].scrollTop = this.$refs["history-content"].scrollHeight);
     },
     onSocketConnect() {
       if (!this.contacts || this.contacts.length <= 0) {
@@ -383,10 +391,10 @@ export default {
         return ;
       }
       if (this.current) {
-        this.loadHistoryMessage(this.current);
+        this.loadHistoryMessage(this.current, d.target);
       }
     },
-    loadHistoryMessage(contact) {
+    loadHistoryMessage(contact, el) {
 
       if (contact.lastLoadMessage) {
         return ;
@@ -419,7 +427,7 @@ export default {
               let beforeHeight = 0;
 
               if (this.visible) {
-                beforeHeight = this.$refs["message-content"].scrollHeight;
+                beforeHeight = el.scrollHeight;
               }
 
               if (data.elements && data.elements.length > 0) {
@@ -437,7 +445,14 @@ export default {
               }
 
               if (this.visible) {
-                this.$nextTick(() => this.$refs["message-content"].scrollTop = this.$refs["message-content"].scrollHeight - beforeHeight);
+                this.$nextTick(() => {
+                  el.scrollTop = el.scrollHeight - beforeHeight;
+                  if (el.id === "message-content") {
+                    this.$refs["history-content"].scrollTop  = this.$refs["history-content"].scrollHeight;
+                  } else if (el.id === "history-content") {
+                    this.$refs["message-content"].scrollTop  = this.$refs["message-content"].scrollHeight;
+                  }
+                });
               }
 
               localStorage.setItem(this.getLocalStorageContactName(this.principal.details.id), JSON.stringify(this.contacts));
@@ -613,49 +628,116 @@ export default {
           return;
         }
 
-        let param = {};
-        if (treeNode.eventKey === "root") {
-          param["filter_[parent_id_eqn]"] = "true";
+        let currentGroups = this.tree.groups[treeNode.eventKey];
+
+        if (currentGroups) {
+          treeNode.dataRef.children = currentGroups;
+          if (treeNode.eventKey !== "root") {
+            this.loadGroupUser(treeNode);
+          }
+          resolve();
         } else {
-          param["filter_[parent_id_eq]"] = treeNode.eventKey;
+          let param = {};
+
+          if (treeNode.eventKey === "root") {
+            param["filter_[parent_id_eqn]"] = "true";
+          } else {
+            param["filter_[parent_id_eq]"] = treeNode.eventKey;
+          }
+
+          this
+              .$http
+              .post("/authentication/group/find", this.formUrlencoded(param))
+              .then(r => {
+
+                treeNode.dataRef.children = r.data.data || [];
+
+                if (treeNode.dataRef.children.length > 0) {
+                  treeNode.dataRef.children.forEach(c => {
+                    c.slots = { icon: 'group' };
+                    c.id = "group-" + c.id;
+                  });
+                }
+
+                this.tree.groups[treeNode.eventKey] = treeNode.dataRef.children;
+                localStorage.setItem(process.env.VUE_APP_LOCAL_STORAGE_CHAT_GROUP_NAME, JSON.stringify(this.groups));
+
+                if (treeNode.eventKey !== "root") {
+                  this.loadGroupUser(treeNode);
+                }
+
+                resolve();
+
+              });
         }
 
+      });
+    },
+    loadGroupUser(treeNode) {
+      let id = treeNode.eventKey.replace("group-","");
+
+      let currentUsers = this.tree.users.filter(u => u.group === treeNode.eventKey);
+
+      let addChildren = function(data) {
+        treeNode.dataRef.children.push({
+          name : data.name,
+          id: "user-" + data.id,
+          isLeaf: true
+        });
+      }
+
+      if (currentUsers) {
+        currentUsers.forEach(addChildren);
+      } else {
         this
             .$http
-            .post("/authentication/group/find", this.formUrlencoded(param))
-            .then(r => {
+            .get("/authentication/console/user/findByGroup?groupId=" + id)
+            .then(u => {
+              let users = u.data.data;
+              users.forEach(u => {
+                if (u.id === this.principal.details.id) {
+                  return ;
+                }
 
-              treeNode.dataRef.children = r.data.data || [];
-              if (treeNode.dataRef.children.length > 0) {
-                treeNode.dataRef.children.forEach(c => {
-                  c.slots = { icon: 'group' };
-                  c.id = "group-" + c.id;
-                });
-              }
+                let data = {
+                  name : this.principal.getName(u),
+                  id: u.id,
+                  group: treeNode.eventKey
+                };
 
-              if (treeNode.eventKey !== "root") {
-                this
-                    .$http
-                    .get("/authentication/console/user/findByGroup?groupId=" + treeNode.eventKey.replace("group-",""))
-                    .then(u => {
-                      let users = u.data.data;
-                      users.forEach(u => {
-                        if (u.id === this.principal.details.id) {
-                          return ;
-                        }
-                        treeNode.dataRef.children.push({
-                          name : this.principal.getName(u),
-                          id: "user-" + u.id,
-                          isLeaf: true,
-                        });
-                      });
-                    });
-              }
+                addChildren(data);
 
-              resolve();
+                let current = this.tree.users.find(user => user.id === data.id);
+                if (current) {
+                  this.tree.users[this.tree.users.indexOf(current)] = data;
+                } else {
+                  this.tree.users.push(data);
+                }
 
+              });
+              localStorage.setItem(process.env.VUE_APP_LOCAL_STORAGE_CHAT_USER_NAME, JSON.stringify(this.tree.users));
             });
-      });
+      }
+
+    },
+    getUsernameById(id) {
+      if (id === this.principal.details.id) {
+        return this.principal.getName(this.principal.details);
+      }
+
+      let contact = this.contacts.find(u => u.id === id);
+
+      if (contact) {
+        return contact.title;
+      }
+
+      let user = this.tree.users.find(u => u.id === id);
+
+      if (user) {
+        return user.name;
+      }
+
+      return "用户 [" + id + "]";
     },
     addContact(contact) {
       let currentContact = this.contacts.find(c => c.id === contact.id);
@@ -671,7 +753,7 @@ export default {
         currentContact.disturb = false;
         currentContact.top = false;
 
-        this.loadHistoryMessage(currentContact);
+        this.loadHistoryMessage(currentContact, this.$refs["message-content"]);
       }
       this.contacts.unshift(currentContact);
       localStorage.setItem(this.getLocalStorageContactName(this.principal.details.id), JSON.stringify(this.contacts));
@@ -701,7 +783,7 @@ export default {
       this.current = this.contacts.find(c => c.id === record.key * 1);
 
       if (this.current.messages.length <= 0 && !this.current.lastLoadMessage) {
-        this.loadHistoryMessage(this.current);
+        this.loadHistoryMessage(this.current, this.$refs["message-content"]);
       }
 
       this.readMessage(this.current);
@@ -741,6 +823,10 @@ export default {
   },
   data() {
     return {
+      tree: {
+        users: JSON.parse(localStorage.getItem(process.env.VUE_APP_LOCAL_STORAGE_CHAT_USER_NAME)) || [],
+        groups: JSON.parse(localStorage.getItem(process.env.VUE_APP_LOCAL_STORAGE_CHAT_GROUP_NAME)) || {},
+      },
       contactHistoryView:false,
       hasFocus:true,
       selectedToolBar:["message"],

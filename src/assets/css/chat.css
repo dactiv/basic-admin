@@ -22,7 +22,7 @@
     background-color: #ffffff;
 }
 
-.chat .ant-drawer-body .contact-history .history-content {
+.chat .ant-drawer-body .contact-history .history {
     height: calc(100% - 98px);
     padding: 10px;
     overflow: auto;
