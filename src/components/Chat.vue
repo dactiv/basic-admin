@@ -239,7 +239,7 @@ export default {
         let content = contents.find(m => m.id === id);
         if (content) {
           content.status = "read";
-          content.tooltip = "已阅";
+          content.tooltip = content.senderId === this.principal.detail.id ? "对方已查阅" : "您已查阅";
         }
       });
 
@@ -383,7 +383,7 @@ export default {
 
                 data.elements.forEach(d => {
                   d.status = d.read ? "read" : d.senderId === this.principal.details.id ? "success" : "unread";
-                  d.tooltip = d.read ? "已阅" : "待查阅";
+                  d.tooltip = d.read ? d.senderId === this.principal.details.id ? "对方已查阅" : "您已查阅" : "待查阅";
                   this.addMessage(c, d, true);
                 });
 
@@ -688,7 +688,7 @@ export default {
             .then(() => {
               unreadMessages.forEach(m => {
                 m.status = "read";
-                m.tooltip = "已阅";
+                m.tooltip = m.senderId === this.principal.details.id ? "对方已查阅" : "您已查阅";
               });
               localStorage.setItem(this.getLocalStorageContactName(this.principal.details.id), JSON.stringify(this.contacts));
               this.$emit('messageCountChange', this.messageCount);
