@@ -230,12 +230,12 @@ export default {
     onReadMessage(data) {
       let json = data;
       if (typeof(data) === 'string') {
-        json = JSON.parse(data);
+        json = JSON.parse(data).data;
       }
-      let contact = this.contacts.find(c => c.id === json.data.id);
+      let contact = this.contacts.find(c => c.id === json.id);
       let contents = contact.messages.flatMap(m => m.contents)
 
-      json.data.messageIds.forEach(id => {
+      json.messageIds.forEach(id => {
         let content = contents.find(m => m.id === id);
         if (content) {
           content.status = "read";
@@ -251,20 +251,20 @@ export default {
     onChatMessage(data) {
       let json = data;
       if (typeof(data) === 'string') {
-        json = JSON.parse(data);
+        json = JSON.parse(data).data;
       }
-      let contact = this.contacts.find(c => c.id === json.data.id);
+      let contact = this.contacts.find(c => c.id === json.id);
 
-      json.data.messages.forEach(m => {
+      json.messages.forEach(m => {
         m.status = "unread";
         m.tooltip = "待查阅";
       });
 
       if (contact) {
-        json.data.messages.forEach(m => this.addMessage(contact, m));
+        json.messages.forEach(m => this.addMessage(contact, m));
 
-        contact.lastMessage = json.data.lastMessage;
-        contact.lastSendTime = json.data.lastSendTime;
+        contact.lastMessage = json.lastMessage;
+        contact.lastSendTime = json.lastSendTime;
         localStorage.setItem(this.getLocalStorageContactName(this.principal.details.id), JSON.stringify(this.contacts));
 
         if (this.current && contact.id === this.current.id && this.hasFocus) {
@@ -275,18 +275,20 @@ export default {
       } else {
         this
             .$http
-            .get("/authentication/getPrincipalProfile?type=Console&ids=" + json.data.id)
+            .get("/authentication/getPrincipalProfile?type=Console&ids=" + json.id)
             .then((r) => {
+
               let data = r.data.data[0];
-              json.data.title = this.principal.getName(data);
-              json.data.avatar = data.avatar;
-              json.data.lastLoadMessage = false;
 
-              let messages = json.data.messages
-              delete json.data.messages;
+              json.title = this.principal.getName(data);
+              json.avatar = data.avatar;
+              json.lastLoadMessage = false;
 
-              this.contacts.unshift(json.data);
-              messages.forEach(m => this.addMessage(json.data, m));
+              let messages = json.messages
+              json.messages = [];
+              this.contacts.unshift(json);
+
+              messages.forEach(m => this.addMessage(json, m));
               localStorage.setItem(this.getLocalStorageContactName(this.principal.details.id), JSON.stringify(this.contacts));
 
               if (this.current && contact.id === this.current.id && this.hasFocus) {
@@ -380,7 +382,7 @@ export default {
               if (data.elements && data.elements.length > 0) {
 
                 data.elements.forEach(d => {
-                  d.status = d.read ? "read" : "success";
+                  d.status = d.read ? "read" : d.senderId === this.principal.details.id ? "success" : "unread";
                   d.tooltip = d.read ? "已阅" : "待查阅";
                   this.addMessage(c, d, true);
                 });
@@ -504,6 +506,7 @@ export default {
             if (readMessages && readMessages.length > 0) {
               readMessages.forEach(m => this.onReadMessage(m));
             }
+            this.$http.post("/socket-server/clearTempMessage", this.formUrlencoded(param));
           });
     },
     visibleChange(visible) {
