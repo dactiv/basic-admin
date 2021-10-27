@@ -442,7 +442,7 @@ export default {
 
         let intervalTime = process.env.VUE_APP_SOCKET_CHAT_MESSAGE_GROUP_INTERVAL_TIME * 1;
 
-        if (currentIntervalTime > intervalTime) {
+        if (currentIntervalTime >= intervalTime) {
           if (unshift) {
             contact.messages.unshift(result)
           } else {
