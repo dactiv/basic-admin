@@ -34,6 +34,18 @@
   margin-right: 10px!important;
 }
 
+.margin-right-15 {
+  margin-right: 15px!important;
+}
+
+.margin-left-15 {
+  margin-left: 15px!important;
+}
+
+.margin-left-5 {
+  margin-left: 5px!important;
+}
+
 .no-margin {
   margin: 0 !important;
 }
@@ -123,23 +135,23 @@
 }
 
 .border {
-  border: 1px solid #d9d9d9;
+  border: 1px solid #d9d9d9!important;
 }
 
 .border-top {
-  border-top: 1px solid #d9d9d9;
+  border-top: 1px solid #d9d9d9!important;
 }
 
 .border-bottom {
-  border-bottom: 1px solid #d9d9d9;
+  border-bottom: 1px solid #d9d9d9!important;
 }
 
 .border-left {
-  border-left: 1px solid #d9d9d9;
+  border-left: 1px solid #d9d9d9!important;
 }
 
 .border-right {
-  border-right: 1px solid #d9d9d9;
+  border-right: 1px solid #d9d9d9!important;
 }
 
 .height-100-percent {

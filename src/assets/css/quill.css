@@ -73,3 +73,14 @@
 .ql-snow .ql-tooltip {
     z-index: 999;
 }
+
+.ql-snow.ql-toolbar button.custom {
+    float:none;
+}
+
+.ql-snow.ql-toolbar button.custom .icon {
+    font-size: 18px!important;
+    color: #000000;
+    vertical-align:unset;
+    margin-bottom:0;
+}

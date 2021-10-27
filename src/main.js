@@ -10,8 +10,9 @@ import VueAxios from 'vue-axios'
 import { createFromIconfontCN, ExclamationCircleOutlined } from '@ant-design/icons-vue';
 import moment from "moment";
 
-import '@/assets/css/style.css';
 import '@/assets/css/basic.css';
+import '@/assets/css/style.css';
+import '@/assets/css/chat.css';
 
 import '@/assets/less/responsive-utilities.less'
 

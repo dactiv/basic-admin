@@ -1,7 +1,7 @@
 <template >
   <a-drawer :width="950" placement="right" :closable="false" :afterVisibleChange="visibleChange" v-model:visible="this.visible" class="chat">
     <a-layout class="height-100-percent">
-      <a-layout-sider class="main-aside border-right" :width="300">
+      <a-layout-sider class="main-aside border-right" :width="280">
         <a-row class="height-100-percent">
           <a-col :span="4" class="tool-bar border-right">
             <div class="text-center margin-top-15">
@@ -111,52 +111,88 @@
             </a-col>
           </a-row>
         </a-layout-header>
-        <a-layout-content class="height-100-percent">
-          <div class="message" ref="message-content" @scroll="messageContentScroll">
-            <template v-if="this.current">
-              <a-divider class="font-size-12 no-margin" v-if="!this.current.lastLoadMessage">
-                <a-typography-text type="secondary">
-                  <icon-font spin class="icon" type="icon-refresh" /> 数据加载中...
-                </a-typography-text>
-              </a-divider>
-              <div v-for="m of this.current.messages" :key="m.id">
+        <a-layout>
+          <a-layout-content class="height-100-percent">
+            <div class="message" ref="message-content" @scroll="messageContentScroll">
+              <template v-if="this.current">
+                <a-divider class="font-size-12 no-margin" v-if="!this.current.lastLoadMessage">
+                  <a-typography-text type="secondary">
+                    <icon-font spin class="icon" type="icon-refresh" /> 数据加载中...
+                  </a-typography-text>
+                </a-divider>
+                <div v-for="m of this.current.messages" :key="m.id">
 
-                <div class="text-center margin-top-10 margin-bottom-10">
-                  <a-typography-text type="secondary">{{this.timestampFormat(m.creationTime)}}</a-typography-text>
+                  <div class="text-center margin-top-10 margin-bottom-10">
+                    <a-typography-text type="secondary">{{this.timestampFormat(m.creationTime)}}</a-typography-text>
+                  </div>
+
+                  <div v-for="c of m.contents" :key="c" :class="c.senderId !== this.principal.details.id ? 'margin-bottom-15' : 'margin-bottom-15 text-right'">
+                    <a-space align="start">
+                        <a-avatar v-if="c.senderId !== this.principal.details.id" :src="this.getUserAvatarByUserId(this.current.id)" class="basic-box-shadow" >
+                          {{this.current.title.substring(0,1)}}
+                        </a-avatar>
+                        <a-space>
+                          <a-tooltip :title="c.tooltip" v-if="c.senderId === this.principal.details.id">
+                            <a-typography-text :type="c.status === 'sending' || c.status === 'success' || c.status === 'unread' ? 'secondary' : c.status === 'read' ? 'success' : 'danger'">
+                              <icon-font :spin="c.status === 'sending'" class="icon" :type="c.status === 'sending' ? 'icon-refresh' : c.status === 'fail' ? 'icon-error' :  'icon-success'" />
+                            </a-typography-text>
+                          </a-tooltip>
+                          <a-card :class="c.senderId === this.principal.details.id ? 'border-radius-4 basic-box-shadow self' : 'border-radius-4 basic-box-shadow'" v-html="c.content">
+                          </a-card>
+                          <a-tooltip :title="c.tooltip" v-if="c.senderId !== this.principal.details.id">
+                            <a-typography-text :type="c.status === 'sending' || c.status === 'success' || c.status === 'unread' ? 'secondary' : c.status === 'read' ? 'success' : 'danger'">
+                              <icon-font :spin="c.status === 'sending'" class="icon" :type="c.status === 'sending' ? 'icon-refresh' : c.status === 'fail' ? 'icon-error' :  'icon-success'" />
+                            </a-typography-text>
+                          </a-tooltip>
+                        </a-space>
+                        <a-avatar v-if="c.senderId === this.principal.details.id" :src="this.principal.details.avatar" class="basic-box-shadow">
+                          我
+                        </a-avatar>
+                    </a-space>
+                  </div>
                 </div>
 
-                <div v-for="c of m.contents" :key="c" :class="c.senderId !== this.principal.details.id ? 'margin-bottom-15' : 'margin-bottom-15 text-right'">
-                  <a-space align="start">
-                      <a-avatar v-if="c.senderId !== this.principal.details.id" :src="this.getUserAvatarByUserId(this.current.id)" class="basic-box-shadow" >
-                        {{this.current.title.substring(0,1)}}
-                      </a-avatar>
-                      <a-space>
-                        <a-tooltip :title="c.tooltip" v-if="c.senderId === this.principal.details.id">
-                          <a-typography-text :type="c.status === 'sending' || c.status === 'success' || c.status === 'unread' ? 'secondary' : c.status === 'read' ? 'success' : 'danger'">
-                            <icon-font :spin="c.status === 'sending'" class="icon" :type="c.status === 'sending' ? 'icon-refresh' : c.status === 'fail' ? 'icon-error' :  'icon-success'" />
-                          </a-typography-text>
-                        </a-tooltip>
-                        <a-card :class="c.senderId === this.principal.details.id ? 'border-radius-4 basic-box-shadow self' : 'border-radius-4 basic-box-shadow'" v-html="c.content">
-                        </a-card>
-                        <a-tooltip :title="c.tooltip" v-if="c.senderId !== this.principal.details.id">
-                          <a-typography-text :type="c.status === 'sending' || c.status === 'success' || c.status === 'unread' ? 'secondary' : c.status === 'read' ? 'success' : 'danger'">
-                            <icon-font :spin="c.status === 'sending'" class="icon" :type="c.status === 'sending' ? 'icon-refresh' : c.status === 'fail' ? 'icon-error' :  'icon-success'" />
-                          </a-typography-text>
-                        </a-tooltip>
-                      </a-space>
-                      <a-avatar v-if="c.senderId === this.principal.details.id" :src="this.principal.details.avatar" class="basic-box-shadow">
-                        我
-                      </a-avatar>
-                  </a-space>
+              </template>
+            </div>
+            <div class="input border-top" v-if="this.current">
+                  <QuillEditor toolbar="#chat-toolbar" ref="editor" v-model:content="this.inputContent" @keyup.ctrl.enter="send()" content-type="html">
+                    <template #toolbar>
+                      <div id="chat-toolbar" class="border-bottom">
+                        <a-row>
+                          <a-col :span="18">
+                            <button class="ql-bold" />
+                            <button class="ql-italic" />
+                            <button class="ql-link" />
+                            <button class="ql-image" />
+                            <button class="ql-video" />
+                            <button class="ql-list" value="ordered" />
+                          </a-col>
+                          <a-col :span="6" class="text-right">
+                            <button class="custom ql-contact-history" @click="showContactHistory">
+                              <icon-font class="icon" type="icon-time" />
+                            </button>
+                          </a-col>
+                        </a-row>
+                      </div>
+                    </template>
+                  </QuillEditor>
                 </div>
+          </a-layout-content>
+          <a-layout-sider v-if="contactHistoryView" class="contact-history height-100-percent border-left" :width="300">
+            <a-input class="padding-10">
+              <template #addonAfter>
+                <icon-font class="icon" type="icon-time" />
+              </template>
+            </a-input>
+            <a-divider class="font-size-12"><icon-font class="icon" type="icon-calendar" /> 消息内容</a-divider>
+            <div class="history-content padding-10">
+              <div v-for="c of this.current.messages.flatMap(m => m.contents)" :key="c.id">
+                <a-typography-text class="display-block font-size-12" :content="c.senderId  + ' ' + this.timestampFormat(c.creationTime)" />
+                <div class="margin-left-5" v-html="c.content"></div>
               </div>
-
-            </template>
-          </div>
-          <div class="input border-top" v-if="this.current">
-            <QuillEditor :toolbar="[{ 'header': [1, 2, 3, 4, false] }, 'bold', 'italic', 'strike', 'link', 'image', { 'list': 'ordered'}, { 'list': 'bullet' }, { 'color': [] }, { 'background': [] }]" ref="editor" theme="snow" v-model:content="this.inputContent" @keyup.ctrl.enter="send()" content-type="html" />
-          </div>
-        </a-layout-content>
+            </div>
+          </a-layout-sider>
+        </a-layout>
       </a-layout>
     </a-layout>
   </a-drawer>
@@ -181,6 +217,7 @@ export default {
   },
   created() {
     this.$store.dispatch(SOCKET_IO_ACTION_TYPE.IS_CONNECTED).then(this.onSocketConnect);
+
     this.$store.dispatch(SOCKET_IO_ACTION_TYPE.SUBSCRIBE, {
       name: SOCKET_EVENT_TYPE.CONNECT,
       callback:this.onSocketConnect
@@ -210,6 +247,12 @@ export default {
     window.onblur = () => _this.hasFocus = false;
   },
   methods:{
+    showContactHistory() {
+      this.contactHistoryView = !this.contactHistoryView;
+      if (!this.contactHistoryView || !this.current) {
+        return ;
+      }
+    },
     onSocketConnect() {
       if (!this.contacts || this.contacts.length <= 0) {
         this
@@ -698,6 +741,7 @@ export default {
   },
   data() {
     return {
+      contactHistoryView:false,
       hasFocus:true,
       selectedToolBar:["message"],
       current: undefined,
