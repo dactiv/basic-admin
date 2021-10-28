@@ -57,7 +57,6 @@ import '@/assets/css/chat.css';
 
 import '@/assets/less/responsive-utilities.less'
 
-
 const application = createApp(App);
 
 application.config.globalProperties.timestampFormat = function(timestamp) {
@@ -174,32 +173,22 @@ application.config.globalProperties.getFileIcon = function(filename) {
     return icon.icon
 }
 
-const IconFont = createFromIconfontCN({
-    scriptUrl: [
-        // commons-icon
-        "//at.alicdn.com/t/font_2732722_0tk3o424mxjb.js",
-        // file-icon
-        "//at.alicdn.com/t/font_2783178_o30jvdzd5vo.js"
-    ]
-});
-
-application.component('IconFont', IconFont);
-
 application.config.globalProperties.principal = {
     details: store.state.principal,
-    getName:function(details) {
-        return details.realName || details.username;
-    },
     hasPermission: store.getters[PRINCIPAL_GETTER_TYPE.HAS_PERMISSION],
     hasRole: store.getters[PRINCIPAL_GETTER_TYPE.HAS_ROLE]
 }
 
-application.config.globalProperties.getUserAvatar = function(filename) {
+application.config.globalProperties.getPrincipalName = function(details) {
+    return details.realName || details.username;
+}
+
+application.config.globalProperties.getPrincipalAvatar = function(filename) {
     return process.env.VUE_APP_USER_AVATAR_URI_PREFIX + filename;
 }
 
-application.config.globalProperties.getUserAvatarByUserId = function(userId) {
-    return this.getUserAvatar("current_" + userId);
+application.config.globalProperties.getPrincipalAvatarByUserId = function(userId) {
+    return this.getPrincipalAvatar("current_" + userId);
 }
 
 application.config.globalProperties.$message = message;
@@ -255,6 +244,15 @@ application.config.globalProperties.attachmentFileSupport = [
     {name:"bin",icon:"icon-BIN"}
 ]
 
+const IconFont = createFromIconfontCN({
+    scriptUrl: [
+        // commons-icon
+        "//at.alicdn.com/t/font_2732722_0tk3o424mxjb.js",
+        // file-icon
+        "//at.alicdn.com/t/font_2783178_o30jvdzd5vo.js"
+    ]
+});
+
 application
     .use(store)
     .use(router)
@@ -296,4 +294,5 @@ application
     .use(Drawer)
     .use(Tree)
     .use(Radio)
+    .component('IconFont', IconFont)
     .mount('#app');

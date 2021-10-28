@@ -14,12 +14,11 @@ module.exports = {
             less: {
                 lessOptions: {
                     modifyVars: {
-                        "menu-inline-submenu-bg":"#ffffff",
+                        "menu-inline-submenu-bg":"#fff",
                         "menu-item-height":"42px",
                         "card-padding-base": "20px",
                         "primary-color":"#1196da",
-                        "link-color":"#1196da",
-                        "heading-color": "rgba(94, 88, 115, 1)",
+                        "heading-color": "rgba(94, 88, 115, 0.8)",
                         "text-color": "rgba(94, 88, 115, 0.8)",
                         "text-color-secondary": "rgba(94, 88, 115, 0.6)",
                         "disabled-color":"rgba(94, 88, 115, 0.4)"

@@ -6,7 +6,7 @@
           <a-col :span="4" class="tool-bar border-right">
             <div class="text-center margin-top-15">
               <a-avatar :src="this.principal.details.avatar">
-                {{ this.principal.getName(this.principal.details).substring(0, 1) }}
+                {{ this.getPrincipalName(this.principal.details).substring(0, 1) }}
               </a-avatar>
               <a-menu mode="vertical" class="margin-top-10" @select="toolbarSelect" :selectedKeys="selectedToolBar">
                 <a-menu-item key="message">
@@ -31,7 +31,7 @@
                     <a-row type="flex" justify="space-around" align="middle">
                       <a-col :span="4">
                         <a-badge :count="c.messages.reduce((s, m) => s + m.contents.filter(c => c.status === 'unread').length, 0)" :offset="[x=-25, y=0]">
-                          <a-avatar :src="this.getUserAvatarByUserId(c.id)" >
+                          <a-avatar :src="this.getPrincipalAvatarByUserId(c.id)" >
                             {{ c.title.substring(0, 1) }}
                           </a-avatar>
                         </a-badge>
@@ -80,7 +80,7 @@
                   </template>
                   <template #title="{name, id}">
                     <div v-if="id.includes('user-')" class="group-user">
-                      <a-avatar size="small" :src="this.getUserAvatarByUserId(id.replace('user-',''))">
+                      <a-avatar size="small" :src="this.getPrincipalAvatarByUserId(id.replace('user-',''))">
                         {{name.substring(0,1)}}
                       </a-avatar>
                       <a-typography-text strong>{{ name }}</a-typography-text>
@@ -98,7 +98,7 @@
           <a-row>
             <a-col :span="20">
               <a-space v-if="this.current" :size="10" :color="this.current.status">
-                <a-avatar :src="this.getUserAvatarByUserId(this.current.id)" >
+                <a-avatar :src="this.getPrincipalAvatarByUserId(this.current.id)" >
                   {{ this.current.title.substring(0,1) }}
                 </a-avatar>
                 <a-typography-text strong>{{ this.current.title }}</a-typography-text>
@@ -128,7 +128,7 @@
 
                   <div v-for="c of m.contents" :key="c" :class="c.senderId !== this.principal.details.id ? 'margin-bottom-15' : 'margin-bottom-15 text-right'">
                     <a-space align="start">
-                        <a-avatar v-if="c.senderId !== this.principal.details.id" :src="this.getUserAvatarByUserId(this.current.id)" class="basic-box-shadow" >
+                        <a-avatar v-if="c.senderId !== this.principal.details.id" :src="this.getPrincipalAvatarByUserId(this.current.id)" class="basic-box-shadow" >
                           {{this.current.title.substring(0,1)}}
                         </a-avatar>
                         <a-space>
@@ -331,7 +331,7 @@ export default {
 
               let data = r.data.data[0];
 
-              json.title = this.principal.getName(data);
+              json.title = this.getPrincipalName(data);
               json.avatar = data.avatar;
               json.lastLoadMessage = false;
 
@@ -447,6 +447,7 @@ export default {
               if (this.visible) {
                 this.$nextTick(() => {
                   el.scrollTop = el.scrollHeight - beforeHeight;
+                  // FIXME 这里求的滚动条有问题。
                   if (el.id === "message-content") {
                     this.$refs["history-content"].scrollTop  = this.$refs["history-content"].scrollHeight;
                   } else if (el.id === "history-content") {
@@ -534,7 +535,7 @@ export default {
             data.forEach(d => {
               this.addContact({
                 id:d.id,
-                title:this.principal.getName(d),
+                title:this.getPrincipalName(d),
               });
               this.getSocketTempMessages();
             })
@@ -700,7 +701,7 @@ export default {
                 }
 
                 let data = {
-                  name : this.principal.getName(u),
+                  name : this.getPrincipalName(u),
                   id: u.id,
                   group: treeNode.eventKey
                 };
@@ -722,7 +723,7 @@ export default {
     },
     getUsernameById(id) {
       if (id === this.principal.details.id) {
-        return this.principal.getName(this.principal.details);
+        return this.getPrincipalName(this.principal.details);
       }
 
       let contact = this.contacts.find(u => u.id === id);
