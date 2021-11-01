@@ -48,7 +48,7 @@
             <icon-font class="icon" type="icon-database" />
           </template>
 
-          <a-input v-model:value="dataDictionary.form['filter_[code_like]']" placeholder="请输入名称进行查询" class="margin-bottom-20">
+          <a-input v-model:value="dataDictionary.form['filter_[code_like]']" placeholder="请输入名称进行查询" class="margin-lg-bottom">
             <template #addonAfter>
               <a-button type="text" @click="searchDataDictionary()">
                 <icon-font class="icon" type="icon-search" />
@@ -85,7 +85,7 @@
               </template>
             </a-table>
 
-            <div class="margin-top-15 text-right" >
+            <div class="margin-md-top text-right" >
 
               <a-space :size="10">
                 <span class="hidden-xs">每页</span>

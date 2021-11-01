@@ -1,8 +1,8 @@
 <template>
-  <div class="margin-top-20 margin-bottom-20 display-flex align-items-center justify-content-center">
+  <div class="margin-lg-top margin-lg-bottom display-flex align-items-center justify-content-center">
     <a-image :src="require('@/assets/403.svg')" />
   </div>
-  <h1 class="text-center margin-top-20 margin-bottom-20">您没有权限访问,请联系管理员开通权限.</h1>
+  <h1 class="text-center margin-lg-top margin-lg-bottom">您没有权限访问,请联系管理员开通权限.</h1>
   <div class="text-center">
 
     <a-space :size="10">

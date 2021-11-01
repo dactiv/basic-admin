@@ -1,10 +1,10 @@
 <template>
 
-  <div class="margin-top-20 margin-bottom-20 display-flex align-items-center justify-content-center">
+  <div class="margin-lg-top margin-lg-bottom display-flex align-items-center justify-content-center">
     <a-image :src="require('@/assets/400.svg')" />
   </div>
 
-  <h1 class="text-center margin-top-20 margin-bottom-20">您提交的参数不正确.</h1>
+  <h1 class="text-center margin-lg-top margin-lg-bottom">您提交的参数不正确.</h1>
 
   <a-row>
     <a-col :span="12" :offset="6">
@@ -14,7 +14,7 @@
     </a-col>
   </a-row>
 
-  <div class="text-center margin-top-20">
+  <div class="text-center margin-lg-top">
     <a-button onclick="this.$router.back();">
       <icon-font class="icon" type="icon-arrow-left-circle" />
       <span>返回</span>

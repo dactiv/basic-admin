@@ -6,7 +6,7 @@
     <a-breadcrumb-item><icon-font class="icon" type="icon-notification" /> 站内信消息</a-breadcrumb-item>
   </a-breadcrumb>
 
-  <a-card title="站内信管理" class="basic-box-shadow margin-top-20">
+  <a-card title="站内信管理" class="basic-box-shadow margin-lg-top">
 
     <template #extra>
       <icon-font class="icon" type="icon-notification" />
@@ -14,7 +14,7 @@
 
     <a-spin :spinning="spinning" tip="数据加载中...">
 
-      <a-space :size="10" class="margin-bottom-20">
+      <a-space :size="10" class="margin-lg-bottom">
         <a-button @click="this.searchDialogVisible=true;" :loading="spinning">
           <icon-font class="icon" v-if="!spinning" type="icon-search" />
           <span class="hidden-xs">搜索</span>
@@ -54,7 +54,7 @@
 
       </a-table>
 
-      <div class="margin-top-15 text-right" >
+      <div class="margin-md-top text-right" >
 
         <a-space :size="10">
           <span class="hidden-xs">每页</span>

@@ -46,7 +46,7 @@
 
       </a-table>
 
-      <div class="margin-top-15 text-right" >
+      <div class="margin-md-top text-right" >
 
         <a-space :size="10">
           <span class="hidden-xs">每页</span>

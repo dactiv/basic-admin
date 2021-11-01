@@ -1,6 +1,6 @@
+@import "~ant-design-vue/lib/style/themes/default";
+
 body {
-  background-color: #eff2f5;
-  color: #5e5873;
   margin: 0;
 }
 
@@ -10,29 +10,25 @@ body {
 }
 
 .header-navbar {
-  background-color: #ffffff;
-  padding:0 10px;
+  background-color: @white;
+  padding: 0 @padding-xss;
   position: fixed;
   z-index: 100;
   width: calc(100% - 290px);
-  margin-top: 10px;
+  margin-top: @margin-md;
   margin-left: 275px;
   transition: 0.2s;
-  border-radius: 10px;
-}
-
-.header-navbar.toggle {
-  margin-left: 100px;
-  width: calc(100% - 115px);
-  transition: 0.3s;
-}
-
-.header-navbar .ant-menu-item {
-  padding: 0 10px !important;
-}
-
-.header-navbar .right .username {
-  margin-right: 10px;
+  &.toggle {
+    margin-left: 100px;
+    width: calc(100% - 115px);
+    transition: 0.3s;
+  }
+  .ant-menu-item {
+    padding: 0 @padding-md !important;
+  }
+  .right .username {
+    margin-right: @margin-lg;
+  }
 }
 
 .header-navbar-shadow {
@@ -49,42 +45,38 @@ body {
 }
 
 .logo {
-  background-color: #ffffff;
-  padding: 20px;
-}
-
-.logo span.anticon {
-  font-size: 1.95rem!important;
-  margin-left: 2px;
-  vertical-align: middle;
-}
-
-.logo span.anticon svg {
-  display: flex;
-}
-
-.logo span {
-  line-height: 36px;
-  vertical-align: middle;
-  color: #1196da!important;;
-  font-weight: 600;
-  font-size: 1.55rem;
-  margin-left: 5px!important;
+  background-color: @white;
+  padding: @padding-lg;
+  span {
+    line-height: @height-base;
+    vertical-align: middle;
+    color: #1196da!important;;
+    font-weight: 600;
+    font-size: 1.55rem;
+    &.anticon {
+      font-size: 1.95rem!important;
+      margin-left: 2px;
+      vertical-align: middle;
+      svg {
+        display: flex;
+      }
+    }
+  }
 }
 
 .main-aside {
   position: fixed;
   height: 100%;
   overflow: hidden;
-  background-color: #ffffff;
-  box-shadow: 0 0 15px 0 rgba(0, 0, 0, 0.1);
+  background-color: @white;
+  box-shadow: 0 0 15px 0 fade(@black, 10%);
   z-index: 100;
 }
 
 .main-footer {
-  color: #6e6b7b;
-  line-height: 60px;
-  padding: 0;
+  color: @text-color;
+  line-height: @height-lg;
+  padding: @padding-xss;
   transition: 0.2s;
 }
 
@@ -93,10 +85,9 @@ body {
   height: 100%;
   padding-bottom: 80px;
   overflow: auto;
-}
-
-.main-menu .ant-spin-nested-loading {
-  min-height: 260px;
+  .ant-spin-nested-loading {
+    min-height: 260px;
+  }
 }
 
 .authentication-inner {
@@ -104,15 +95,14 @@ body {
   width: 100%;
   position: relative;
   min-height: calc(1vh * 100);
-}
-
-.authentication-inner .logo {
-  background-color: #eff2f5;
-  padding: 0 20px;
+  .logo {
+    background-color: @body-background;
+    padding: 0 @padding-lg;
+  }
 }
 
 .authentication-aside {
-  background-color: #ffffff;
+  background-color: @white;
   padding: 4rem!important;
 }
 
@@ -125,29 +115,23 @@ body {
 }
 
 .ant-breadcrumb {
-  margin: 20px 0;
+  margin: @margin-lg 0;
 }
 
 .main-content {
   padding-top: 75px;
   position: relative;
-  margin-right: 15px;
+  margin-right: @margin-md;
   margin-left: 275px;
   transition: 0.2s;
-}
-
-.main-content .content-body {
-  margin-top: 20px;
-  min-height: calc(100% - 80px);
-}
-
-.main-content.toggle {
-  margin-left: 100px;
-  transition: 0.3s;
-}
-
-.ant-input-group-addon .ant-btn {
-  height: 30px;
+  .content-body {
+    margin-top: @margin-lg;
+    min-height: calc(100% - 80px);
+  }
+  &.toggle {
+    margin-left: 100px;
+    transition: 0.3s;
+  }
 }
 
 .ant-table-tbody td .ant-form-item {
@@ -155,7 +139,7 @@ body {
 }
 
 .icon {
-  font-size: 16px!important;
+  font-size: @font-size-lg!important;
   vertical-align: middle;
   margin-bottom: 3px;
 }
@@ -168,18 +152,18 @@ body {
   font-size: 20px!important;
 }
 
-.attachment .file {
-  font-size: 42px!important;
-}
-
-.attachment .ant-list-item {
-  padding: 10px;
-}
-
-.attachment .ant-list-item .ant-list-item-meta .ant-list-item-meta-title {
-  margin-bottom: 0;
+.attachment {
+  .file {
+    font-size: 42px !important;
+  }
+  .ant-list-item {
+    padding: @padding-sm;
+    .ant-list-item-meta .ant-list-item-meta-title {
+      margin-bottom: 0;
+    }
+  }
 }
 
 .ant-menu-submenu.ant-menu-submenu-horizontal {
-  padding: 0 10px!important;
+  padding: 0 @padding-sm!important;
 }

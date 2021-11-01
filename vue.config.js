@@ -14,8 +14,10 @@ module.exports = {
             less: {
                 lessOptions: {
                     modifyVars: {
+                        "body-background":"#eff2f5",
                         "menu-inline-submenu-bg":"#fff",
-                        "menu-item-height":"42px",
+                        "menu-item-height": "42px",
+                        "line-height-base": "1.7715",
                         "card-padding-base": "20px",
                         "primary-color":"#1196da",
                         "heading-color": "rgba(94, 88, 115, 0.8)",

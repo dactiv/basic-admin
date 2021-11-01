@@ -6,7 +6,7 @@
     <a-breadcrumb-item><icon-font class="icon" type="icon-send" /> 发送站内信</a-breadcrumb-item>
   </a-breadcrumb>
 
-  <a-card title="发送站内信" class="basic-box-shadow margin-top-20">
+  <a-card title="发送站内信" class="basic-box-shadow margin-lg-top">
 
     <template #extra>
       <icon-font class="icon" type="icon-notification" />
@@ -24,7 +24,7 @@
 
       <a-form-item label="发送给:" name="phoneNumbers">
         <a-row type="flex">
-          <a-col flex="auto" class="margin-right-10">
+          <a-col flex="auto" class="margin-right">
             <a-select class="width-100-percent" :max-tag-count="2" ref="select-tags" :disabled="form.phoneNumbers.includes(13000000000)" mode="tags" :token-separators="[',']" v-model:value="form.phoneNumbers" :filter-option="false" :not-found-content="searching ? undefined : null" :options="data" @search="searchSelectUser">
             </a-select>
           </a-col>

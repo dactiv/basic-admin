@@ -4,7 +4,7 @@
 
   <a-layout class="height-100-percent">
 
-    <a-layout-header :class="menu.collapsed ? 'header-navbar basic-box-shadow toggle' : 'header-navbar basic-box-shadow'">
+    <a-layout-header :class="menu.collapsed ? 'header-navbar border-radius-lg basic-box-shadow toggle' : 'header-navbar border-radius-lg basic-box-shadow'">
       <a-row>
         <a-col :span="16">
           <a-menu mode="horizontal" class="left">

@@ -4,11 +4,11 @@
       <a-layout-sider class="main-aside border-right" :width="280">
         <a-row class="height-100-percent">
           <a-col :span="4" class="tool-bar border-right">
-            <div class="text-center margin-top-15">
+            <div class="text-center margin-md-top">
               <a-avatar :src="this.principal.details.avatar">
                 {{ this.getPrincipalName(this.principal.details).substring(0, 1) }}
               </a-avatar>
-              <a-menu mode="vertical" class="margin-top-10" @select="toolbarSelect" :selectedKeys="selectedToolBar">
+              <a-menu mode="vertical" class="margin-top" @select="toolbarSelect" :selectedKeys="selectedToolBar">
                 <a-menu-item key="message">
                   <a-badge :count="this.messageCount">
                     <icon-font class="icon" type="icon-message" />
@@ -46,7 +46,7 @@
                             </a-typography-text>
                           </a-col>
                           <a-col :span="8" class="text-right">
-                            <a-typography-text v-if="c.lastSendTime" type="secondary" class="contacts-name display-block font-size-12" :content="this.$moment(c.lastSendTime).fromNow()" />
+                            <a-typography-text v-if="c.lastSendTime" type="secondary" class="contacts-name display-block font-size-sm" :content="this.$moment(c.lastSendTime).fromNow()" />
                           </a-col>
                         </a-row>
                         <a-row type="flex" justify="space-around" align="middle">
@@ -97,7 +97,7 @@
         <a-layout-header class="border-bottom">
           <a-row>
             <a-col :span="20">
-              <a-space v-if="this.current" :size="10" :color="this.current.status">
+              <a-space v-if="this.current" :size="10" :color="this.current.status" class="padding-left">
                 <a-avatar :src="this.getPrincipalAvatarByUserId(this.current.id)" >
                   {{ this.current.title.substring(0,1) }}
                 </a-avatar>
@@ -115,18 +115,18 @@
           <a-layout-content class="height-100-percent">
             <div id="message-content" class="message" ref="message-content" @scroll="messageContentScroll">
               <template v-if="this.current">
-                <a-divider class="font-size-12 no-margin" v-if="!this.current.lastLoadMessage">
+                <a-divider class="font-size-sm margin-none" v-if="!this.current.lastLoadMessage">
                   <a-typography-text type="secondary">
                     <icon-font spin class="icon" type="icon-refresh" /> 数据加载中...
                   </a-typography-text>
                 </a-divider>
                 <div v-for="m of this.current.messages" :key="m.id">
 
-                  <div class="text-center margin-top-10 margin-bottom-10">
+                  <div class="text-center margin-top margin-bottom">
                     <a-typography-text type="secondary">{{this.timestampFormat(m.creationTime)}}</a-typography-text>
                   </div>
 
-                  <div v-for="c of m.contents" :key="c" :class="c.senderId !== this.principal.details.id ? 'margin-bottom-15' : 'margin-bottom-15 text-right'">
+                  <div v-for="c of m.contents" :key="c" :class="c.senderId !== this.principal.details.id ? 'margin-bottom' : 'margin-bottom text-right'">
                     <a-space align="start">
                         <a-avatar v-if="c.senderId !== this.principal.details.id" :src="this.getPrincipalAvatarByUserId(this.current.id)" class="basic-box-shadow" >
                           {{this.current.title.substring(0,1)}}
@@ -179,23 +179,23 @@
             </div>
           </a-layout-content>
           <a-layout-sider v-if="contactHistoryView" class="contact-history height-100-percent border-left" :width="300">
-            <a-input class="padding-10">
+            <a-input class="padding">
               <template #addonAfter>
                 <icon-font class="icon" type="icon-time" />
               </template>
             </a-input>
-            <a-divider class="font-size-12"><icon-font class="icon" type="icon-calendar" /> 消息内容</a-divider>
-            <div id="history-content" class="history padding-10" ref="history-content" @scroll="messageContentScroll">
-              <a-divider class="font-size-12 no-margin" v-if="!this.current.lastLoadMessage">
+            <a-divider class="font-size-sm"><icon-font class="icon" type="icon-calendar" /> 消息内容</a-divider>
+            <div id="history-content" class="history padding" ref="history-content" @scroll="messageContentScroll">
+              <a-divider class="font-size-sm margin-none" v-if="!this.current.lastLoadMessage">
                 <a-typography-text type="secondary">
                   <icon-font spin class="icon" type="icon-refresh" /> 数据加载中...
                 </a-typography-text>
               </a-divider>
               <div v-for="c of this.current.messages.flatMap(m => m.contents)" :key="c.id">
                 <p>
-                  <a-typography-text class="display-block font-size-12" :content="this.getUsernameById(c.senderId)  + ' ' + this.timestampFormat(c.creationTime)" />
+                  <a-typography-text class="display-block font-size-sm" :content="this.getUsernameById(c.senderId)  + ' ' + this.timestampFormat(c.creationTime)" />
                 </p>
-                <div class="margin-left-5" v-html="c.content"></div>
+                <div class="margin-xss-left" v-html="c.content"></div>
               </div>
             </div>
           </a-layout-sider>
@@ -211,7 +211,6 @@ import {QuillEditor} from "@vueup/vue-quill";
 import { SOCKET_EVENT_TYPE, SOCKET_IO_ACTION_TYPE } from "@/store/socketIo"
 
 import '@vueup/vue-quill/dist/vue-quill.snow.css';
-import '@/assets/css/quill.css'
 
 export default {
   name: "Chat",

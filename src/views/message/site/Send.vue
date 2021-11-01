@@ -6,7 +6,7 @@
     <a-breadcrumb-item><icon-font class="icon" type="icon-send" /> 发送站内信</a-breadcrumb-item>
   </a-breadcrumb>
 
-  <a-card title="发送站内信" class="basic-box-shadow margin-top-20">
+  <a-card title="发送站内信" class="basic-box-shadow margin-lg-top">
 
     <template #extra>
       <icon-font class="icon" type="icon-notification" />
@@ -24,7 +24,7 @@
 
       <a-form-item label="发送给:" name="toUserIds">
         <a-row type="flex">
-          <a-col flex="auto" class="margin-right-10">
+          <a-col flex="auto" class="margin-right">
             <a-select class="width-100-percent" :max-tag-count="2" ref="select-multiple" :disabled="form.toUserIds.includes(0)" mode="multiple" :token-separators="[',']" v-model:value="form.toUserIds" :filter-option="false" :not-found-content="searching ? undefined : null" :options="data" @search="searchSelectUser">
             </a-select>
           </a-col>
@@ -48,7 +48,7 @@
         <a-input v-model:value="form.title" :default-value="form.title" />
       </a-form-item>
 
-      <a-list class="margin-bottom-20 attachment" item-layout="horizontal" bordered v-if="fileList.length > 0" :data-source="fileList">
+      <a-list class="margin-lg-bottom attachment" item-layout="horizontal" bordered v-if="fileList.length > 0" :data-source="fileList">
         <template #renderItem="{ item }">
           <a-list-item :key="item.uid">
             <template #actions>

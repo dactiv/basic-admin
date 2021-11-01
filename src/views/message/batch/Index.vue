@@ -6,7 +6,7 @@
     <a-breadcrumb-item><icon-font class="icon" type="icon-batch" /> 批量消息</a-breadcrumb-item>
   </a-breadcrumb>
 
-  <a-card title="批量消息管理" class="basic-box-shadow margin-top-20">
+  <a-card title="批量消息管理" class="basic-box-shadow margin-lg-top">
 
     <template #extra>
       <icon-font class="icon" type="icon-batch" />
@@ -14,7 +14,7 @@
 
     <a-spin :spinning="spinning" tip="数据加载中...">
 
-      <a-space :size="10" class="margin-bottom-20">
+      <a-space :size="10" class="margin-lg-bottom">
 
         <a-button @click="search(this.page.number)" :loading="spinning">
           <icon-font class="icon" v-if="!spinning" type="icon-refresh" />
@@ -59,7 +59,7 @@
 
       </a-table>
 
-      <div class="margin-top-15 text-right" >
+      <div class="margin-md-top text-right" >
 
         <a-space :size="10">
           <span class="hidden-xs">每页</span>

@@ -6,7 +6,7 @@
     <a-breadcrumb-item><icon-font class="icon" type="icon-variable" /> 环境变量查询</a-breadcrumb-item>
   </a-breadcrumb>
 
-  <a-card title="环境变量查询" class="basic-box-shadow margin-top-20">
+  <a-card title="环境变量查询" class="basic-box-shadow margin-lg-top">
 
     <template #extra>
       <icon-font class="icon" type="icon-variable" />

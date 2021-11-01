@@ -6,7 +6,7 @@
     <a-breadcrumb-item><icon-font class="icon" type="icon-enum-major-o" /> 系统枚举查询</a-breadcrumb-item>
   </a-breadcrumb>
 
-  <a-card title="系统枚举查询" class="basic-box-shadow margin-top-20">
+  <a-card title="系统枚举查询" class="basic-box-shadow margin-lg-top">
 
     <template #extra>
       <a-button :loading="sync" @click="syncEnumerate" v-if="this.principal.hasPermission('perms[enumerate:sync]')">

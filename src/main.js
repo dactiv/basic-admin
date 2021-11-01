@@ -51,11 +51,7 @@ import {
     message
 } from "ant-design-vue";
 
-import '@/assets/css/basic.css';
-import '@/assets/css/style.css';
-import '@/assets/css/chat.css';
-
-import '@/assets/less/responsive-utilities.less'
+import '@/assets/less/index.less'
 
 const application = createApp(App);
 

@@ -6,13 +6,13 @@
     <a-breadcrumb-item><icon-font class="icon" type="icon-attachment" /> 資源管理</a-breadcrumb-item>
   </a-breadcrumb>
 
-  <a-card title="資源管理" class="basic-box-shadow margin-top-20">
+  <a-card title="資源管理" class="basic-box-shadow margin-lg-top">
 
     <template #extra>
       <icon-font class="icon" type="icon-attachment" />
     </template>
 
-    <a-input v-model:value="form['filter_[name_like]']" placeholder="请输入名称进行查询" class="margin-bottom-20">
+    <a-input v-model:value="form['filter_[name_like]']" placeholder="请输入名称进行查询" class="margin-lg-bottom">
       <template #addonAfter>
         <a-button type="text" @click="$refs['resource-table'].search(this.form)" :loading="spinning">
           <icon-font class="icon" v-if="!spinning" type="icon-search" />

@@ -7,7 +7,7 @@
       <a-layout-content class="display-flex align-items-center justify-content-center">
         <a-image :src="require('../assets/login.svg')" :width="747" :height="547" />
       </a-layout-content>
-      <a-layout-footer class="no-margin main-footer text-center">COPYRIGHT © 2021 Dactiv, All rights ReservedHand-crafted & Made with</a-layout-footer>
+      <a-layout-footer class="margin-none main-footer text-center">COPYRIGHT © 2021 Dactiv, All rights ReservedHand-crafted & Made with</a-layout-footer>
     </a-layout>
 
     <a-layout-sider width="500" class="authentication-aside">
