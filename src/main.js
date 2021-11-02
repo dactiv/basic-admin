@@ -47,6 +47,8 @@ import {
     Switch,
     Tree,
     Radio,
+    Popover,
+    Calendar,
     notification,
     message
 } from "ant-design-vue";
@@ -55,22 +57,31 @@ import '@/assets/less/index.less'
 
 const application = createApp(App);
 
-application.config.globalProperties.timestampFormat = function(timestamp) {
-    if (!timestamp || timestamp === "") {
+application.config.globalProperties.momentFormat = function(value, format) {
+    if (!value || value === "") {
         return "";
     }
 
-    if (this.$moment.isMoment(timestamp)) {
-        return timestamp.format(process.env.VUE_APP_TIMESTAMP_FORMAT);
+    if (this.$moment.isMoment(value)) {
+        return value.format(format);
     }
 
-    return moment(timestamp).format(process.env.VUE_APP_TIMESTAMP_FORMAT);
+    return moment(value).format(format);
+}
+
+application.config.globalProperties.dateFormat = function(value) {
+    return this.momentFormat(value, process.env.VUE_APP_DATE_VALUE_FORMAT);
+}
+
+
+application.config.globalProperties.timestampFormat = function(value) {
+    return this.momentFormat(value, process.env.VUE_APP_TIMESTAMP_FORMAT);
 }
 
 application.config.globalProperties.convertFormUrlencoded = function(val) {
 
     if (this.$moment.isMoment(val)) {
-        return val.format(process.env.VUE_APP_POST_DATE_FORMAT);
+        return this.momentFormat(val, process.env.VUE_APP_POST_DATETIME_FORMAT);
     }
 
     return val;
@@ -290,5 +301,7 @@ application
     .use(Drawer)
     .use(Tree)
     .use(Radio)
+    .use(Popover)
+    .use(Calendar)
     .component('IconFont', IconFont)
     .mount('#app');
