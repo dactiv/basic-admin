@@ -25,7 +25,7 @@
               <a-input placeholder="搜索" />
             </div>
             <div class="left-content">
-              <a-menu v-show="this.tab === 'message'" @click="selectContact" mode="vertical">
+              <a-menu v-show="this.tab === 'message'" @click="selectContact" :selectedKeys="selectedKeys" mode="vertical">
                 <a-menu-item v-for="c of this.contacts" :key="c.id" >
                   <a-dropdown :trigger="['contextmenu']">
                     <a-row type="flex" justify="space-around" align="middle">
@@ -199,7 +199,7 @@
               消息内容
             </a-divider>
             <div id="history-content" class="history padding" ref="history-content" @scroll="messageContentScroll">
-              <a-divider class="font-size-sm margin-none" v-if="this.current.history.lastLoadMessage">
+              <a-divider class="font-size-sm margin-none" v-if="!this.current.history.lastLoadMessage">
                 <a-typography-text type="secondary">
                   <icon-font spin class="icon" type="icon-refresh" /> 数据加载中...
                 </a-typography-text>
@@ -286,6 +286,7 @@ export default {
             this.current.history.loadMessages.unshift(d);
           });
         }
+        this.current.history.lastLoadMessage = this.current.contact.lastLoadMessage;
 
         this.$nextTick(() => this.$refs["history-content"].scrollTop = this.$refs["history-content"].scrollHeight);
       }
@@ -421,12 +422,13 @@ export default {
       this.current.history.calendar.show = false;
       this.current.history.calendar.enabledDate = [];
       this.current.history.messages = [];
+      this.current.history.lastLoadMessage = [];
       this.current.history.search.text = '';
       this.current.history.search.date = '';
       this.current.history.search.status = false;
     },
     messageContentScroll(d) {
-      if (d.target.scrollTop !== 20) {
+      if (d.target.scrollTop !== 0) {
         return ;
       }
       if (this.current.contact.id > 0) {
@@ -525,15 +527,18 @@ export default {
               }
 
               localStorage.setItem(this.getLocalStorageContactName(this.principal.details.id), JSON.stringify(this.contacts));
-            }
+            } else if (this.current.contact.id === contact.id && this.current.history.show) {
 
-            if (beforeHeight === 0 || (this.current.contact.id === contact.id && this.current.history.show)) {
-              data.elements.forEach(d => {
-                this.current.history.messages.unshift(d)
-                if (!this.current.history.search.status) {
-                  this.current.history.loadMessages.push(d);
-                }
-              });
+              this.current.history.lastLoadMessage = data.last;
+
+              if (data.elements && data.elements.length > 0) {
+                data.elements.forEach(d => {
+                  this.current.history.messages.unshift(d)
+                  if (!this.current.history.search.status) {
+                    this.current.history.loadMessages.push(d);
+                  }
+                });
+              }
             }
 
             if (this.visible) {
@@ -844,24 +849,30 @@ export default {
         id:selectedKeys[0].replaceAll("user-","") * 1,
         title: info.node.dataRef.name,
       }
+      this.selectedKeys = [contact.id];
+      this.current.history.show = false;
 
       this.current.contact = this.addContact(contact);
-      this.current.history.lastLoadMessage = this.current.contact.lastLoadMessage;
       this.readMessage(this.current.contact);
       this.tab = "message";
       this.selectedToolBar = ["message"];
     },
     selectContact(record){
+      let id = record.key * 1;
 
-      if (this.current.contact.id > 0 && this.current.contact.id === record.key) {
+      if (this.current.contact.id > 0 && this.current.contact.id === id) {
         return ;
       }
+      this.selectedKeys = [id];
 
-      this.current.contact = this.contacts.find(c => c.id === record.key * 1);
+      this.current.history.show = false;
+
+      this.current.contact = this.contacts.find(c => c.id === id);
 
       if (this.current.contact.messages.length <= 0 && !this.current.contact.lastLoadMessage) {
         this.loadHistoryMessage(this.current.contact, this.$refs["message-content"]);
       }
+
       this.installContactHistory(this.current.contact);
 
       this.readMessage(this.current.contact);
@@ -936,6 +947,7 @@ export default {
       },
       hasFocus:true,
       selectedToolBar:["message"],
+      selectedKeys:[],
       defaultContactValue:{
         title:"",
         lastLoadMessage: true,
