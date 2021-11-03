@@ -3,14 +3,14 @@
     <a-layout class="height-100-percent">
       <a-layout-sider class="main-aside border-right" :width="280">
         <a-row class="height-100-percent">
-          <a-col :span="4" class="tool-bar border-right">
+          <a-col :span="5" class="tool-bar border-right">
             <div class="text-center margin-md-top">
               <a-avatar :src="this.principal.details.avatar">
                 {{ this.getPrincipalName(this.principal.details).substring(0, 1) }}
               </a-avatar>
               <a-menu mode="vertical" class="margin-top" @select="toolbarSelect" :selectedKeys="selectedToolBar">
                 <a-menu-item key="message">
-                  <a-badge :count="this.messageCount">
+                  <a-badge :count="this.messageCount" :offset="[x=-20, y=0]">
                     <icon-font class="icon" type="icon-message" />
                   </a-badge>
                 </a-menu-item>
@@ -20,7 +20,7 @@
               </a-menu>
             </div>
           </a-col>
-          <a-col :span="20" class="height-100-percent">
+          <a-col :span="19" class="height-100-percent">
             <div class="search">
               <a-input placeholder="搜索" />
             </div>
@@ -36,7 +36,7 @@
                           </a-avatar>
                         </a-badge>
                       </a-col>
-                      <a-col :span="20">
+                      <a-col :span="20" class="padding-left">
                         <a-row>
                           <a-col :span="16">
                             <a-typography-text strong :ellipsis="true" class="contacts-name display-block" >
@@ -132,14 +132,16 @@
                           {{this.current.contact.title.substring(0,1)}}
                         </a-avatar>
                         <a-space>
-                          <a-tooltip :title="c.tooltip" v-if="c.senderId === this.principal.details.id">
+                          <a-tooltip v-if="c.senderId === this.principal.details.id">
+                            <template #title><a-button v-if="c.status === 'fail'" type="link" class="padding-none" @click="this.retrySend(c.id)">[重试]</a-button>{{c.tooltip}} </template>
                             <a-typography-text :type="c.status === 'sending' || c.status === 'success' || c.status === 'unread' ? 'secondary' : c.status === 'read' ? 'success' : 'danger'">
                               <icon-font :spin="c.status === 'sending'" class="icon" :type="c.status === 'sending' ? 'icon-refresh' : c.status === 'fail' ? 'icon-error' :  'icon-success'" />
                             </a-typography-text>
                           </a-tooltip>
-                          <a-card :class="c.senderId === this.principal.details.id ? 'border-radius-4 basic-box-shadow self' : 'border-radius-4 basic-box-shadow'" v-html="c.content">
+                          <a-card :class="c.senderId === this.principal.details.id ? 'border-radius basic-box-shadow self' : 'border-radius basic-box-shadow'" v-html="c.content">
                           </a-card>
-                          <a-tooltip :title="c.tooltip" v-if="c.senderId !== this.principal.details.id">
+                          <a-tooltip v-if="c.senderId !== this.principal.details.id">
+                            <template #title>{{c.tooltip}}</template>
                             <a-typography-text :type="c.status === 'sending' || c.status === 'success' || c.status === 'unread' ? 'secondary' : c.status === 'read' ? 'success' : 'danger'">
                               <icon-font :spin="c.status === 'sending'" class="icon" :type="c.status === 'sending' ? 'icon-refresh' : c.status === 'fail' ? 'icon-error' :  'icon-success'" />
                             </a-typography-text>
@@ -178,48 +180,51 @@
               </QuillEditor>
             </div>
           </a-layout-content>
-          <a-layout-sider v-if="this.current.history.show" class="contact-history height-100-percent border-left" :width="300">
-            <a-input class="padding" v-model:value="this.current.history.search.text">
-              <template #addonAfter>
-                <a-popover v-model:visible="this.current.history.calendar.show" title="选择时间" trigger="click">
-                  <template #content>
-                    <a-calendar v-model:value="this.current.history.search.date" :fullscreen="false" @select="this.selectCalendar" :disabled-date="this.disabledHistoryDate">
-
-                    </a-calendar>
-                  </template>
-                  <icon-font class="icon" type="icon-time" />
-                </a-popover>
-              </template>
-            </a-input>
-            <a-divider class="font-size-sm">
-              <a-tag v-if="this.current.history.search.date !== ''" closable @close="this.clearSearch">
-                <icon-font class="icon" type="icon-calendar" />
-                {{this.dateFormat(this.current.history.search.date)}}
-              </a-tag>
-              消息内容
-            </a-divider>
-            <div id="history-content" class="history padding" ref="history-content" @scroll="messageContentScroll">
-              <a-divider class="font-size-sm margin-none" v-if="!this.current.history.lastLoadMessage">
-                <a-typography-text type="secondary">
-                  <icon-font spin class="icon" type="icon-refresh" /> 数据加载中...
-                </a-typography-text>
-              </a-divider>
-              <div v-for="c of this.current.history.messages" :key="c.id" :class="c.senderId === this.principal.details.id ? 'self' : ''">
-                <p>
-                  <a-typography-paragraph>
-                    <a-typography-text strong >{{this.getUsernameById(c.senderId) + " "}}</a-typography-text>
-                    <a-typography-text class="font-size-sm">{{this.timestampFormat(c.creationTime)}}</a-typography-text>
-                  </a-typography-paragraph>
-
-                </p>
-                <div class="margin-xss-left" v-html="c.content"></div>
-              </div>
-            </div>
-          </a-layout-sider>
         </a-layout>
       </a-layout>
     </a-layout>
   </a-drawer>
+
+  <a-modal v-model:visible="this.current.history.show" :destroyOnClose="true" :mask="false" :maskClosable="false" :footer="null" class="history" title="聊天记录" width="500px">
+    <a-input v-model:value="this.current.history.search.text">
+      <template #addonAfter>
+        <a-popover v-model:visible="this.current.history.calendar.show" title="选择时间" trigger="click">
+          <template #content>
+            <a-calendar :fullscreen="false" @select="this.selectCalendar" :disabled-date="this.disabledHistoryDate">
+
+            </a-calendar>
+          </template>
+          <icon-font class="icon" type="icon-time" />
+        </a-popover>
+      </template>
+    </a-input>
+    <a-divider class="font-size-sm">
+      <a-tag v-if="this.current.history.search.date !== ''" closable @close="this.clearSearch">
+        <icon-font class="icon" type="icon-calendar" />
+        {{this.dateFormat(this.current.history.search.date)}}
+      </a-tag>
+      消息内容
+    </a-divider>
+
+    <div id="history-content" class="message-content" ref="history-content" @scroll="messageContentScroll">
+      <a-divider class="font-size-sm margin-none" v-if="!this.current.history.lastLoadMessage">
+        <a-typography-text type="secondary">
+          <icon-font spin class="icon" type="icon-refresh" /> 数据加载中...
+        </a-typography-text>
+      </a-divider>
+      <a-empty v-if="this.current.history.messages.length === 0"></a-empty>
+      <div v-for="c of this.current.history.messages" :key="c.id" :class="c.senderId === this.principal.details.id ? 'self' : ''">
+        <p>
+          <a-typography-paragraph>
+            <a-typography-text strong >{{this.getUsernameById(c.senderId) + " "}}</a-typography-text>
+            <a-typography-text class="font-size-sm">{{this.timestampFormat(c.creationTime)}}</a-typography-text>
+          </a-typography-paragraph>
+        </p>
+        <div class="margin-xss-left" v-html="c.content"/>
+      </div>
+    </div>
+  </a-modal>
+
 </template>
 
 <script>
@@ -469,7 +474,7 @@ export default {
     },
     loadHistoryMessage(contact, el) {
 
-      if (contact.lastLoadMessage) {
+      if (contact.lastLoadMessage && this.current.history.lastLoadMessage) {
         return ;
       }
 
@@ -550,8 +555,31 @@ export default {
             }
           });
     },
-    retrySend(current, content) {
-      console.log(current, content);
+    retrySend(id) {
+
+      let message = this.current.contact.messages.find(m => m.contents.find(c => c.id === id));
+
+      if (!message) {
+        return ;
+      }
+
+      let content = message.contents.find(c => c.id === id);
+      if (!content) {
+        return ;
+      }
+
+      let index = message.contents.indexOf(content);
+      if (index < 0) {
+        return ;
+      }
+
+      message.contents.splice(index, 1);
+      if (message.contents.length === 0) {
+        this.current.contact.messages.splice(this.current.contact.messages.indexOf(message), 1);
+      }
+
+      this.inputContent = content.content;
+      this.send();
     },
     addMessage(contact, message, unshift) {
 
@@ -919,9 +947,10 @@ export default {
 
       return !array.includes(source);
     },
-    selectCalendar() {
+    selectCalendar(date) {
 
       this.current.history.search.status = true;
+      this.current.history.search.date = date;
       this.current.history.calendar.show = false;
       this.current.history.lastLoadMessage = false;
 
@@ -932,11 +961,13 @@ export default {
     clearSearch() {
       this.current.history.messages = [];
       this.current.history.search.status = false;
-      this.current.history.search.date = this.$moment.now();
-      this.current.history.search.text = '';
+      this.current.history.search.date = "";
+      this.current.history.search.text = "";
       this.current.history.lastLoadMessage = false;
-      this.current.history.loadMessages.forEach((d) => this.current.history.messages.unshift(d));
-      this.$nextTick(() => this.$refs["history-content"].scrollTop = this.$refs["history-content"].scrollHeight);
+      this.$nextTick(() => {
+        this.current.history.loadMessages.forEach((d) => this.current.history.messages.unshift(d));
+        this.$refs["history-content"].scrollTop = this.$refs["history-content"].scrollHeight
+      });
     }
   },
   data() {
@@ -960,7 +991,7 @@ export default {
           show:false,
           search: {
             text:'',
-            date:'',
+            date:null,
             status: false,
           },
           messages:[],

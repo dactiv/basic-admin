@@ -15,11 +15,12 @@
       display: inline-block;
       min-width: 30px;
       min-height: 35px;
+      max-width: 570px;
       padding: @padding-sm;
       p {
         margin:0;
       }
-      .self {
+      &.self {
         color: @black;
         background-color: @primary-1;
       }
@@ -29,13 +30,15 @@
     }
   }
   .tool-bar {
+    background-color: fade(@black, 5%);
     .ant-menu {
       height: 100%;
       .ant-menu-item{
+        background-color: fade(@black, 5%);
         padding: 0;
         text-align: center;
         .icon {
-          font-size: 20px!important;
+          font-size: 24px!important;
         }
       }
     }
@@ -49,19 +52,8 @@
     main,header  {
       margin-left: 280px;
     }
-    .contact-history {
-      background-color: @white;
-      .history {
-        height: calc(100% - 98px);
-        padding: @padding-sm;
-        overflow: auto;
-        .self {
-          color: @primary-color;
-        }
-      }
-    }
     header {
-      .contact-history();
+      background-color: @white;
       padding: 0 @padding-sm;
     }
     .ant-menu {
@@ -75,7 +67,7 @@
   }
   .input {
     height: 165px;
-    .ant-drawer-body.contact-history();
+    background-color: @white;
     .ql-toolbar {
       border-left: none;
       &.ql-snow {
@@ -110,10 +102,6 @@
     height: calc(100% - 64px);
     overflow: auto;
   }
-  .group-tool-bar {
-    padding: @padding-xss @padding-sm;
-    background-color: fade(@black, 5%);
-  }
   .contacts-name {
     line-height: 20px;
   }
@@ -129,5 +117,12 @@
     .ant-avatar {
       margin-right: @margin-sm;
     }
+  }
+}
+
+.history {
+  .message-content {
+    max-height: 350px;
+    overflow: auto;
   }
 }
