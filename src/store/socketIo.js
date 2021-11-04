@@ -12,13 +12,16 @@ export const SOCKET_EVENT_TYPE = {
     ERROR:"error",
     CONNECT_ERROR:"connect_error",
     CONNECT_TIMEOUT:"connect_timeout",
-    CLIENT_DISCONNECT: "client_disconnect",
-    SAVE_GROUP:"save_group",
-    DELETE_GROUP:"delete_group",
+    CLIENT_DISCONNECT:"client_disconnect",
+    GROUP_SAVE:"group_save",
+    GROUP_DELETE:"group_delete",
+    CONSOLE_USER_SAVE:"console_user_save",
+    CONSOLE_USER_DELETE:"console_user_delete",
     CHAT_MESSAGE:"chat_message",
     CHAT_READ_MESSAGE:"chat_read_message",
-    SAVE_CONSOLE_USER:"save_console_user",
-    DELETE_CONSOLE_USER:"delete_console_user"
+    ROOM_CREATE:"room_create",
+    ROOM_JOIN:"room_join",
+    ROOM_DELETE:"room_delete"
 }
 
 export const SOCKET_IO_ACTION_TYPE = {

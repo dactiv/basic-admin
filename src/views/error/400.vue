@@ -6,9 +6,9 @@
 
   <h1 class="text-center margin-lg-top margin-lg-bottom">您提交的参数不正确.</h1>
 
-  <a-row>
-    <a-col :span="12" :offset="6">
-      <a-table class="ant-table-striped basic-box-shadow" :pagination="false" :data-source="dataSource" :columns="columns" bordered>
+  <a-row type="flex" justify="center">
+    <a-col :span="18">
+      <a-table class="ant-table-striped basic-box-shadow" :pagination="false" :data-source="dataSource" :columns="columns" :scroll="{ x: 700 }" bordered>
 
       </a-table>
     </a-col>
@@ -27,15 +27,22 @@
 
 export default {
   name: "400",
-  computed: {
-      dataSource() {
-        let json = JSON.parse(sessionStorage.getItem("400"));
-        return json.data || [];
-      }
+  created() {
+    let json = JSON.parse(sessionStorage.getItem("400"));
+    if (json) {
+      this.dataSource = json.data || []
+    }
   },
   data() {
     return {
+      dataSource:[],
       columns:[
+        {
+          title: "错误代码",
+          dataIndex: "code",
+          ellipsis: true,
+          width: 200
+        },
         {
           title: "字段信息",
           dataIndex: "field",
@@ -46,13 +53,7 @@ export default {
           title: "错误信息",
           dataIndex: "defaultMessage",
           ellipsis: true,
-          width: 200
-        },
-        {
-          title: "错误信息",
-          dataIndex: "code",
-          ellipsis: true,
-          width: 200
+          width: 300
         }
       ],
     }

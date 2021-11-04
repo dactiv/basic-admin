@@ -26,12 +26,12 @@
             </div>
             <div class="left-content">
               <a-menu v-show="this.tab === 'message'" @click="selectContact" :selectedKeys="selectedKeys" mode="vertical">
-                <a-menu-item v-for="c of this.contacts" :key="c.id" >
+                <a-menu-item v-for="c of this.contacts" :key="c.type + '-' + c.id" >
                   <a-dropdown :trigger="['contextmenu']">
                     <a-row type="flex" justify="space-around" align="middle">
                       <a-col :span="4">
                         <a-badge :count="c.messages.reduce((s, m) => s + m.contents.filter(c => c.status === 'unread').length, 0)" :offset="[x=-25, y=0]">
-                          <a-avatar :src="this.getPrincipalAvatarByUserId(c.id)" >
+                          <a-avatar :src="c.type === 10 ? this.getPrincipalAvatarByUserId(c.id) : null" :shape="c.type === 10 ? 'circle' : 'square'">
                             {{ c.title.substring(0, 1) }}
                           </a-avatar>
                         </a-badge>
@@ -58,34 +58,37 @@
                     </a-row>
                     <template #overlay>
                       <a-menu @click="contextMenuClick">
-                        <a-menu-item :key="c.id + '-top'"><icon-font class="icon" :type="c.top ? 'icon-unstar' : 'icon-star'" /> {{c.top ? '取消置顶' : '置顶'}}</a-menu-item>
-                        <a-menu-item :key="c.id + '-read'"><icon-font class="icon" type="icon-survey" /> 设置为已读</a-menu-item>
-                        <a-menu-item v-if="!c.top" :key="c.id + '-disturb'">
+                        <a-menu-item :key="c.id + '-' + c.type + '-top'"><icon-font class="icon" :type="c.top ? 'icon-unstar' : 'icon-star'" /> {{c.top ? '取消置顶' : '置顶'}}</a-menu-item>
+                        <a-menu-item :key="c.id + '-' + c.type + '-read'"><icon-font class="icon" type="icon-survey" /> 设置为已读</a-menu-item>
+                        <a-menu-item v-if="!c.top" :key="c.id + '-' + c.type + '-disturb'">
                           <icon-font class="icon" :type="c.disturb ? 'icon-success' : 'icon-stop'" /> {{c.disturb ? '取消免打扰' : '消息免打扰'}}
                         </a-menu-item>
                         <a-menu-divider />
-                        <a-menu-item :key="c.id + '-delete'"><icon-font class="icon" type="icon-error" /> 删除</a-menu-item>
+                        <a-menu-item :key="c.id + '-' + c.type + '-delete'"><icon-font class="icon" type="icon-error" /> 删除</a-menu-item>
                       </a-menu>
                     </template>
                   </a-dropdown>
                 </a-menu-item>
               </a-menu>
               <div v-show="this.tab === 'group'">
-                <a-tree @select="selectTreeContact" show-icon :load-data="loadGroupData" :replaceFields="{title:'name', key:'id'}" :tree-data="this.groupData">
+                <a-tree @select="selectTreeContact" show-icon :load-data="loadTreeData" :replaceFields="{title:'name', key:'id'}" :tree-data="this.groupData">
                   <template #group>
                     <icon-font class="icon" type="icon-folder-close" />
                   </template>
-                  <template #root>
+                  <template #room>
+                    <icon-font class="icon" type="icon-user-groups" />
+                  </template>
+                  <template #contact>
                     <icon-font class="icon" type="icon-profile" />
                   </template>
                   <template #title="{name, id}">
-                    <div v-if="id.includes('user-')" class="group-user">
-                      <a-avatar size="small" :src="this.getPrincipalAvatarByUserId(id.replace('user-',''))">
+                    <div v-if="id.includes('user-') || id.includes('room-')" class="group-user">
+                      <a-avatar size="small" :src="id.includes('user-') ? this.getPrincipalAvatarByUserId(id.replace('user-','')) : ''" :shape="id.includes('user-') ? 'circle' : 'square'">
                         {{name.substring(0,1)}}
                       </a-avatar>
-                      <a-typography-text strong>{{ name }}</a-typography-text>
+                      <a-typography-text strong :content="name" />
                     </div>
-                    <a-typography-text v-else>{{ name }}</a-typography-text>
+                    <a-typography-text v-else :content="name" />
                   </template>
                 </a-tree>
               </div>
@@ -98,15 +101,15 @@
           <a-row>
             <a-col :span="20">
               <a-space v-if="this.current.contact.id > 0" :size="10" class="padding-left">
-                <a-avatar :src="this.getPrincipalAvatarByUserId(current.contact.id)" >
+                <a-avatar :src="this.current.contact.type === 10 ? this.getPrincipalAvatarByUserId(this.current.contact.id) : null" :shape="this.current.contact.type === 10 ? 'circle' : 'square'" >
                   {{ this.current.contact.title.substring(0,1) }}
                 </a-avatar>
                 <a-typography-text strong>{{ this.current.contact.title }}</a-typography-text>
               </a-space>
             </a-col>
             <a-col :span="4" class="text-right">
-              <a-button type="text">
-                <icon-font class="icon" type="icon-all" />
+              <a-button type="text" @click="this.room.show = true" v-if="this.current.contact.type === 10">
+                <icon-font class="icon" type="icon-user-groups" />
               </a-button>
             </a-col>
           </a-row>
@@ -157,24 +160,18 @@
               </template>
             </div>
             <div class="input border-top" v-if="this.current.contact.id > 0">
-              <QuillEditor toolbar="#chat-toolbar" ref="editor" v-model:content="this.inputContent" @keyup.ctrl.enter="send()" content-type="html">
+              <QuillEditor toolbar="#chat-toolbar" ref="editor" v-model:content="this.inputContent" @keyup.ctrl.enter="sendMessage()" content-type="html">
                 <template #toolbar>
                   <div id="chat-toolbar" class="border-bottom">
-                    <a-row>
-                      <a-col :span="18">
                         <button class="ql-bold" />
                         <button class="ql-italic" />
                         <button class="ql-link" />
                         <button class="ql-image" />
                         <button class="ql-video" />
                         <button class="ql-list" value="ordered" />
-                      </a-col>
-                      <a-col :span="6" class="text-right">
                         <button class="custom ql-contact-history" @click="showContactHistory">
                           <icon-font class="icon" type="icon-time" />
                         </button>
-                      </a-col>
-                    </a-row>
                   </div>
                 </template>
               </QuillEditor>
@@ -185,14 +182,57 @@
     </a-layout>
   </a-drawer>
 
+  <a-modal v-model:visible="this.room.show" @cancel="this.room.selectedUser = []" @ok="this.createRoom" :destroyOnClose="true" :mask="false" :maskClosable="false" title="创建多人聊天" class="room">
+    <a-row class="height-100-percent">
+      <a-col :span="8" class="border-right padding height-100-percent">
+        <a-row>
+          <a-col :span="24" >
+            <a-input placeholder="搜索" />
+          </a-col>
+        </a-row>
+        <a-divider class="font-size-sm"> <icon-font class="icon" type="icon-user-groups" /> 选择用户</a-divider>
+        <div class="tree-content">
+          <a-tree checkable @check="roomUserCheck" show-icon :load-data="loadTreeData" :replaceFields="{title:'name', key:'id'}" :tree-data="this.room.contactData">
+            <template #group>
+              <icon-font class="icon" type="icon-folder-close" />
+            </template>
+            <template #contact>
+              <icon-font class="icon" type="icon-profile" />
+            </template>
+            <template #title="{name, id}">
+              <div v-if="id.includes('user-')" class="group-user">
+                <a-avatar size="small" :src="this.getPrincipalAvatarByUserId(id.replace('user-',''))">
+                  {{name.substring(0,1)}}
+                </a-avatar>
+                <a-typography-text strong class="margin-left" :content="name" />
+              </div>
+              <a-typography-text v-else :content="name" />
+            </template>
+          </a-tree>
+        </div>
+      </a-col>
+      <a-col :span="16" class="padding height-100-percent overflow-auto">
+        <a-card v-if="this.room.selectedUser.length > 0">
+          <a-card-grid v-for="u of this.room.selectedUser" :key="u.key" style="width: 25%; text-align: center">
+            <a-avatar :src="this.getPrincipalAvatarByUserId(u.key.replaceAll('user-',''))" >
+              {{ u.props.name.substring(0,1) }}
+            </a-avatar>
+            <div>
+              <a-typography-text :ellipsis="true" wid strong>{{ u.props.name }}</a-typography-text>
+            </div>
+          </a-card-grid>
+        </a-card>
+        <a-empty v-else class="margin-lg-top padding-lg-top"/>
+      </a-col>
+    </a-row>
+  </a-modal>
+
   <a-modal v-model:visible="this.current.history.show" :destroyOnClose="true" :mask="false" :maskClosable="false" :footer="null" class="history" title="聊天记录" width="500px">
     <a-input v-model:value="this.current.history.search.text">
       <template #addonAfter>
         <a-popover v-model:visible="this.current.history.calendar.show" title="选择时间" trigger="click">
           <template #content>
-            <a-calendar :fullscreen="false" @select="this.selectCalendar" :disabled-date="this.disabledHistoryDate">
-
-            </a-calendar>
+            <a-calendar :fullscreen="false" @select="this.selectCalendar" :disabled-date="this.disabledHistoryDate" />
           </template>
           <icon-font class="icon" type="icon-time" />
         </a-popover>
@@ -261,6 +301,16 @@ export default {
       callback:this.onChatMessage
     });
 
+    this.$store.dispatch(SOCKET_IO_ACTION_TYPE.SUBSCRIBE,{
+      name:SOCKET_EVENT_TYPE.ROOM_CREATE,
+      callback:this.onRoomCreate
+    });
+
+    this.$store.dispatch(SOCKET_IO_ACTION_TYPE.SUBSCRIBE,{
+      name:SOCKET_EVENT_TYPE.ROOM_DELETE,
+      callback:this.onRoomDelete
+    });
+
     this.current.contact = JSON.parse(JSON.stringify(this.defaultContactValue));
   },
   mounted() {
@@ -277,6 +327,46 @@ export default {
     window.onblur = () => _this.hasFocus = false;
   },
   methods:{
+    onRoomDelete(data) {
+      let id = JSON.parse(data).data;
+      let c = this.contacts.find(c => c.id === id && c.type === 20);
+
+      if (!c) {
+        return ;
+      }
+
+      this.contacts.splice(this.contacts.indexOf(c), 1);
+    },
+    onRoomCreate(data) {
+      let json = JSON.parse(data).data;
+      this.addContact({
+        id: json.id,
+        title: json.name,
+        type: 20
+      });
+    },
+    roomUserCheck(checkedKeys, e) {
+      this.room.selectedUser = e.checkedNodes.filter(c => c.key.indexOf('group-') < 0 && c.key !== 'contact');
+    },
+    createRoom() {
+      if (!this.room.selectedUser || this.room.selectedUser.length <= 0) {
+        return ;
+      }
+
+      let userIds = this.room.selectedUser.map((v) => v.key.replaceAll("user-",""));
+      let array = [];
+      let defaultNameSize = process.env.VUE_APP_SOCKET_CHAT_ROOM_DEFAULT_NAME_SIZE * 1;
+      for (let i = 0; i < Math.min(this.room.selectedUser.length, defaultNameSize); i++) {
+        array.push(this.room.selectedUser[i].props.name);
+      }
+
+      let name = array.join(process.env.VUE_APP_SOCKET_CHAT_ROOM_DEFAULT_NAME_SEPARATOR);
+      let param = {name, userIds};
+      this
+          .$http
+          .post("/socket-server/room/createRoom", this.formUrlencoded(param))
+          .then(() => this.room.show = false);
+    },
     showContactHistory() {
       if (this.current.contact.id === 0) {
         return ;
@@ -318,7 +408,7 @@ export default {
       if (typeof(data) === 'string') {
         json = JSON.parse(data).data;
       }
-      let contact = this.contacts.find(c => c.id === json.id);
+      let contact = this.contacts.find(c => c.id === json.id && c.type === json.type);
       let contents = contact.messages.flatMap(m => m.contents)
 
       json.messageIds.forEach(id => {
@@ -339,7 +429,7 @@ export default {
       if (typeof(data) === 'string') {
         json = JSON.parse(data).data;
       }
-      let contact = this.contacts.find(c => c.id === json.id);
+      let contact = this.contacts.find(c => c.id === json.id && c.type === json.type);
 
       json.messages.forEach(m => {
         m.status = "unread";
@@ -390,10 +480,12 @@ export default {
       }
     },
     contextMenuClick(o) {
-      let id = o.key.substring(0, o.key.indexOf("-")) * 1;
-      let key = o.key.substring(o.key.indexOf("-") + 1, o.key.length);
+      let button = o.key.substring(0, o.key.lastIndexOf("-"));
+      let id = button.substring(0, o.key.indexOf("-")) * 1;
+      let type = button.substring(o.key.indexOf("-") + 1, button.length) * 1;
+      let key = o.key.substring(o.key.lastIndexOf("-") + 1, o.key.length);
 
-      let target = this.contacts.find(c => c.id === id);
+      let target = this.contacts.find(c => c.id === id && c.type === type);
       if (!target) {
         return ;
       }
@@ -498,7 +590,7 @@ export default {
       let param = {
         targetId: contact.id,
         time: time,
-        size: 10
+        size: process.env.VUE_APP_SOCKET_CHAT_MESSAGE_PAGE_SIZE * 1
       };
 
       this
@@ -506,7 +598,7 @@ export default {
           .post("/socket-server/chat/getHistoryMessagePage", this.formUrlencoded(param))
           .then((r) => {
             let data = r.data.data;
-            let c = this.contacts.find(c => c.id === contact.id);
+            let c = this.contacts.find(c => c.id === contact.id  && c.type === contact.type);
 
             let beforeHeight = 0;
 
@@ -643,17 +735,19 @@ export default {
     getRecentContactsProfile(data) {
       let param = {
         type:"Console",
-        ids:data
+        ids:data.map((v) => v.id)
       }
       this
           .$http
           .post("/authentication/getPrincipalProfile",this.formUrlencoded(param))
           .then(r => {
-            let data = r.data.data;
-            data.forEach(d => {
+            let profile = r.data.data;
+            profile.forEach(p => {
+              let current = data.find((d) => d.id === p.id);
               this.addContact({
-                id:d.id,
-                title:this.getPrincipalName(d),
+                id:p.id,
+                title:this.getPrincipalName(p),
+                type: current.type
               });
               this.getSocketTempMessages();
             })
@@ -691,13 +785,8 @@ export default {
         this.readMessage(this.current.contact);
       }
     },
-    send() {
-      let param = {
-        recipientId:this.current.contact.id,
-        content:this.inputContent
-      };
-
-      let contact = this.contacts.find(c => c.id === param.recipientId);
+    sendMessage() {
+      let contact = this.contacts.find(c => c.id === this.current.contact.id && c.type === this.current.contact.type);
       contact.messages = contact.messages || [];
 
       let content = this.addMessage(contact, {
@@ -705,8 +794,28 @@ export default {
         creationTime: this.$moment.now(),
         status: "sending",
         tooltip:"发送中...",
-        content:param.content,
+        content: this.inputContent,
       });
+
+      if (this.current.contact.type === 10) {
+        this.sendPersonMessage(contact,content);
+      } else {
+        this.sendGroupMessage(contact,content)
+      }
+
+      this.$refs["editor"].setContents("");
+      this.inputContent = "";
+
+      this.$nextTick(() => this.$refs["message-content"].scrollTop = this.$refs["message-content"].scrollHeight);
+    },
+    sendGroupMessage(contact, content) {
+      console.log(contact, content);
+    },
+    sendPersonMessage(contact, content) {
+      let param = {
+        recipientId:contact.id,
+        content:content.contents[0].content
+      };
 
       let current = contact.messages[content.messageIndex].contents[content.currentIndex];
 
@@ -722,25 +831,20 @@ export default {
             contact.lastSendTime = content.creationTime;
 
             localStorage.setItem(this.getLocalStorageContactName(this.principal.details.id), JSON.stringify(this.contacts));
-            this.$nextTick(() => this.$refs["message-content"].scrollTop = this.$refs["message-content"].scrollHeight);
+            //this.$nextTick(() => this.$refs["message-content"].scrollTop = this.$refs["message-content"].scrollHeight);
           })
           .catch((r) => {
             current.status = "fail";
             current.tooltip = r.data.message;
             localStorage.setItem(this.getLocalStorageContactName(this.principal.details.id), JSON.stringify(this.contacts));
-            this.$nextTick(() => this.$refs["message-content"].scrollTop = this.$refs["message-content"].scrollHeight);
+            //this.$nextTick(() => this.$refs["message-content"].scrollTop = this.$refs["message-content"].scrollHeight);
           });
-
-      this.$refs["editor"].setContents("");
-      this.inputContent = "";
-
-      this.$nextTick(() => this.$refs["message-content"].scrollTop = this.$refs["message-content"].scrollHeight);
     },
     toolbarSelect(info) {
       this.tab = info.key;
       this.selectedToolBar = [info.key];
     },
-    loadGroupData(treeNode) {
+    loadTreeData(treeNode) {
       return new Promise((resolve) => {
         if (treeNode.dataRef.children) {
           resolve();
@@ -752,17 +856,37 @@ export default {
         if (currentGroups) {
           treeNode.dataRef.children = currentGroups;
           resolve();
+          return;
+        }
+
+        if (treeNode.eventKey === "room") {
+          this.$http
+              .get("/socket-server/room/getCurrentPrincipalRooms")
+              .then(r => {
+                treeNode.dataRef.children = r.data.data || [];
+                if (treeNode.dataRef.children.length > 0) {
+                  treeNode.dataRef.children.forEach(c => {
+                    //c.slots = { icon: 'room' };
+                    c.id = "room-" + c.id;
+                    c.isLeaf = true
+                    c.slots = { icon: 'room-children' };
+                  });
+                }
+                this.tree.groups[treeNode.eventKey] = treeNode.dataRef.children;
+                localStorage.setItem(process.env.VUE_APP_LOCAL_STORAGE_CHAT_GROUP_NAME, JSON.stringify(this.tree.groups));
+                resolve();
+              })
         } else {
+
           let param = {};
 
-          if (treeNode.eventKey === "root") {
+          if (treeNode.eventKey === "contact") {
             param["filter_[parent_id_eqn]"] = "true";
           } else {
             param["filter_[parent_id_eq]"] = treeNode.eventKey.replace("group-","");
           }
 
-          this
-              .$http
+          this.$http
               .post("/authentication/group/find", this.formUrlencoded(param))
               .then(r => {
 
@@ -778,24 +902,28 @@ export default {
                 this.tree.groups[treeNode.eventKey] = treeNode.dataRef.children;
                 localStorage.setItem(process.env.VUE_APP_LOCAL_STORAGE_CHAT_GROUP_NAME, JSON.stringify(this.tree.groups));
 
-                if (treeNode.eventKey !== "root") {
-                  this.loadGroupUser(treeNode);
+                if (treeNode.eventKey !== "contact") {
+                  this.loadTreeUser(treeNode);
                 }
 
                 resolve();
 
               });
         }
-
       });
     },
-    loadGroupUser(treeNode) {
+    loadTreeUser(treeNode) {
 
       this
           .$http
           .get("/authentication/console/user/findByGroup?groupId=" + treeNode.eventKey.replace("group-",""))
           .then(u => {
             let users = u.data.data;
+
+            if (!users) {
+              return ;
+            }
+
             users.forEach(u => {
               if (u.id === this.principal.details.id) {
                 return ;
@@ -833,7 +961,7 @@ export default {
         return this.getPrincipalName(this.principal.details);
       }
 
-      let contact = this.contacts.find(u => u.id === id);
+      let contact = this.contacts.find(u => u.id === id && u.type === 10);
 
       if (contact) {
         return contact.title;
@@ -848,7 +976,8 @@ export default {
       return "用户 [" + id + "]";
     },
     addContact(contact) {
-      let currentContact = this.contacts.find(c => c.id === contact.id);
+
+      let currentContact = this.contacts.find(c => c.id === contact.id && c.type === contact.type);
       if (currentContact) {
         this.contacts.splice(this.contacts.indexOf(currentContact),1);
         currentContact.title = contact.title;
@@ -873,11 +1002,15 @@ export default {
         return ;
       }
 
+      let key = selectedKeys[0];
+      let type = key.indexOf("user-") >= 0 ? 10: 20;
+
       let contact = {
-        id:selectedKeys[0].replaceAll("user-","") * 1,
+        id: (type === 10 ? key.replaceAll("user-", "") : key.replaceAll("room-", ""))  * 1,
         title: info.node.dataRef.name,
+        type:type
       }
-      this.selectedKeys = [contact.id];
+      this.selectedKeys = [contact.type + "-" + contact.id];
       this.current.history.show = false;
 
       this.current.contact = this.addContact(contact);
@@ -886,18 +1019,21 @@ export default {
       this.selectedToolBar = ["message"];
     },
     selectContact(record){
-      let id = record.key * 1;
+      let id = record.key.substring(record.key.indexOf("-") + 1, record.key.length) * 1;
+      let type = record.key.substring(0, record.key.indexOf("-")) * 1;
 
       if (this.current.contact.id > 0 && this.current.contact.id === id) {
         return ;
       }
-      this.selectedKeys = [id];
+
+      this.selectedKeys = [record.key];
 
       this.current.history.show = false;
+      this.current.contact = this.contacts.find(c => c.id === id && c.type === type);
 
-      this.current.contact = this.contacts.find(c => c.id === id);
+      let pageSize = process.env.VUE_APP_SOCKET_CHAT_MESSAGE_PAGE_SIZE * 1
 
-      if (this.current.contact.messages.length <= 0 && !this.current.contact.lastLoadMessage) {
+      if (this.current.contact.messages.length < pageSize && !this.current.contact.lastLoadMessage) {
         this.loadHistoryMessage(this.current.contact, this.$refs["message-content"]);
       }
 
@@ -976,6 +1112,15 @@ export default {
         users: JSON.parse(localStorage.getItem(process.env.VUE_APP_LOCAL_STORAGE_CHAT_USER_NAME)) || [],
         groups: JSON.parse(localStorage.getItem(process.env.VUE_APP_LOCAL_STORAGE_CHAT_GROUP_NAME)) || {},
       },
+      room: {
+        show:false,
+        selectedUser:[],
+        contactData:[{
+          name: '联系人',
+          id: 'contact',
+          slots : { icon: 'contact' }
+        }],
+      },
       hasFocus:true,
       selectedToolBar:["message"],
       selectedKeys:[],
@@ -1007,7 +1152,15 @@ export default {
       contacts: JSON.parse(localStorage.getItem(this.getLocalStorageContactName(this.principal.details.id))) || [],
       inputContent:"",
       tab:"message",
-      groupData:[{ name: '联系人', id: 'root', slots : { icon: 'root' }}]
+      groupData:[{
+        name: '联系人',
+        id: 'contact',
+        slots : { icon: 'contact' }
+      }, {
+        name:'群组',
+        id: 'room',
+        slots : { icon: 'room' }
+      }]
     }
   }
 }
