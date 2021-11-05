@@ -1,5 +1,57 @@
 <template >
   <a-drawer :width="950" placement="right" :closable="false" :afterVisibleChange="visibleChange" v-model:visible="this.visible" class="chat">
+
+    <a-drawer width="250" :closable="false" :visible="this.groupDrawer.visible" :bodyStyle="{'padding':'0px'}">
+      <div class="text-right">
+        <a-button type="text" @click="this.groupDrawer.visible = false" class="padding-xss-left padding-xss-right">
+          <icon-font class="icon" type="icon-close" />
+        </a-button>
+      </div>
+
+      <div class="padding">
+        <a-divider class="font-size-sm" orientation="left">名称</a-divider>
+        <a-space>
+          <a-button type="text" class="padding-none" @click="this.groupDrawer.editable = !this.groupDrawer.editable">
+            <icon-font class="icon" :type="this.groupDrawer.editable ? 'icon-select' : 'icon-edit'" />
+          </a-button>
+          <a-input v-if="this.groupDrawer.editable" @blur="this.groupDrawer.editable = false" @keyup.enter="this.groupDrawer.editable = false" v-model:value="this.current.contact.title" />
+          <a-typography-text v-else :ellipsis="true" v-model:content="this.current.contact.title" style="width: 175px"/>
+        </a-space>
+
+        <a-divider class="font-size-sm" orientation="left">备注</a-divider>
+        <a-empty v-if="!this.current.contact.reamrk"></a-empty>
+        <p v-else>{{this.current.contact.reamrk}}</p>
+
+        <a-divider class="font-size-sm" orientation="left">成员信息</a-divider>
+
+        <a-row type="flex" justify="space-around" align="middle" class="margin-bottom">
+          <a-input-search placeholder="搜索" v-model:value="this.groupDrawer.searchText" />
+        </a-row>
+
+        <a-row type="flex" justify="space-around" align="middle" class="margin-bottom">
+          <a-col :span="12">
+            <a-button @click="this.room.visible = true">
+              <icon-font class="icon" type="icon-add" /> 添加
+            </a-button>
+          </a-col>
+          <a-col :span="12" class="text-right">
+            <a-button danger>
+              <icon-font class="icon" type="icon-ashbin" /> 解散
+            </a-button>
+          </a-col>
+        </a-row>
+
+        <a-space direction="vertical">
+          <a-space v-for="p of this.current.contact.participants" :key="p.id">
+            <a-avatar :src="this.getPrincipalAvatarByUserId(p.userId)">
+              {{ this.getUsernameById(p.userId).substring(0,1) }}
+            </a-avatar>
+            <a-typography-text strong>{{ this.getUsernameById(p.userId) }}</a-typography-text>
+          </a-space>
+        </a-space>
+      </div>
+    </a-drawer>
+
     <a-layout class="height-100-percent">
       <a-layout-sider class="main-aside border-right" :width="280">
         <a-row class="height-100-percent">
@@ -108,8 +160,8 @@
               </a-space>
             </a-col>
             <a-col :span="4" class="text-right">
-              <a-button type="text" @click="this.room.show = true" v-if="this.current.contact.type === 10">
-                <icon-font class="icon" type="icon-user-groups" />
+              <a-button type="text" @click="this.current.contact.id >= 0 && this.current.contact.type === 10 ? this.room.visible = true : this.groupDrawer.visible = true">
+                <icon-font class="icon" :type="this.current.contact.id >= 0 && this.current.contact.type === 10 ? 'icon-user-groups' : 'icon-image-text'" />
               </a-button>
             </a-col>
           </a-row>
@@ -170,7 +222,7 @@
                         <button class="ql-video" />
                         <button class="ql-list" value="ordered" />
                         <button class="custom ql-contact-history" @click="showContactHistory">
-                          <icon-font class="icon" type="icon-time" />
+                          <icon-font class="icon" type="icon-history" />
                         </button>
                   </div>
                 </template>
@@ -182,7 +234,7 @@
     </a-layout>
   </a-drawer>
 
-  <a-modal v-model:visible="this.room.show" @cancel="this.room.selectedUser = []" @ok="this.createRoom" :destroyOnClose="true" :mask="false" :maskClosable="false" title="创建多人聊天" class="room">
+  <a-modal v-model:visible="this.room.visible" @cancel="this.room.selectedUser = []" @ok="this.createRoom" :destroyOnClose="true" :mask="false" :maskClosable="false" title="创建多人聊天" class="room">
     <a-row class="height-100-percent">
       <a-col :span="8" class="border-right padding height-100-percent">
         <a-row>
@@ -227,10 +279,10 @@
     </a-row>
   </a-modal>
 
-  <a-modal v-model:visible="this.current.history.show" :destroyOnClose="true" :mask="false" :maskClosable="false" :footer="null" class="history" title="聊天记录" width="500px">
+  <a-modal v-model:visible="this.current.history.visible" :destroyOnClose="true" :mask="false" :maskClosable="false" :footer="null" class="history" title="聊天记录" width="500px">
     <a-input v-model:value="this.current.history.search.text">
       <template #addonAfter>
-        <a-popover v-model:visible="this.current.history.calendar.show" title="选择时间" trigger="click">
+        <a-popover v-model:visible="this.current.history.calendar.visible" title="选择时间" trigger="click">
           <template #content>
             <a-calendar :fullscreen="false" @select="this.selectCalendar" :disabled-date="this.disabledHistoryDate" />
           </template>
@@ -365,15 +417,15 @@ export default {
       this
           .$http
           .post("/socket-server/room/createRoom", this.formUrlencoded(param))
-          .then(() => this.room.show = false);
+          .then(() => this.room.visible = false);
     },
     showContactHistory() {
       if (this.current.contact.id === 0) {
         return ;
       }
-      this.current.history.show = !this.current.history.show;
+      this.current.history.visible = !this.current.history.visible;
 
-      if (this.current.history.show) {
+      if (this.current.history.visible) {
 
         if (this.current.contact.messages && this.current.contact.messages.length > 0) {
           this.current.contact.messages.flatMap(m => m.contents).forEach((d) => {
@@ -516,7 +568,7 @@ export default {
     },
     clearCurrentHistory() {
       this.current.history.lastLoadMessage = false;
-      this.current.history.calendar.show = false;
+      this.current.history.calendar.visible = false;
       this.current.history.calendar.enabledDate = [];
       this.current.history.messages = [];
       this.current.history.lastLoadMessage = [];
@@ -546,7 +598,7 @@ export default {
         });
       }
 
-      if (this.current.history.show) {
+      if (this.current.history.visible) {
         this.$nextTick(() => this.$refs["history-content"].scrollTop = this.$refs["history-content"].scrollHeight);
       }
 
@@ -577,7 +629,7 @@ export default {
         if (message.contents.length > 0) {
           time = this.$moment(message.contents[0].creationTime);
         }
-      } else if (this.current.contact.id === contact.id && this.current.history.show) {
+      } else if (this.current.contact.id === contact.id && this.current.history.visible) {
         time = this.current.history.search.status && this.current.history.messages.length === 0 ? this.current.history.search.date : undefined;
         if (!time) {
           let message = this.current.history.messages[0];
@@ -624,7 +676,7 @@ export default {
               }
 
               localStorage.setItem(this.getLocalStorageContactName(this.principal.details.id), JSON.stringify(this.contacts));
-            } else if (this.current.contact.id === contact.id && this.current.history.show) {
+            } else if (this.current.contact.id === contact.id && this.current.history.visible) {
 
               this.current.history.lastLoadMessage = data.last;
 
@@ -1010,8 +1062,13 @@ export default {
         title: info.node.dataRef.name,
         type:type
       }
+
+      if (type === 20) {
+        contact.participants = info.node.dataRef.participantList;
+      }
+
       this.selectedKeys = [contact.type + "-" + contact.id];
-      this.current.history.show = false;
+      this.current.history.visible = false;
 
       this.current.contact = this.addContact(contact);
       this.readMessage(this.current.contact);
@@ -1028,7 +1085,7 @@ export default {
 
       this.selectedKeys = [record.key];
 
-      this.current.history.show = false;
+      this.current.history.visible = false;
       this.current.contact = this.contacts.find(c => c.id === id && c.type === type);
 
       let pageSize = process.env.VUE_APP_SOCKET_CHAT_MESSAGE_PAGE_SIZE * 1
@@ -1087,7 +1144,7 @@ export default {
 
       this.current.history.search.status = true;
       this.current.history.search.date = date;
-      this.current.history.calendar.show = false;
+      this.current.history.calendar.visible = false;
       this.current.history.lastLoadMessage = false;
 
       this.current.history.messages = [];
@@ -1113,7 +1170,7 @@ export default {
         groups: JSON.parse(localStorage.getItem(process.env.VUE_APP_LOCAL_STORAGE_CHAT_GROUP_NAME)) || {},
       },
       room: {
-        show:false,
+        visible:false,
         selectedUser:[],
         contactData:[{
           name: '联系人',
@@ -1127,13 +1184,14 @@ export default {
       defaultContactValue:{
         title:"",
         lastLoadMessage: true,
+        type:10,
         id:0,
         messages:[]
       },
       current: {
         contact:this.defaultContactValue,
         history: {
-          show:false,
+          visible:false,
           search: {
             text:'',
             date:null,
@@ -1143,10 +1201,15 @@ export default {
           loadMessages:[],
           lastLoadMessage:false,
           calendar: {
-            show:false,
+            visible:false,
             enabledDate:[]
           }
         }
+      },
+      groupDrawer:{
+        visible:false,
+        editable:false,
+        searchText:''
       },
       visible: false,
       contacts: JSON.parse(localStorage.getItem(this.getLocalStorageContactName(this.principal.details.id))) || [],
