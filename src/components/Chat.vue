@@ -10,6 +10,7 @@
 
       <div class="padding">
         <a-divider class="font-size-sm" orientation="left">名称</a-divider>
+
         <a-space>
           <a-button type="text" class="padding-none" @click="this.groupDrawer.editable = !this.groupDrawer.editable">
             <icon-font class="icon" :type="this.groupDrawer.editable ? 'icon-select' : 'icon-edit'" />
@@ -25,17 +26,19 @@
         <a-divider class="font-size-sm" orientation="left">成员信息</a-divider>
 
         <a-row type="flex" justify="space-around" align="middle" class="margin-bottom">
-          <a-input-search placeholder="搜索" v-model:value="this.groupDrawer.searchText" />
+          <a-col :span="24">
+            <a-input-search placeholder="搜索" v-model:value="this.groupDrawer.searchText" />
+          </a-col>
         </a-row>
 
-        <a-row type="flex" justify="space-around" align="middle" class="margin-bottom">
+        <a-row type="flex" justify="space-around" align="middle" class="margin-bottom" :gutter="[12,0]">
           <a-col :span="12">
-            <a-button @click="this.room.visible = true">
+            <a-button @click="this.room.visible = true" block>
               <icon-font class="icon" type="icon-add" /> 添加
             </a-button>
           </a-col>
-          <a-col :span="12" class="text-right">
-            <a-button danger>
+          <a-col :span="12">
+            <a-button type="primary" danger block>
               <icon-font class="icon" type="icon-ashbin" /> 解散
             </a-button>
           </a-col>

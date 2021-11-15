@@ -3,7 +3,7 @@ import axios from "axios";
 const defaultStatus = {
     id: 0,
     username: "未认证用户",
-    roleAuthorityStrings: [],
+    roleAuthorities: [],
     type: 'Anonymous',
     status: 1,
     statusName: '启用',
@@ -39,7 +39,7 @@ export default {
             return state.resourceAuthorityStrings.includes(permission);
         },
         hasRole: (state) => (role) => {
-            return state.roleAuthorityStrings.includes(role);
+            return !state.roleAuthorities.find(r => r.authority === role) ;
         }
     },
     mutations: {

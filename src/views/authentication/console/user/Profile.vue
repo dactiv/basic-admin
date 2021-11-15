@@ -43,7 +43,7 @@
       </a-upload>
       </p>
       <a-typography-title class="margin-md-top" :level="4" type="secondary">{{ this.getPrincipalName(this.principal.details) }}</a-typography-title>
-      <a-typography-title class="margin-md-top" :level="5" disabled>所在组:{{ this.principal.details.roleAuthorityStrings }}</a-typography-title>
+      <a-typography-title class="margin-md-top" :level="5" disabled>所在组:{{ this.principal.details.roleAuthorities.map(r => r.name) }}</a-typography-title>
 
     </div>
 

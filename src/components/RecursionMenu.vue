@@ -1,6 +1,6 @@
 <template>
   <template v-for="d of data" :key="d.id">
-    <a-menu-item :key="getPath(d)" v-if="!hasChildren(d)" :disabled="d.status !== 1">
+    <a-menu-item :key="getPath(d)" v-if="!hasChildren(d)">
       <router-link :to='getPath(d)'>
         <icon-font class="icon" :type="d.icon" v-if="d.icon ? d.icon : 'icon-file'" />
         <span>{{d.name}}</span>

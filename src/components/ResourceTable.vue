@@ -11,12 +11,8 @@
         </a-button>
       </template>
 
-      <template #sourceName="{ text: sourceName }">
-        <a-space :size="10">
-          <a-tag color="success">
-            {{ sourceName }}
-          </a-tag>
-        </a-space>
+      <template #sourcesName="{ record }">
+        {{record.sourcesName.join(",")}}
       </template>
 
       <template #action="{ record }">
@@ -53,9 +49,9 @@ export default {
           slots: { customRender: 'name' },
         },{
           title: "来源",
-          dataIndex: "sourceName",
+          dataIndex: "sourcesName",
           ellipsis: true,
-          slots: { customRender: 'sourceName' },
+          slots: { customRender: 'sourcesName' },
           width: 120
         },{
           title: "資源值",
