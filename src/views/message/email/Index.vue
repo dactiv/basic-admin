@@ -60,9 +60,9 @@
           <span class="hidden-xs">每页</span>
           <a-input v-model:value="page.size" size="small" @pressEnter="search" :maxlength="4" class="text-center hidden-xs" style="width: 50px" />
           <span class="hidden-xs">条 / 第 1 页</span>
-          <a-button size="small" @click="search(page.number - 1)" :disabled="page.first"><icon-font class="icon" type="icon-arrow-left-bold" /></a-button>
+          <a-button size="small" @click="search(page.number - 1)" :disabled="page.first"><icon-font type="icon-arrow-left-bold" /></a-button>
           {{page.number}}
-          <a-button size="small" @click="search(page.number + 1)" :disabled="page.last"><icon-font class="icon" type="icon-arrow-right-bold" /></a-button>
+          <a-button size="small" @click="search(page.number + 1)" :disabled="page.last"><icon-font type="icon-arrow-right-bold" /></a-button>
 
         </a-space>
 
@@ -215,8 +215,8 @@ export default {
       },
       page: {
         elements:[],
-        first:false,
-        last:false,
+        first:true,
+        last:true,
         number:1
       },
       spinning: false,

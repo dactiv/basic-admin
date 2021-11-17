@@ -156,8 +156,8 @@ export default {
         }],
         page: {
           elements:[],
-          first:false,
-          last:false,
+          first:true,
+          last:true,
           number:1
         },
         form:{
