@@ -15,9 +15,9 @@
 
       <a-image-preview-group>
         <a-space :size="10">
-          <div v-for="v of historyAvatar.values" :key="v" class="border padding">
+          <div v-for="v of historyAvatar.values" :key="v" class="border padding basic-box-shadow">
             <a-image :width="100" :height="100" :src="this.getPrincipalAvatar(v)" />
-            <p class="margin-xss-top">
+            <p class="margin-none border">
               <a-button type="text" v-if="v !== historyAvatar.currentAvatarFilename" @click="selectAvatar(v)">
                 <icon-font class="icon" type="icon-success" />
               </a-button>

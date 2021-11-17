@@ -17,11 +17,10 @@
       <a-descriptions bordered :column="{ xxl: 2, xl: 2, lg: 2, md: 2, sm: 2, xs: 1 }">
 
         <a-descriptions-item label="名称"><icon-font class="icon" :type="!form.icon ? 'icon-unkown' : form.icon" /> {{form.name}} </a-descriptions-item>
-        <a-descriptions-item label="来源">{{ form.sourcesName.join(",")}}</a-descriptions-item>
-        <a-descriptions-item label="代码">{{ form.code }}</a-descriptions-item>
-        <a-descriptions-item label="資源值">{{ form.value ? form.value : ""}}</a-descriptions-item>
-        <a-descriptions-item label="权限值">{{ form.authority ? form.authority : ""}}</a-descriptions-item>
         <a-descriptions-item label="所属应用">{{ form.applicationName }}</a-descriptions-item>
+        <a-descriptions-item label="来源" :span="2">{{ form.sourcesName.join(",")}}</a-descriptions-item>
+        <a-descriptions-item label="資源值" :span="2">{{ form.value ? form.value : ""}}</a-descriptions-item>
+        <a-descriptions-item label="权限值">{{ form.authority ? form.authority : ""}}</a-descriptions-item>
         <a-descriptions-item label="类型">{{ form.typeName }}</a-descriptions-item>
         <a-descriptions-item label="版本号">{{ form.version }}</a-descriptions-item>
         <a-descriptions-item label="顺序值">{{ form.sort ? form.sort : "" }}</a-descriptions-item>
@@ -45,7 +44,7 @@ export default {
         name: "",
         value: "",
         authority: "",
-        sourcesName: "",
+        sourcesName: [""],
         code:"",
         applicationName: "",
         typeName: "",

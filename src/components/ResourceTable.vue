@@ -2,7 +2,7 @@
 
   <a-spin :spinning="spinning">
 
-    <a-table class="ant-table-striped" :row-selection="selection ? { selectedRowKeys: selectedIds, onChange: selectChange, onSelect: select} : undefined" :rowKey="record=>record.id" :scroll="{ x: 880 }" :pagination="false" :data-source="data" :columns="columns" bordered>
+    <a-table class="ant-table-striped" :row-selection="selection ? { selectedRowKeys: selectedIds, onSelect: select} : undefined" :rowKey="record=>record.id" :scroll="{ x: 880 }" :pagination="false" :data-source="data" :columns="columns" bordered>
 
       <template #name="{ record }">
         <a-button type="text">
@@ -36,7 +36,7 @@
 
 export default {
   name:"AuthenticationResourceTable",
-  props:["selection"],
+  props:["selection", "searchData"],
   emits: ['searching', 'search'],
   data() {
     return {
@@ -78,54 +78,42 @@ export default {
   },
   methods:{
     select(record, selected) {
-
+      this.selectedIds = [];
       if (selected) {
-
         let parentIds = this.getParentIds(record);
-
         parentIds.forEach(p => this.selectedIds.push(p));
-
+        this.selectedIds.push(record.id);
         let childrenIds = this.getChildrenIds(record);
-
         childrenIds.forEach(c => this.selectedIds.push(c));
-
       } else {
-
+        this.selectedIds.splice(this.selectedIds.indexOf(record.id), 1)
         let childrenIds = this.getChildrenIds(record);
-
         childrenIds.forEach(c => this.selectedIds.splice(this.selectedIds.findIndex(i => i === c), 1));
       }
-
+    },
+    getSelectedRecords() {
+      return this.selectedIds.map(id => this.getRecordById(id, this.data));
     },
     getRecordById(id, data) {
-
       for (let i = 0; i < data.length; i++) {
         let r = data[i];
-
         if (r.id === id) {
           return r;
         } else if (r.children) {
-
           r = this.getRecordById(id, r.children);
-
           if (r) {
             return r;
           }
-
         }
       }
-
     },
     getParentIds(record) {
-
       let result = [];
-
       if (!record.parentId) {
         return result
       }
 
       let parent = this.getRecordById(record.parentId, this.data);
-
       if (parent) {
         let parentIds = this.getParentIds(parent);
         parentIds.forEach(p => result.push(p));
@@ -138,24 +126,18 @@ export default {
     getChildrenIds(record) {
 
       let result = [];
-
       if (record.children) {
-
         for (let i = 0; i < record.children.length; i++) {
           let c = record.children[i];
           result.push(c.id);
+
           let ids = this.getChildrenIds(c);
           ids.forEach(id => result.push(id));
-
         }
-
       }
 
       return result;
 
-    },
-    selectChange(selectedIds) {
-      this.selectedIds = selectedIds;
     },
     detail(record) {
 
@@ -175,6 +157,10 @@ export default {
 
       _this.spinning = true;
       _this.$emit('searching');
+
+      if (!form) {
+        form = this.searchData;
+      }
 
       _this
           .$http

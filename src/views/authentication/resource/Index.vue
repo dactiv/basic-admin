@@ -27,7 +27,7 @@
       </template>
     </a-input>
 
-    <resourceTable ref="resource-table" @searching="this.spinning=true" @search="this.spinning=false"/>
+    <resource-table ref="resource-table" @searching="this.spinning=true" @search="this.spinning=false"/>
 
   </a-card>
 

@@ -79,7 +79,7 @@
             <icon-font class="icon" type="icon-group" />
             <span class="hidden-xs">所在组</span>
           </template>
-          <group-table ref="group-table" :enable-disabled-checkbox="false" />
+          <group-table ref="group-table" :enable-disabled-checkbox="false" :searchData="{mergeTree:true, 'filter_[status_eq]': 1, 'filter_[sources_jin]':['Console']}" @search="onGroupSearch"/>
         </a-tab-pane>
 
         <a-tab-pane key="resource-table" forceRender>
@@ -87,7 +87,7 @@
             <icon-font class="icon" type="icon-attachment" />
             <span class="hidden-xs">独立权限</span>
           </template>
-          <resource-table ref="resource-table" :selection="true"/>
+          <resource-table ref="resource-table" :selection="true" :searchData="{mergeTree:true, sources:['Console']}" @search="onResourceSearch"/>
         </a-tab-pane>
 
       </a-tabs>
@@ -129,8 +129,8 @@ export default {
         username: "",
         realName: "",
         password: "",
-        groupIds:[],
-        resourceIds:[],
+        groupsInfo:[],
+        resourceMap:{},
         confirmPassword:"",
         email: "",
         remark: "",
@@ -158,6 +158,24 @@ export default {
     }
   },
   methods: {
+    onGroupSearch() {
+      if (!this.form.groupsInfo) {
+        return ;
+      }
+      this.$refs['group-table'].selectedIds = this.form.groupsInfo.map(g => g.id);
+    },
+    onResourceSearch() {
+      if (!this.form.resourceMap) {
+        return ;
+      }
+
+      let resourceIds = []
+      for (let v in this.form.resourceMap) {
+        this.form.resourceMap[v].forEach(id => resourceIds.push(id));
+      }
+
+      this.$refs['resource-table'].selectedIds = resourceIds;
+    },
     validateRemoteUsername(value, s) {
       if (this.$refs["username"].disabled) {
         return Promise.resolve();
@@ -186,23 +204,42 @@ export default {
       }
     },
     submitForm() {
-
       let _this = this;
 
       _this.$refs['edit-form'].validate().then(() => {
 
         _this.spinning = true;
 
-        _this.form.groupIds = this.$refs['group-table'].selectedIds;
-        _this.form.resourceIds = this.$refs['resource-table'].selectedIds;
+        let groups = this.$refs['group-table'].getSelectedRecords();
+        if (groups.length > 0) {
+          let groupsInfo = [];
+          groups.forEach(r => {
+            groupsInfo.push({
+              id:r.id,
+              name:r.name,
+              authority: r.authority
+            });
+          })
+          _this.form.groupsInfo = groupsInfo;
+        }
+
+        let resources = _this.$refs['resource-table'].getSelectedRecords();
+        if (resources.length > 0) {
+          let resourceMap = {};
+          resources.forEach(r => {
+            if (!resourceMap[r.applicationName]) {
+              resourceMap[r.applicationName] = [];
+            }
+            resourceMap[r.applicationName].push(r.id);
+          })
+          _this.form.resourceMap = resourceMap;
+        }
 
         _this
             .$http
-            .post("/authentication/console/user/save",_this.formUrlencoded(_this.form))
+            .post("/authentication/console/user/save",_this.form)
             .then((r) => {
-
               let id = r.data.data;
-
               _this.$message.success(r.data.message);
 
               if (id !== _this.form.id) {
@@ -217,23 +254,11 @@ export default {
 
       });
 
-    },
-    setResourceAndGroup(id) {
-      this
-          .$http
-          .get("/authentication/resource/getUserResource?userId=" + id)
-          .then(r => this.$refs['resource-table'].selectedIds = r.data.data);
-
-      this
-          .$http
-          .get("/authentication/group/getConsoleUserGroups?userId=" + id)
-          .then(r => this.$refs['group-table'].selectedIds = r.data.data);
     }
   },
   mounted() {
-    this.$refs['group-table'].search({"mergeTree":true, "filter_[status_eq]": 1, "filter_[source_in]":["Console"]});
-
-    this.$refs['resource-table'].search({"mergeTree":true, "filter_[status_eq]": 1, "filter_[source_in]":["Console"]});
+    this.$refs['group-table'].search();
+    this.$refs['resource-table'].search();
   },
   created() {
 
@@ -250,7 +275,6 @@ export default {
             _this.form = r.data.data;
             _this.form.status = _this.form.status + '';
             _this.spinning = false;
-            _this.setResourceAndGroup(_this.form.id);
           })
           .catch(() => _this.spinning = false);
 

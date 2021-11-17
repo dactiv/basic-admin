@@ -37,7 +37,7 @@
 
 export default {
   name:"AuthenticationGroupTable",
-  props:["enableDisabledCheckbox"],
+  props:["enableDisabledCheckbox", "searchData"],
   emits: ["searching", "search"],
   data() {
     return {
@@ -97,6 +97,22 @@ export default {
     selectChange(selectedIds) {
       this.selectedIds = selectedIds;
     },
+    getSelectedRecords() {
+      return this.selectedIds.map(id => this.findRecordById(id));
+    },
+    findRecordById(id) {
+      for (let i = 0; i < this.data.length; i++) {
+        let r = this.data[i];
+        if (r.id === id) {
+          return r;
+        } else if (r.children) {
+          r = this.getRecordById(id, r.children);
+          if (r) {
+            return r;
+          }
+        }
+      }
+    },
     remove(record) {
 
       let ids = [];
@@ -131,6 +147,11 @@ export default {
 
       _this.spinning = true;
       this.$emit('searching');
+
+      if (!form) {
+        form = this.searchData;
+      }
+
       _this
           .$http
           .post("/authentication/group/find",_this.formUrlencoded(form))

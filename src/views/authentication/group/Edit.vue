@@ -31,8 +31,8 @@
 
         <a-row :gutter="[24]">
           <a-col :span="12">
-            <a-form-item has-feedback label="来源:" name="source">
-              <a-select @change="sourceChange" class="width-100-percent" mode="multiple" v-model:value="form.source" >
+            <a-form-item has-feedback label="来源:" name="sources">
+              <a-select @change="sourcesChange" class="width-100-percent" mode="multiple" v-model:value="form.sources" >
                 <a-select-option v-for="(name,value ) of sourceOptions" :key="value + ''" :value="value + ''">
                   {{name}}
                 </a-select-option>
@@ -76,7 +76,7 @@
         </a-row>
 
         <a-form-item label="拥有权限:" name="remark">
-          <resource-table ref="resource-table" :selection="true"/>
+          <resource-table ref="resource-table" :selection="true" @search="this.onResourceSearch"/>
         </a-form-item>
 
       </a-form>
@@ -117,8 +117,8 @@ export default {
         id:null,
         name: "",
         authority: "",
-        source: [],
-        resourceIds:[],
+        sources: [],
+        resourceMap:{},
         parentId:"",
         removable: 1,
         modifiable: 1,
@@ -134,17 +134,27 @@ export default {
           { required: true, message: "请输入权限名称", trigger: "change" },
           { validator:this.validateRemoteAuthority, trigger: "change" }
         ],
-        source: [{ required: true, message: "请选择组来源", trigger: "change", type: "array" }]
+        sources: [{ required: true, message: "请选择组来源", trigger: "change", type: "array" }]
       }
     }
   },
   methods: {
-    sourceChange(value) {
+    sourcesChange(value) {
       if(value.length === 0) {
         this.$refs['resource-table'].data = [];
       } else {
-        this.$refs['resource-table'].search({"mergeTree":true, "filter_[status_eq]": 1, "filter_[source_in]":value});
+        this.$refs['resource-table'].search({"mergeTree":true, "sources":value});
       }
+    },
+    onResourceSearch() {
+      if (!this.form.resourceMap) {
+        return ;
+      }
+      let resourceIds = []
+      for (let v in this.form.resourceMap) {
+        this.form.resourceMap[v].forEach(id => resourceIds.push(id));
+      }
+      this.$refs['resource-table'].selectedIds = resourceIds;
     },
     validateRemoteName() {
       console.log(this.$refs["name"].disabled);
@@ -174,14 +184,25 @@ export default {
       _this.$refs['edit-form'].validate().then(() => {
 
         _this.spinning = true;
-        _this.form.resourceIds = this.$refs['resource-table'].selectedIds;
+
+        let resources = _this.$refs['resource-table'].getSelectedRecords();
+
+        if (resources.length > 0) {
+          let resourceMap = {};
+          resources.forEach(r => {
+            if (!resourceMap[r.applicationName]) {
+              resourceMap[r.applicationName] = [];
+            }
+            resourceMap[r.applicationName].push(r.id);
+          })
+          _this.form.resourceMap = resourceMap;
+        }
 
         _this
             .$http
-            .post("/authentication/group/save",_this.formUrlencoded(_this.form))
+            .post("/authentication/group/save", _this.form)
             .then((r) => {
               let id = r.data.data;
-
               _this.$message.success(r.data.message);
 
               if (id !== _this.form.id) {
@@ -193,14 +214,7 @@ export default {
 
             })
             .catch(() => _this.spinning = false);
-
       });
-    },
-    setGroupResource(id) {
-      this
-          .$http
-          .get("/authentication/resource/getGroupResource?groupId=" + id)
-          .then(r => this.$refs['resource-table'].selectedIds = r.data.data);
     }
   },
   created() {
@@ -215,27 +229,23 @@ export default {
     }
 
     if (this.$route.query.id !== undefined) {
-
       _this
           .$http
           .get("/authentication/group/get?id=" + this.$route.query.id)
           .then(r => {
             _this.form = r.data.data;
             _this.form.status = _this.form.status + '';
-            _this.form.source =  r.data.data.source.split(",");
+            _this.form.sources =  r.data.data.sources;
             _this.spinning = false;
 
-            if (_this.form.source.length > 0) {
-              this.$refs['resource-table'].search({"mergeTree":true, "filter_[status_eq]": 1, "filter_[source_in]":_this.form.source});
+            if (_this.form.sources.length > 0) {
+              _this.$refs['resource-table'].search({"mergeTree":true, "sources":_this.form.sources});
             }
-
-            _this.setGroupResource(_this.form.id);
 
           })
           .catch(() => _this.spinning = false);
 
       findParentParam["filter_[id_ne]"] = this.$route.query.id;
-
     } else {
       this.spinning = false
     }
