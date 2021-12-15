@@ -4,10 +4,10 @@
 
     <a-table class="ant-table-striped" :row-selection="{ selectedRowKeys: selectedIds, onChange: selectChange, getCheckboxProps: disabledCheckbox}" :rowKey="record=>record.id" :scroll="{ x: 855 }" :pagination="false" :data-source="data" :columns="columns" bordered>
 
-      <template #sourceName="{ text: sourceName }">
-        <a-space :size="10">
-          <a-tag v-for="name of sourceName" :key="name" color="success">
-            {{ name }}
+      <template #sources="{ text: sources }">
+        <a-space>
+          <a-tag v-for="name of sources" :key="name.value" color="success">
+            {{ name.value }}
           </a-tag>
         </a-space>
       </template>
@@ -34,7 +34,7 @@
 </template>
 
 <script>
-
+// FIXME 表格没办法全选
 export default {
   name:"AuthenticationGroupTable",
   props:["enableDisabledCheckbox", "searchData"],
@@ -56,13 +56,13 @@ export default {
         },
         {
           title: "来源",
-          dataIndex: "sourceName",
+          dataIndex: "sources",
           ellipsis: true,
-          slots: { customRender: 'sourceName' },
+          slots: { customRender: 'sources' },
           width: 320
         },{
           title: "状态",
-          dataIndex: "statusName",
+          dataIndex: "status.name",
           ellipsis: true,
           width: 80
         },{

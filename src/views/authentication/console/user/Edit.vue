@@ -79,7 +79,7 @@
             <icon-font class="icon" type="icon-group" />
             <span class="hidden-xs">所在组</span>
           </template>
-          <group-table ref="group-table" :enable-disabled-checkbox="false" :searchData="{mergeTree:true, 'filter_[status_eq]': 1, 'filter_[sources_jin]':['Console']}" @search="onGroupSearch"/>
+          <group-table ref="group-table" :enable-disabled-checkbox="false" :searchData="{mergeTree:true, 'filter_[status_eq]': 1, 'filter_[sources_jin]':['CONSOLE']}" @search="onGroupSearch"/>
         </a-tab-pane>
 
         <a-tab-pane key="resource-table" forceRender>
@@ -87,7 +87,7 @@
             <icon-font class="icon" type="icon-attachment" />
             <span class="hidden-xs">独立权限</span>
           </template>
-          <resource-table ref="resource-table" :selection="true" :searchData="{mergeTree:true, sources:['Console']}" @search="onResourceSearch"/>
+          <resource-table ref="resource-table" :selection="true" :searchData="{mergeTree:true, sources:['CONSOLE']}" @search="onResourceSearch"/>
         </a-tab-pane>
 
       </a-tabs>
@@ -273,7 +273,7 @@ export default {
           .get("/authentication/console/user/get?id=" + this.$route.query.id)
           .then(r => {
             _this.form = r.data.data;
-            _this.form.status = _this.form.status + '';
+            _this.form.status = _this.form.status.value + '';
             _this.spinning = false;
           })
           .catch(() => _this.spinning = false);

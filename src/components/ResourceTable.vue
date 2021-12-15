@@ -11,8 +11,12 @@
         </a-button>
       </template>
 
-      <template #sourcesName="{ record }">
-        {{record.sourcesName.join(",")}}
+      <template #sources="{ text: sources }">
+        <a-space>
+          <a-tag v-for="name of sources" :key="name.value" color="success">
+            {{ name.value }}
+          </a-tag>
+        </a-space>
       </template>
 
       <template #action="{ record }">
@@ -33,7 +37,7 @@
 </template>
 
 <script>
-
+// FIXME 表格没办法全选
 export default {
   name:"AuthenticationResourceTable",
   props:["selection", "searchData"],
@@ -49,9 +53,9 @@ export default {
           slots: { customRender: 'name' },
         },{
           title: "来源",
-          dataIndex: "sourcesName",
+          dataIndex: "sources",
           ellipsis: true,
-          slots: { customRender: 'sourcesName' },
+          slots: { customRender: 'sources' },
           width: 120
         },{
           title: "資源值",

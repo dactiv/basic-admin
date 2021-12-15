@@ -506,7 +506,7 @@ export default {
       } else {
         this
             .$http
-            .get("/authentication/getPrincipalProfile?type=Console&ids=" + json.id)
+            .get("/authentication/getPrincipalProfile?type=CONSOLE&ids=" + json.id)
             .then((r) => {
 
               let data = r.data.data[0];
@@ -789,7 +789,7 @@ export default {
     },
     getRecentContactsProfile(data) {
       let param = {
-        type:"Console",
+        type:"CONSOLE",
         ids:data.map((v) => v.id)
       }
       this

@@ -157,7 +157,6 @@ export default {
       this.$refs['resource-table'].selectedIds = resourceIds;
     },
     validateRemoteName() {
-      console.log(this.$refs["name"].disabled);
       if (this.$refs["name"].disabled) {
         return Promise.resolve();
       }
@@ -222,7 +221,7 @@ export default {
     let _this = this;
 
     _this.loadConfig({service:"config", enumerateName:"DisabledOrEnabled"}, r=> _this.statusOptions = r.data.data);
-    _this.loadConfig({service:"config", enumerateName:"ResourceSource"}, r=> _this.sourceOptions = r.data.data);
+    _this.loadConfig({service:"config", enumerateName:"ResourceSourceEnum"}, r=> _this.sourceOptions = r.data.data);
 
     let findParentParam = {
       mergeTree:false
@@ -234,8 +233,10 @@ export default {
           .get("/authentication/group/get?id=" + this.$route.query.id)
           .then(r => {
             _this.form = r.data.data;
-            _this.form.status = _this.form.status + '';
-            _this.form.sources =  r.data.data.sources;
+            _this.form.status = _this.form.status.value + '';
+            _this.form.sources =  r.data.data.sources.map(r => r.value);
+            _this.removable = r.data.data.removable.value;
+            _this.modifiable  = r.data.data.modifiable.value;
             _this.spinning = false;
 
             if (_this.form.sources.length > 0) {

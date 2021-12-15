@@ -7,7 +7,7 @@
     <a-breadcrumb-item><icon-font class="icon" type="icon-file" /> {{ '[' + form.name + ']' + '資源明细' }}</a-breadcrumb-item>
   </a-breadcrumb>
 
-  <a-card :title="'[' + form.name + ']' + '資源明细'" class="basic-box-shadow">
+  <a-card :title="'[' + form.name + ']資源明细'" class="basic-box-shadow">
 
     <template #extra>
       <icon-font class="icon" type="icon-file" />
@@ -18,10 +18,16 @@
 
         <a-descriptions-item label="名称"><icon-font class="icon" :type="!form.icon ? 'icon-unkown' : form.icon" /> {{form.name}} </a-descriptions-item>
         <a-descriptions-item label="所属应用">{{ form.applicationName }}</a-descriptions-item>
-        <a-descriptions-item label="来源" :span="2">{{ form.sourcesName.join(",")}}</a-descriptions-item>
+        <a-descriptions-item label="来源" :span="2">
+          <a-space>
+            <a-tag v-for="name of form.sources" :key="name.value" color="success">
+              {{ name.value }}
+            </a-tag>
+          </a-space>
+        </a-descriptions-item>
         <a-descriptions-item label="資源值" :span="2">{{ form.value ? form.value : ""}}</a-descriptions-item>
         <a-descriptions-item label="权限值">{{ form.authority ? form.authority : ""}}</a-descriptions-item>
-        <a-descriptions-item label="类型">{{ form.typeName }}</a-descriptions-item>
+        <a-descriptions-item label="类型">{{ form.type.value }}</a-descriptions-item>
         <a-descriptions-item label="版本号">{{ form.version }}</a-descriptions-item>
         <a-descriptions-item label="顺序值">{{ form.sort ? form.sort : "" }}</a-descriptions-item>
         <a-descriptions-item label="备注" :span="2">{{ form.remark ? form.remark : "" }}</a-descriptions-item>
@@ -44,10 +50,16 @@ export default {
         name: "",
         value: "",
         authority: "",
-        sourcesName: [""],
+        sources: [{
+          name:"",
+          value:""
+        }],
         code:"",
         applicationName: "",
-        typeName: "",
+        type: {
+          name:"",
+          value:""
+        },
         version: "",
         icon:"",
         sort:"",

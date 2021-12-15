@@ -198,7 +198,7 @@ export default {
       smsColumns:[
         {
           title: "状态",
-          dataIndex: "statusName",
+          dataIndex: "status.name",
           ellipsis: true,
           width: 100
         },
@@ -246,7 +246,7 @@ export default {
       siteColumns:[
         {
           title: "状态",
-          dataIndex: "statusName",
+          dataIndex: "status.name",
           ellipsis: true,
           width: 100
         },
@@ -294,7 +294,7 @@ export default {
       emailColumns:[
         {
           title: "状态",
-          dataIndex: "statusName",
+          dataIndex: "status.name",
           ellipsis: true,
           width: 100
         },

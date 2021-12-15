@@ -145,7 +145,7 @@ export default {
         },
         {
           title: "状态",
-          dataIndex: "statusName",
+          dataIndex: "status.name",
           ellipsis: true,
           width: 80
         },

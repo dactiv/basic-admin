@@ -76,7 +76,7 @@ export default {
         login(context, payload) {
             return new Promise((resolve, reject) => {
                 axios
-                    .post("/authentication/login", payload, {headers: {"X-AUTHENTICATION-TYPE": "Console"}})
+                    .post("/authentication/login", payload, {headers: {"X-AUTHENTICATION-TYPE": "CONSOLE"}})
                     .then(response => {
                         let data = response.data.data;
                         data.authentication = true;
