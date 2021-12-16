@@ -908,7 +908,7 @@ export default {
 
         let currentGroups = this.tree.groups[treeNode.eventKey];
 
-        if (currentGroups) {
+        if (currentGroups && currentGroups.length > 0) {
           treeNode.dataRef.children = currentGroups;
           resolve();
           return;
