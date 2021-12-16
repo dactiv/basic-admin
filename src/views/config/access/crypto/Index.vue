@@ -133,12 +133,12 @@ export default {
           width: 120
         },{
           title: "请求加密",
-          dataIndex: "requestDecryptName",
+          dataIndex: "requestDecrypt.name",
           ellipsis: true,
           width: 150
         },{
           title: "响应加密",
-          dataIndex: "responseEncryptName",
+          dataIndex: "responseEncrypt.name",
           ellipsis: true,
           width: 150
         },{

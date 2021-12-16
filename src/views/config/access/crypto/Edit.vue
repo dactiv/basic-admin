@@ -149,7 +149,7 @@
           <icon-font class="icon" v-if="!spinning" type="icon-select" />
           <span class="hidden-xs">保存</span>
         </a-button>
-        <a-button @click="this.refs['edit-form'].resetFields();">
+        <a-button @click="this.$refs['edit-form'].resetFields();">
           <icon-font class="icon" type="icon-ashbin" />
           <span class="hidden-xs">重置</span>
         </a-button>
@@ -320,9 +320,9 @@ export default {
 
             _this.form = r.data.data;
 
-            _this.form.enabled = _this.form.enabled + '';
-            _this.form.requestDecrypt = _this.form.requestDecrypt + '';
-            _this.form.responseEncrypt = _this.form.responseEncrypt + '';
+            _this.form.enabled = _this.form.enabled.value + '';
+            _this.form.requestDecrypt = _this.form.requestDecrypt.value + '';
+            _this.form.responseEncrypt = _this.form.responseEncrypt.value + '';
 
             _this.spinning = false;
 
