@@ -49,7 +49,7 @@
 
       <a-divider />
 
-      <a-button type="primary" :loading="sending" @click="submitForm" v-if="this.principal.hasPermission('perms[message:send]')">
+      <a-button type="primary" :loading="sending" @click="submitForm" v-if="principal.hasPermission('perms[message:send]')">
         <icon-font class="icon" v-if="!sending" type="icon-send" />
         <span class="hidden-xs">发送</span>
       </a-button>
@@ -90,7 +90,7 @@
         <a-table class="ant-table-striped" :row-selection="{ selectedRowKeys: search.selectedIds, onChange:userTableSelectChange }" :rowKey="record=>record.id" :scroll="{ x: 800, y: 300 }" :pagination="false" :data-source="search.data" :columns="search.columns" bordered>
 
           <template #registrationTime="{ text:registrationTime }">
-            {{ this.timestampFormat(registrationTime)}}
+            {{ timestampFormat(registrationTime) }}
           </template>
 
         </a-table>

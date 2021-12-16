@@ -9,7 +9,7 @@
 
   <a-card title="批量消息明细" class="basic-box-shadow">
     <template #extra>
-      <a-button @click="reload(this.page.number)" :loading="spinning">
+      <a-button @click="reload(page.number)" :loading="spinning">
         <icon-font class="icon" v-if="!spinning" type="icon-refresh" />
         <span class="hidden-xs">刷新</span>
       </a-button>
@@ -22,9 +22,9 @@
       >
 
         <a-descriptions-item label="类型"><icon-font class="icon" :type="form.type.value === 10 ? 'icon-notification' : form.type.value === 20 ? 'icon-email' : 'icon-sms'" /> {{ form.type.name }}</a-descriptions-item>
-        <a-descriptions-item label="状态"><a-badge :status="form.status.value === 0 ? 'processing' : form.status.value === 1 ? 'success' : 'error'" :text="form.status.name" /></a-descriptions-item>
-        <a-descriptions-item label="创建时间">{{ this.timestampFormat(form.creationTime) }} </a-descriptions-item>
-        <a-descriptions-item label="完成时间">{{ this.timestampFormat(form.completeTime) }}</a-descriptions-item>
+        <a-descriptions-item label="状态"><a-badge :status="form.executeStatus.value === 0 ? 'processing' : form.executeStatus.value === 1 ? 'success' : 'error'" :text="form.executeStatus.name" /></a-descriptions-item>
+        <a-descriptions-item label="创建时间">{{ timestampFormat(form.creationTime) }} </a-descriptions-item>
+        <a-descriptions-item label="完成时间">{{ timestampFormat(form.completeTime) }}</a-descriptions-item>
         <a-descriptions-item label="总发送数量">{{ form.count}}</a-descriptions-item>
         <a-descriptions-item label="发送中数量">{{ form.sendingNumber}}</a-descriptions-item>
         <a-descriptions-item label="发送成功数量"><a-typography-text type="success">{{ form.successNumber }}</a-typography-text></a-descriptions-item>
@@ -37,11 +37,11 @@
       <a-table class="ant-table-striped" :rowKey="record=>record.id" :scroll="{ x: tableScrollX }" :pagination="false" :data-source="page.elements" :columns="columns" bordered>
 
         <template #lastSendTime="{ text:lastSendTime }">
-          <span :title="this.timestampFormat(lastSendTime)">{{ this.timestampFormat(lastSendTime)}}</span>
+          <span :title="timestampFormat(lastSendTime)">{{ timestampFormat(lastSendTime) }}</span>
         </template>
 
         <template #successTime="{ text:successTime }">
-          <span :title="this.timestampFormat(successTime)">{{ this.timestampFormat(successTime)}}</span>
+          <span :title="timestampFormat(successTime)">{{ timestampFormat(successTime) }}</span>
         </template>
 
       </a-table>
@@ -198,13 +198,13 @@ export default {
       smsColumns:[
         {
           title: "状态",
-          dataIndex: "status.name",
+          dataIndex: "executeStatus.name",
           ellipsis: true,
           width: 100
         },
         {
           title: "类型",
-          dataIndex: "typeName",
+          dataIndex: "type.name",
           ellipsis: true,
           width: 100
         },
@@ -246,13 +246,13 @@ export default {
       siteColumns:[
         {
           title: "状态",
-          dataIndex: "status.name",
+          dataIndex: "executeStatus.name",
           ellipsis: true,
           width: 100
         },
         {
           title: "类型",
-          dataIndex: "typeName",
+          dataIndex: "type.name",
           ellipsis: true,
           width: 100
         },
@@ -294,13 +294,13 @@ export default {
       emailColumns:[
         {
           title: "状态",
-          dataIndex: "status.name",
+          dataIndex: "executeStatus.name",
           ellipsis: true,
           width: 100
         },
         {
           title: "类型",
-          dataIndex: "typeName",
+          dataIndex: "type.name",
           ellipsis: true,
           width: 100
         },
@@ -344,9 +344,7 @@ export default {
         id:"",
         creationTime: "",
         type:"",
-        typeName: "",
-        status:"",
-        statusName: "",
+        executeStatus:"",
         successNumber: "",
         failNumber:"",
         sendingNumber: "",

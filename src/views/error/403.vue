@@ -6,7 +6,7 @@
   <div class="text-center">
 
     <a-space :size="10">
-      <a-button @click="this.$router.back();">
+      <a-button @click="$router.back();">
         <icon-font class="icon" type="icon-arrow-left-circle" />
         <span>返回</span>
       </a-button>

@@ -1,9 +1,9 @@
 <template >
-  <a-drawer :width="950" placement="right" :closable="false" :afterVisibleChange="visibleChange" v-model:visible="this.visible" class="chat">
+  <a-drawer :width="950" placement="right" :closable="false" :afterVisibleChange="visibleChange" v-model:visible="visible" class="chat">
 
-    <a-drawer width="250" :closable="false" :visible="this.groupDrawer.visible" :bodyStyle="{'padding':'0px'}">
+    <a-drawer width="250" :closable="false" :visible="groupDrawer.visible" :bodyStyle="{'padding':'0px'}">
       <div class="text-right">
-        <a-button type="text" @click="this.groupDrawer.visible = false" class="padding-xss-left padding-xss-right">
+        <a-button type="text" @click="groupDrawer.visible = false" class="padding-xss-left padding-xss-right">
           <icon-font class="icon" type="icon-close" />
         </a-button>
       </div>
@@ -12,28 +12,28 @@
         <a-divider class="font-size-sm" orientation="left">名称</a-divider>
 
         <a-space>
-          <a-button type="text" class="padding-none" @click="this.groupDrawer.editable = !this.groupDrawer.editable">
-            <icon-font class="icon" :type="this.groupDrawer.editable ? 'icon-select' : 'icon-edit'" />
+          <a-button type="text" class="padding-none" @click="groupDrawer.editable = !groupDrawer.editable">
+            <icon-font class="icon" :type="groupDrawer.editable ? 'icon-select' : 'icon-edit'" />
           </a-button>
-          <a-input v-if="this.groupDrawer.editable" @blur="this.groupDrawer.editable = false" @keyup.enter="this.groupDrawer.editable = false" v-model:value="this.current.contact.title" />
-          <a-typography-text v-else :ellipsis="true" v-model:content="this.current.contact.title" style="width: 175px"/>
+          <a-input v-if="groupDrawer.editable" @blur="groupDrawer.editable = false" @keyup.enter="groupDrawer.editable = false" v-model:value="current.contact.title" />
+          <a-typography-text v-else :ellipsis="true" v-model:content="current.contact.title" style="width: 175px"/>
         </a-space>
 
         <a-divider class="font-size-sm" orientation="left">备注</a-divider>
-        <a-empty v-if="!this.current.contact.reamrk"></a-empty>
-        <p v-else>{{this.current.contact.reamrk}}</p>
+        <a-empty v-if="!current.contact.reamrk"></a-empty>
+        <p v-else>{{current.contact.reamrk}}</p>
 
         <a-divider class="font-size-sm" orientation="left">成员信息</a-divider>
 
         <a-row type="flex" justify="space-around" align="middle" class="margin-bottom">
           <a-col :span="24">
-            <a-input-search placeholder="搜索" v-model:value="this.groupDrawer.searchText" />
+            <a-input-search placeholder="搜索" v-model:value="groupDrawer.searchText" />
           </a-col>
         </a-row>
 
         <a-row type="flex" justify="space-around" align="middle" class="margin-bottom" :gutter="[12,0]">
           <a-col :span="12">
-            <a-button @click="this.room.visible = true" block>
+            <a-button @click="room.visible = true" block>
               <icon-font class="icon" type="icon-add" /> 添加
             </a-button>
           </a-col>
@@ -45,11 +45,11 @@
         </a-row>
 
         <a-space direction="vertical">
-          <a-space v-for="p of this.current.contact.participants" :key="p.id">
-            <a-avatar :src="this.getPrincipalAvatarByUserId(p.userId)">
-              {{ this.getUsernameById(p.userId).substring(0,1) }}
+          <a-space v-for="p of current.contact.participants" :key="p.id">
+            <a-avatar :src="getPrincipalAvatarByUserId(p.userId)">
+              {{ getUsernameById(p.userId).substring(0,1) }}
             </a-avatar>
-            <a-typography-text strong>{{ this.getUsernameById(p.userId) }}</a-typography-text>
+            <a-typography-text strong>{{ getUsernameById(p.userId) }}</a-typography-text>
           </a-space>
         </a-space>
       </div>
@@ -60,12 +60,12 @@
         <a-row class="height-100-percent">
           <a-col :span="5" class="tool-bar border-right">
             <div class="text-center margin-md-top">
-              <a-avatar :src="this.principal.details.avatar">
-                {{ this.getPrincipalName(this.principal.details).substring(0, 1) }}
+              <a-avatar :src="principal.details.avatar">
+                {{ getPrincipalName(principal.details).substring(0, 1) }}
               </a-avatar>
               <a-menu mode="vertical" class="margin-top" @select="toolbarSelect" :selectedKeys="selectedToolBar">
                 <a-menu-item key="message">
-                  <a-badge :count="this.messageCount" :offset="[x=-20, y=0]">
+                  <a-badge :count="messageCount" :offset="[x=-20, y=0]">
                     <icon-font class="icon" type="icon-message" />
                   </a-badge>
                 </a-menu-item>
@@ -80,8 +80,8 @@
               <a-input placeholder="搜索" />
             </div>
             <div class="left-content">
-              <a-menu v-show="this.tab === 'message'" @click="selectContact" :selectedKeys="selectedKeys" mode="vertical">
-                <a-menu-item v-for="c of this.contacts" :key="c.type + '-' + c.id" >
+              <a-menu v-show="tab === 'message'" @click="selectContact" :selectedKeys="selectedKeys" mode="vertical">
+                <a-menu-item v-for="c of contacts" :key="c.type + '-' + c.id" >
                   <a-dropdown :trigger="['contextmenu']">
                     <a-row type="flex" justify="space-around" align="middle">
                       <a-col :span="4">
@@ -101,7 +101,7 @@
                             </a-typography-text>
                           </a-col>
                           <a-col :span="8" class="text-right">
-                            <a-typography-text v-if="c.lastSendTime" type="secondary" class="contacts-name display-block font-size-sm" :content="this.$moment(c.lastSendTime).fromNow()" />
+                            <a-typography-text v-if="c.lastSendTime" type="secondary" class="contacts-name display-block font-size-sm" :content="$moment(c.lastSendTime).fromNow()" />
                           </a-col>
                         </a-row>
                         <a-row type="flex" justify="space-around" align="middle">
@@ -125,8 +125,8 @@
                   </a-dropdown>
                 </a-menu-item>
               </a-menu>
-              <div v-show="this.tab === 'group'">
-                <a-tree @select="selectTreeContact" show-icon :load-data="loadTreeData" :replaceFields="{title:'name', key:'id'}" :tree-data="this.groupData">
+              <div v-show="tab === 'group'">
+                <a-tree @select="selectTreeContact" show-icon :load-data="loadTreeData" :replaceFields="{title:'name', key:'id'}" :tree-data="groupData">
                   <template #group>
                     <icon-font class="icon" type="icon-folder-close" />
                   </template>
@@ -139,7 +139,7 @@
                   <template #title="{name, id}">
                     <div v-if="id.includes('user-') || id.includes('room-')" class="group-user">
                       <a-avatar size="small" :src="id.includes('user-') ? this.getPrincipalAvatarByUserId(id.replace('user-','')) : ''" :shape="id.includes('user-') ? 'circle' : 'square'">
-                        {{name.substring(0,1)}}
+                        {{name.substring(0,1) }}
                       </a-avatar>
                       <a-typography-text strong :content="name" />
                     </div>
@@ -155,16 +155,16 @@
         <a-layout-header class="border-bottom">
           <a-row>
             <a-col :span="20">
-              <a-space v-if="this.current.contact.id > 0" :size="10" class="padding-left">
-                <a-avatar :src="this.current.contact.type === 10 ? this.getPrincipalAvatarByUserId(this.current.contact.id) : null" :shape="this.current.contact.type === 10 ? 'circle' : 'square'" >
-                  {{ this.current.contact.title.substring(0,1) }}
+              <a-space v-if="current.contact.id > 0" :size="10" class="padding-left">
+                <a-avatar :src="current.contact.type === 10 ? this.getPrincipalAvatarByUserId(this.current.contact.id) : null" :shape="current.contact.type === 10 ? 'circle' : 'square'" >
+                  {{ current.contact.title.substring(0,1) }}
                 </a-avatar>
-                <a-typography-text strong>{{ this.current.contact.title }}</a-typography-text>
+                <a-typography-text strong>{{ current.contact.title }}</a-typography-text>
               </a-space>
             </a-col>
             <a-col :span="4" class="text-right">
-              <a-button type="text" @click="this.current.contact.id >= 0 && this.current.contact.type === 10 ? this.room.visible = true : this.groupDrawer.visible = true">
-                <icon-font class="icon" :type="this.current.contact.id >= 0 && this.current.contact.type === 10 ? 'icon-user-groups' : 'icon-image-text'" />
+              <a-button type="text" @click="current.contact.id >= 0 && this.current.contact.type === 10 ? this.room.visible = true : this.groupDrawer.visible = true">
+                <icon-font class="icon" :type="current.contact.id >= 0 && this.current.contact.type === 10 ? 'icon-user-groups' : 'icon-image-text'" />
               </a-button>
             </a-col>
           </a-row>
@@ -172,7 +172,7 @@
         <a-layout>
           <a-layout-content class="height-100-percent">
             <div id="message-content" class="message" ref="message-content" @scroll="messageContentScroll">
-              <template v-if="this.current.contact.id > 0">
+              <template v-if="current.contact.id > 0">
                 <a-divider class="font-size-sm margin-none" v-if="!this.current.contact.lastLoadMessage">
                   <a-typography-text type="secondary">
                     <icon-font spin class="icon" type="icon-refresh" /> 数据加载中...
@@ -181,17 +181,17 @@
                 <div v-for="m of this.current.contact.messages" :key="m.id">
 
                   <div class="text-center margin-top margin-bottom">
-                    <a-typography-text type="secondary">{{this.timestampFormat(m.creationTime)}}</a-typography-text>
+                    <a-typography-text type="secondary">{{ timestampFormat(m.creationTime) }}</a-typography-text>
                   </div>
 
                   <div v-for="c of m.contents" :key="c" :class="c.senderId !== this.principal.details.id ? 'margin-bottom' : 'margin-bottom text-right'">
                     <a-space align="start">
-                        <a-avatar v-if="c.senderId !== this.principal.details.id" :src="this.getPrincipalAvatarByUserId(this.current.contact.id)" class="basic-box-shadow" >
-                          {{this.current.contact.title.substring(0,1)}}
+                        <a-avatar v-if="c.senderId !== this.principal.details.id" :src="getPrincipalAvatarByUserId(this.current.contact.id)" class="basic-box-shadow" >
+                          {{ current.contact.title.substring(0,1) }}
                         </a-avatar>
                         <a-space>
                           <a-tooltip v-if="c.senderId === this.principal.details.id">
-                            <template #title><a-button v-if="c.status === 'fail'" type="link" class="padding-none" @click="this.retrySend(c.id)">[重试]</a-button>{{c.tooltip}} </template>
+                            <template #title><a-button v-if="c.status === 'fail'" type="link" class="padding-none" @click="retrySend(c.id)">[重试]</a-button>{{c.tooltip}} </template>
                             <a-typography-text :type="c.status === 'sending' || c.status === 'success' || c.status === 'unread' ? 'secondary' : c.status === 'read' ? 'success' : 'danger'">
                               <icon-font :spin="c.status === 'sending'" class="icon" :type="c.status === 'sending' ? 'icon-refresh' : c.status === 'fail' ? 'icon-error' :  'icon-success'" />
                             </a-typography-text>
@@ -205,7 +205,7 @@
                             </a-typography-text>
                           </a-tooltip>
                         </a-space>
-                        <a-avatar v-if="c.senderId === this.principal.details.id" :src="this.principal.details.avatar" class="basic-box-shadow">
+                        <a-avatar v-if="c.senderId === this.principal.details.id" :src="principal.details.avatar" class="basic-box-shadow">
                           我
                         </a-avatar>
                     </a-space>
@@ -214,8 +214,8 @@
 
               </template>
             </div>
-            <div class="input border-top" v-if="this.current.contact.id > 0">
-              <QuillEditor toolbar="#chat-toolbar" ref="editor" v-model:content="this.inputContent" @keyup.ctrl.enter="sendMessage()" content-type="html">
+            <div class="input border-top" v-if="current.contact.id > 0">
+              <QuillEditor toolbar="#chat-toolbar" ref="editor" v-model:content="inputContent" @keyup.ctrl.enter="sendMessage()" content-type="html">
                 <template #toolbar>
                   <div id="chat-toolbar" class="border-bottom">
                         <button class="ql-bold" />
@@ -237,7 +237,7 @@
     </a-layout>
   </a-drawer>
 
-  <a-modal v-model:visible="this.room.visible" @cancel="this.room.selectedUser = []" @ok="this.createRoom" :destroyOnClose="true" :mask="false" :maskClosable="false" title="创建多人聊天" class="room">
+  <a-modal v-model:visible="room.visible" @cancel="room.selectedUser = []" @ok="createRoom" :destroyOnClose="true" :mask="false" :maskClosable="false" title="创建多人聊天" class="room">
     <a-row class="height-100-percent">
       <a-col :span="8" class="border-right padding height-100-percent">
         <a-row>
@@ -247,7 +247,7 @@
         </a-row>
         <a-divider class="font-size-sm"> <icon-font class="icon" type="icon-user-groups" /> 选择用户</a-divider>
         <div class="tree-content">
-          <a-tree checkable @check="roomUserCheck" show-icon :load-data="loadTreeData" :replaceFields="{title:'name', key:'id'}" :tree-data="this.room.contactData">
+          <a-tree checkable @check="roomUserCheck" show-icon :load-data="loadTreeData" :replaceFields="{title:'name', key:'id'}" :tree-data="room.contactData">
             <template #group>
               <icon-font class="icon" type="icon-folder-close" />
             </template>
@@ -256,8 +256,8 @@
             </template>
             <template #title="{name, id}">
               <div v-if="id.includes('user-')" class="group-user">
-                <a-avatar size="small" :src="this.getPrincipalAvatarByUserId(id.replace('user-',''))">
-                  {{name.substring(0,1)}}
+                <a-avatar size="small" :src="getPrincipalAvatarByUserId(id.replace('user-',''))">
+                  {{name.substring(0,1) }}
                 </a-avatar>
                 <a-typography-text strong class="margin-left" :content="name" />
               </div>
@@ -267,9 +267,9 @@
         </div>
       </a-col>
       <a-col :span="16" class="padding height-100-percent overflow-auto">
-        <a-card v-if="this.room.selectedUser.length > 0">
+        <a-card v-if="room.selectedUser.length > 0">
           <a-card-grid v-for="u of this.room.selectedUser" :key="u.key" style="width: 25%; text-align: center">
-            <a-avatar :src="this.getPrincipalAvatarByUserId(u.key.replaceAll('user-',''))" >
+            <a-avatar :src="getPrincipalAvatarByUserId(u.key.replaceAll('user-',''))" >
               {{ u.props.name.substring(0,1) }}
             </a-avatar>
             <div>
@@ -282,21 +282,21 @@
     </a-row>
   </a-modal>
 
-  <a-modal v-model:visible="this.current.history.visible" :destroyOnClose="true" :mask="false" :maskClosable="false" :footer="null" class="history" title="聊天记录" width="500px">
-    <a-input v-model:value="this.current.history.search.text">
+  <a-modal v-model:visible="current.history.visible" :destroyOnClose="true" :mask="false" :maskClosable="false" :footer="null" class="history" title="聊天记录" width="500px">
+    <a-input v-model:value="current.history.search.text">
       <template #addonAfter>
-        <a-popover v-model:visible="this.current.history.calendar.visible" title="选择时间" trigger="click">
+        <a-popover v-model:visible="current.history.calendar.visible" title="选择时间" trigger="click">
           <template #content>
-            <a-calendar :fullscreen="false" @select="this.selectCalendar" :disabled-date="this.disabledHistoryDate" />
+            <a-calendar :fullscreen="false" @select="selectCalendar" :disabled-date="disabledHistoryDate" />
           </template>
           <icon-font class="icon" type="icon-time" />
         </a-popover>
       </template>
     </a-input>
     <a-divider class="font-size-sm">
-      <a-tag v-if="this.current.history.search.date !== ''" closable @close="this.clearSearch">
+      <a-tag v-if="current.history.search.date !== ''" closable @close="clearSearch">
         <icon-font class="icon" type="icon-calendar" />
-        {{this.dateFormat(this.current.history.search.date)}}
+        {{ dateFormat(this.current.history.search.date) }}
       </a-tag>
       消息内容
     </a-divider>
@@ -307,12 +307,12 @@
           <icon-font spin class="icon" type="icon-refresh" /> 数据加载中...
         </a-typography-text>
       </a-divider>
-      <a-empty v-if="this.current.history.messages.length === 0"></a-empty>
+      <a-empty v-if="current.history.messages.length === 0"></a-empty>
       <div v-for="c of this.current.history.messages" :key="c.id" :class="c.senderId === this.principal.details.id ? 'self' : ''">
         <p>
           <a-typography-paragraph>
-            <a-typography-text strong >{{this.getUsernameById(c.senderId) + " "}}</a-typography-text>
-            <a-typography-text class="font-size-sm">{{this.timestampFormat(c.creationTime)}}</a-typography-text>
+            <a-typography-text strong >{{ getUsernameById(c.senderId) + " "}}</a-typography-text>
+            <a-typography-text class="font-size-sm">{{ timestampFormat(c.creationTime) }}</a-typography-text>
           </a-typography-paragraph>
         </p>
         <div class="margin-xss-left" v-html="c.content"/>

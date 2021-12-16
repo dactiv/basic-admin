@@ -86,11 +86,11 @@
               </a-col>
               <a-col :span="8" :offset="8" class="text-right">
                 <a-space :size="10">
-                  <a-button @click="editPredicate(null)" v-if="this.principal.hasPermission('perms[access_crypto:save]')">
+                  <a-button @click="editPredicate(null)" v-if="principal.hasPermission('perms[access_crypto:save]')">
                     <icon-font class="icon" type="icon-add"/>
                     <span class="hidden-xs">添加断言</span>
                   </a-button>
-                  <a-button type="primary" danger @click="removePredicate(null)" v-if="this.principal.hasPermission('perms[access_crypto:delete]')">
+                  <a-button type="primary" danger @click="removePredicate(null)" v-if="principal.hasPermission('perms[access_crypto:delete]')">
                     <icon-font class="icon" type="icon-ashbin" />
                     <span class="hidden-xs">删除选中</span>
                   </a-button>
@@ -115,7 +115,7 @@
             <div class="text-center">
               <a-space :size="10">
 
-                <a-button size="small" @click="cancelAndSavePredicate(record)" v-if="this.principal.hasPermission('perms[access_crypto:save]') && record.editing">
+                <a-button size="small" @click="cancelAndSavePredicate(record)" v-if="principal.hasPermission('perms[access_crypto:save]') && record.editing">
                   <icon-font class="icon" type="icon-select" />
                   <span class="hidden-xs">确定</span>
                 </a-button>
@@ -125,12 +125,12 @@
                   <span class="hidden-xs">取消</span>
                 </a-button>
 
-                <a-button size="small" @click="editPredicate(record)" v-if="this.principal.hasPermission('perms[access_crypto:get]') && !record.editing">
+                <a-button size="small" @click="editPredicate(record)" v-if="principal.hasPermission('perms[access_crypto:get]') && !record.editing">
                   <icon-font class="icon" type="icon-edit" />
                   <span class="hidden-xs">编辑</span>
                 </a-button>
 
-                <a-button size="small" type="primary" danger @click="removePredicate(record)" v-if="this.principal.hasPermission('perms[access_crypto:delete]') && !record.editing">
+                <a-button size="small" type="primary" danger @click="removePredicate(record)" v-if="principal.hasPermission('perms[access_crypto:delete]') && !record.editing">
                   <icon-font class="icon" type="icon-ashbin" />
                   <span class="hidden-xs">删除</span>
                 </a-button>
@@ -145,11 +145,11 @@
       <a-divider />
 
       <a-space :size="10">
-        <a-button type="primary" @click="submitForm" v-if="this.principal.hasPermission('perms[access_crypto:save]')" :loading="spinning" >
+        <a-button type="primary" @click="submitForm" v-if="principal.hasPermission('perms[access_crypto:save]')" :loading="spinning" >
           <icon-font class="icon" v-if="!spinning" type="icon-select" />
           <span class="hidden-xs">保存</span>
         </a-button>
-        <a-button @click="this.$refs['edit-form'].resetFields();">
+        <a-button @click="$refs['edit-form'].resetFields();">
           <icon-font class="icon" type="icon-ashbin" />
           <span class="hidden-xs">重置</span>
         </a-button>

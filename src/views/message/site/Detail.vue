@@ -22,11 +22,11 @@
       >
 
         <a-descriptions-item label="类型">{{ form.type.name }}</a-descriptions-item>
-        <a-descriptions-item label="状态"><a-badge :status="form.status.value === 0 ? 'processing' : form.status.value === 1 ? 'success' : 'error'" :text="form.status.name" /></a-descriptions-item>
-        <a-descriptions-item label="创建时间">{{ this.timestampFormat(form.creationTime) }} </a-descriptions-item>
-        <a-descriptions-item label="下次重试时间">{{ this.timestampFormat(form.nextRetryTime) }} </a-descriptions-item>
-        <a-descriptions-item label="最后发送时间">{{ this.timestampFormat(form.lastSendTime) }} </a-descriptions-item>
-        <a-descriptions-item label="发送完成时间">{{ this.timestampFormat(form.successTime) }} </a-descriptions-item>
+        <a-descriptions-item label="状态"><a-badge :status="form.executeStatus.value === 0 ? 'processing' : form.executeStatus.value === 1 ? 'success' : 'error'" :text="form.executeStatus.name" /></a-descriptions-item>
+        <a-descriptions-item label="创建时间">{{ timestampFormat(form.creationTime) }} </a-descriptions-item>
+        <a-descriptions-item label="下次重试时间">{{ timestampFormat(form.nextRetryTime) }} </a-descriptions-item>
+        <a-descriptions-item label="最后发送时间">{{ timestampFormat(form.lastSendTime) }} </a-descriptions-item>
+        <a-descriptions-item label="发送完成时间">{{ timestampFormat(form.successTime) }} </a-descriptions-item>
         <a-descriptions-item label="重试次数">{{ form.retryCount}}</a-descriptions-item>
         <a-descriptions-item label="最大重试次数">{{ form.maxRetryCount}}</a-descriptions-item>
         <a-descriptions-item label="异常信息" :span="2"><pre>{{ form.exception }}</pre></a-descriptions-item>
@@ -47,7 +47,7 @@
         <a-descriptions-item label="已读">{{form.isReadName}}</a-descriptions-item>
         <a-descriptions-item label="标题" :span="2">{{ form.title}}</a-descriptions-item>
         <a-descriptions-item label="内容" :span="2"><p v-html="form.content"></p></a-descriptions-item>
-        <a-descriptions-item v-if="form.hasAttachment > 0" label="附件" :span="2">
+        <a-descriptions-item v-if="form.hasAttachment.value > 0" label="附件" :span="2">
 
           <a-list class="attachment" item-layout="horizontal" bordered  :data-source="form.attachmentList">
             <template #renderItem="{ item }">
@@ -60,7 +60,7 @@
                   </template>
                   <template #avatar>
                     <a-typography-link :href="item.meta.link" target="_blank">
-                      <icon-font class="icon" :type="this.getFileIcon(item.name)" />
+                      <icon-font class="icon" :type="getFileIcon(item.name)" />
                     </a-typography-link>
                   </template>
                 </a-list-item-meta>
@@ -120,7 +120,7 @@ export default {
           name:"",
           value:""
         },
-        status:{
+        executeStatus:{
           name:"",
           value:""
         },

@@ -20,14 +20,14 @@
         </a-button>
       </template>
       <template #addonBefore>
-        <a-button type="text" :loading="spinning" @click="syncResource" v-if="this.principal.hasPermission('perms[resource:sync_plugin_resource]')">
+        <a-button type="text" :loading="spinning" @click="syncResource" v-if="principal.hasPermission('perms[resource:sync_plugin_resource]')">
           <icon-font class="icon" v-if="!spinning" type="icon-history"/>
           <span class="hidden-xs">同步資源</span>
         </a-button>
       </template>
     </a-input>
 
-    <resource-table ref="resource-table" @searching="this.spinning=true" @search="this.spinning=false"/>
+    <resource-table ref="resource-table" @searching="spinning=true" @search="spinning=false"/>
 
   </a-card>
 

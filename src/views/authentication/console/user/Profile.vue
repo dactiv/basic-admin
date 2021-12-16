@@ -16,7 +16,7 @@
       <a-image-preview-group>
         <a-space :size="10">
           <div v-for="v of historyAvatar.values" :key="v" class="border padding basic-box-shadow">
-            <a-image :width="100" :height="100" :src="this.getPrincipalAvatar(v)" />
+            <a-image :width="100" :height="100" :src="getPrincipalAvatar(v)" />
             <p class="margin-none border">
               <a-button type="text" v-if="v !== historyAvatar.currentAvatarFilename" @click="selectAvatar(v)">
                 <icon-font class="icon" type="icon-success" />
@@ -31,8 +31,8 @@
 
       <a-divider v-if="historyAvatar.values.length > 0" />
 
-      <a-avatar :size="64" :src="this.principal.details.avatar">
-        {{ this.getPrincipalName(this.principal.details).substring(0, 1) }}
+      <a-avatar :size="64" :src="principal.details.avatar">
+        {{ getPrincipalName(this.principal.details).substring(0, 1) }}
       </a-avatar>
       <p class="margin-md-top">
       <a-upload :showUploadList="false" action="/authentication/user/avatar/upload" @change="fileListChange" :before-upload="beforeUpload">
@@ -42,8 +42,8 @@
         </a-button>
       </a-upload>
       </p>
-      <a-typography-title class="margin-md-top" :level="4" type="secondary">{{ this.getPrincipalName(this.principal.details) }}</a-typography-title>
-      <a-typography-title class="margin-md-top" :level="5" disabled>所在组:{{ this.principal.details.roleAuthorities.map(r => r.name) }}</a-typography-title>
+      <a-typography-title class="margin-md-top" :level="4" type="secondary">{{ getPrincipalName(this.principal.details) }}</a-typography-title>
+      <a-typography-title class="margin-md-top" :level="5" disabled>所在组:{{ principal.details.roleAuthorities.map(r => r.name) }}</a-typography-title>
 
     </div>
 
@@ -77,7 +77,7 @@
               <icon-font class="icon" type="icon-select" />
               <span class="hidden-xs">保存</span>
             </a-button>
-            <a-button @click="this.$refs['edit-form'].resetFields();">
+            <a-button @click="$refs['edit-form'].resetFields();">
               <icon-font class="icon" type="icon-ashbin" />
               <span class="hidden-xs">重置</span>
             </a-button>

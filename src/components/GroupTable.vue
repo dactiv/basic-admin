@@ -15,11 +15,11 @@
       <template #action="{ record }">
         <div class="text-center">
           <a-space :size="10">
-            <a-button size="small" @click="edit(record)" v-if="this.principal.hasPermission('perms[group:get]') && record.modifiable === 1">
+            <a-button size="small" @click="edit(record)" v-if="principal.hasPermission('perms[group:get]') && record.modifiable === 1">
               <icon-font class="icon" type="icon-edit"/>
               <span class="hidden-xs">编辑</span>
             </a-button>
-            <a-button size="small" type="primary" danger @click="remove(record)" v-if="this.principal.hasPermission('perms[group:delete]') && record.removable === 1">
+            <a-button size="small" type="primary" danger @click="remove(record)" v-if="principal.hasPermission('perms[group:delete]') && record.removable === 1">
               <icon-font class="icon" type="icon-ashbin" />
               <span class="hidden-xs">删除</span>
             </a-button>

@@ -9,10 +9,10 @@
         <a-col :span="16">
           <a-menu mode="horizontal" class="left">
             <a-menu-item key="1" @click="toggleCollapsed" class="hidden-xs">
-              <icon-font class="icon" :type="this.menu.collapsed ? 'icon-arrow-right-circle' : 'icon-arrow-left-circle'" />
+              <icon-font class="icon" :type="menu.collapsed ? 'icon-arrow-right-circle' : 'icon-arrow-left-circle'" />
             </a-menu-item>
-            <a-menu-item key="2" v-if="this.connected" @click="visible">
-              <a-badge :count="this.messageCount">
+            <a-menu-item key="2" v-if="connected" @click="visible">
+              <a-badge :count="messageCount">
                 <icon-font class="icon" type="icon-message" />
               </a-badge>
             </a-menu-item>
@@ -23,16 +23,16 @@
           <a-menu mode="horizontal" class="float-right right">
             <a-menu-item key="1"><icon-font class="icon" type="icon-moon" /></a-menu-item>
             <a-menu-item key="2">
-              <a-typography-text :type="this.connected ? 'success' : 'secondary'">
-                <icon-font class="icon" :type="this.connected ? 'icon-wifi-on' : 'icon-wifi-off'" />
+              <a-typography-text :type="connected ? 'success' : 'secondary'">
+                <icon-font class="icon" :type="connected ? 'icon-wifi-on' : 'icon-wifi-off'" />
               </a-typography-text>
             </a-menu-item>
             <a-sub-menu key="3">
               <template #title>
                 <a-space :size="20">
-                  <span>{{ this.getPrincipalName(this.principal.details) }}</span>
-                  <a-avatar :src="this.principal.details.avatar">
-                    {{ this.getPrincipalName(this.principal.details).substring(0, 1) }}
+                  <span>{{ getPrincipalName(this.principal.details) }}</span>
+                  <a-avatar :src="principal.details.avatar">
+                    {{ getPrincipalName(this.principal.details).substring(0, 1) }}
                   </a-avatar>
                 </a-space>
               </template>
@@ -59,7 +59,7 @@
         <div class="main-menu">
           <a-spin :spinning="spinning" tip="初始化导航...">
             <a-menu mode="inline" :selectedKeys="menu.selectedKeys" :openKeys="menu.openKeys" @openChange="menuOpen" >
-              <recursion-menu :data="this.principal.details.menus" />
+              <recursion-menu :data="principal.details.menus" />
             </a-menu>
           </a-spin>
         </div>

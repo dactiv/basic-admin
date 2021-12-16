@@ -22,7 +22,7 @@
       <template #action="{ record }">
         <div class="text-center">
           <a-space :size="10">
-            <a-button size="small" @click="detail(record)" v-if="this.principal.hasPermission('perms[resource:get]')">
+            <a-button size="small" @click="detail(record)" v-if="principal.hasPermission('perms[resource:get]')">
               <icon-font class="icon" type="icon-file"/>
               <span class="hidden-xs">详情</span>
             </a-button>

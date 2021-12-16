@@ -9,7 +9,7 @@
   <a-card title="系统枚举查询" class="basic-box-shadow margin-lg-top">
 
     <template #extra>
-      <a-button :loading="sync" @click="syncEnumerate" v-if="this.principal.hasPermission('perms[enumerate:sync]')">
+      <a-button :loading="sync" @click="syncEnumerate" v-if="principal.hasPermission('perms[enumerate:sync]')">
         <icon-font class="icon" v-if="!sync" type="icon-history"/>
         <span class="hidden-xs">同步枚举</span>
       </a-button>

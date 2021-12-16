@@ -28,7 +28,7 @@
             <a-form-item label="验证码:" has-feedback name="captcha" class="picture-captcha" v-if="captcha.data.type === 'picture'">
               <a-input v-model:value="form.captcha">
                 <template #addonAfter>
-                  <a-image :width="100" :height="30" :src="this.captcha.pictureCaptchaUrl" @click="generatePictureCaptcha()"/>
+                  <a-image :width="100" :height="30" :src="captcha.pictureCaptchaUrl" @click="generatePictureCaptcha()"/>
                 </template>
               </a-input>
             </a-form-item>

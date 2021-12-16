@@ -1,5 +1,5 @@
 <template>
-  <a-config-provider :locale="this.$store.state.locale.app">
+  <a-config-provider :locale="$store.state.locale.app">
     <router-view v-slot="{ Component }">
         <component :is="Component" />
     </router-view>

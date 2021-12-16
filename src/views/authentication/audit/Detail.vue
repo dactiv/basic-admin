@@ -21,9 +21,9 @@
 
         <a-descriptions-item label="操作人">{{ form.principal}} </a-descriptions-item>
         <a-descriptions-item label="操作模块">{{ form.type}}</a-descriptions-item>
-        <a-descriptions-item label="操作时间" :span="2">{{ this.timestampFormat(form.timestamp.toString().replace(".","") * 1) }}</a-descriptions-item>
+        <a-descriptions-item label="操作时间" :span="2">{{ timestampFormat(form.timestamp.toString().replace(".","") * 1) }}</a-descriptions-item>
         <a-descriptions-item label="参数信息" :span="2">
-          <pre>{{ JSON.stringify(form.data,null,2)}}</pre>
+          <pre>{{ JSON.stringify(form.data,null,2) }}</pre>
         </a-descriptions-item>
 
       </a-descriptions>

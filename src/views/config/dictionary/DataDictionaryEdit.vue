@@ -78,11 +78,11 @@
       <a-divider />
 
       <a-space :size="10">
-        <a-button type="primary" @click="submitForm" v-if="this.principal.hasPermission('perms[data_dictionary:save]')" :loading="spinning" >
+        <a-button type="primary" @click="submitForm" v-if="principal.hasPermission('perms[data_dictionary:save]')" :loading="spinning" >
           <icon-font class="icon" v-if="!spinning" type="icon-select" />
           <span class="hidden-xs">保存</span>
         </a-button>
-        <a-button @click="this.$refs['edit-form'].resetFields();">
+        <a-button @click="$refs['edit-form'].resetFields();">
           <icon-font class="icon" type="icon-ashbin" />
           <span class="hidden-xs">重置</span>
         </a-button>

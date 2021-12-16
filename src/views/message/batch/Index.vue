@@ -21,12 +21,12 @@
           <span class="hidden-xs">刷新</span>
         </a-button>
 
-        <a-button @click="this.searchDialogVisible=true;" :loading="spinning">
+        <a-button @click="searchDialogVisible=true;" :loading="spinning">
           <icon-font class="icon" v-if="!spinning" type="icon-search" />
           <span class="hidden-xs">搜索</span>
         </a-button>
 
-        <a-button type="primary" @click="remove(null)" danger v-if="this.principal.hasPermission('perms[batch_message:delete]')">
+        <a-button type="primary" @click="remove(null)" danger v-if="principal.hasPermission('perms[batch_message:delete]')">
           <icon-font class="icon" type="icon-ashbin" />
           <span class="hidden-xs">删除选中</span>
         </a-button>
@@ -35,21 +35,21 @@
       <a-table class="ant-table-striped" :row-selection="{ selectedRowKeys: selectedIds, onChange:selectChange }" :rowKey="record=>record.id" :scroll="{ x: 1375 }" :pagination="false" :data-source="page.elements" :columns="columns" bordered>
 
         <template #creationTime="{ text:creationTime }">
-          {{ this.timestampFormat(creationTime)}}
+          {{ timestampFormat(creationTime) }}
         </template>
 
         <template #completeTime="{ text:completeTime }">
-          {{ this.timestampFormat(completeTime)}}
+          {{ timestampFormat(completeTime) }}
         </template>
 
         <template #action="{ record }">
           <div class="text-center">
             <a-space :size="10">
-              <a-button size="small" @click="detail(record)" v-if="this.principal.hasPermission('perms[batch_message:get]')">
+              <a-button size="small" @click="detail(record)" v-if="principal.hasPermission('perms[batch_message:get]')">
                 <icon-font class="icon" type="icon-file" />
                 <span class="hidden-xs">详情</span>
               </a-button>
-              <a-button size="small" type="primary" danger @click="remove(record)" v-if="this.principal.hasPermission('perms[batch_message:delete]')">
+              <a-button size="small" type="primary" danger @click="remove(record)" v-if="principal.hasPermission('perms[batch_message:delete]')">
                 <icon-font class="icon" type="icon-ashbin" />
                 <span class="hidden-xs">删除</span>
               </a-button>
@@ -145,7 +145,7 @@ export default {
         },
         {
           title: "状态",
-          dataIndex: "status.name",
+          dataIndex: "executeStatus.name",
           ellipsis: true,
           width: 80
         },

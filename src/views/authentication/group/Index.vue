@@ -20,18 +20,18 @@
         </a-button>
       </template>
       <template #addonBefore>
-        <a-button type="text" @click="$refs['group-table'].edit()" v-if="this.principal.hasPermission('perms[group:save]')">
+        <a-button type="text" @click="$refs['group-table'].edit()" v-if="principal.hasPermission('perms[group:save]')">
           <icon-font class="icon" type="icon-add"/>
           <span class="hidden-xs">添加</span>
         </a-button>
-        <a-button type="text" danger @click="$refs['group-table'].remove(null)" v-if="this.principal.hasPermission('perms[group:delete]')">
+        <a-button type="text" danger @click="$refs['group-table'].remove(null)" v-if="principal.hasPermission('perms[group:delete]')">
           <icon-font class="icon" type="icon-ashbin" />
           <span class="hidden-xs">删除选中</span>
         </a-button>
       </template>
     </a-input>
 
-    <group-table ref="group-table" :enable-disabled-checkbox="true" @searching="this.spinning=true" @search="this.spinning=false"/>
+    <group-table ref="group-table" :enable-disabled-checkbox="true" @searching="spinning=true" @search="spinning=false"/>
 
   </a-card>
 

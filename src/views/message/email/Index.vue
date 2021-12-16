@@ -15,16 +15,16 @@
     <a-spin :spinning="spinning" tip="数据加载中...">
 
       <a-space :size="10" class="margin-lg-bottom">
-        <a-button @click="this.searchDialogVisible=true;" :loading="spinning">
+        <a-button @click="searchDialogVisible=true;" :loading="spinning">
           <icon-font class="icon" v-if="!spinning" type="icon-search" />
           <span class="hidden-xs">搜索</span>
         </a-button>
-        <a-button @click="send" v-if="this.principal.hasPermission('perms[message:send]')">
+        <a-button @click="send" v-if="principal.hasPermission('perms[message:send]')">
           <icon-font class="icon" type="icon-send" />
           <span class="hidden-xs">发送</span>
         </a-button>
 
-        <a-button type="primary" @click="remove(null)" danger v-if="this.principal.hasPermission('perms[email:delete]')">
+        <a-button type="primary" @click="remove(null)" danger v-if="principal.hasPermission('perms[email:delete]')">
           <icon-font class="icon" type="icon-ashbin" />
           <span class="hidden-xs">删除选中</span>
         </a-button>
@@ -32,19 +32,19 @@
 
       <a-table class="ant-table-striped" :row-selection="{ selectedRowKeys: selectedIds, onChange:selectChange }" :rowKey="record=>record.id" :scroll="{ x: 1575 }" :pagination="false" :data-source="page.elements" :columns="columns" bordered>
         <template #successTime="{ text:successTime }">
-          {{ this.timestampFormat(successTime)}}
+          {{ timestampFormat(successTime) }}
         </template>
         <template #lastSendTime="{ text:lastSendTime }">
-          {{ this.timestampFormat(lastSendTime)}}
+          {{ timestampFormat(lastSendTime) }}
         </template>
         <template #action="{ record }">
           <div class="text-center">
             <a-space :size="10">
-              <a-button size="small" @click="detail(record)" v-if="this.principal.hasPermission('perms[email:get]')">
+              <a-button size="small" @click="detail(record)" v-if="principal.hasPermission('perms[email:get]')">
                 <icon-font class="icon" type="icon-file" />
                 <span class="hidden-xs">详情</span>
               </a-button>
-              <a-button size="small" type="primary" danger @click="remove(record)" v-if="this.principal.hasPermission('perms[email:delete]')">
+              <a-button size="small" type="primary" danger @click="remove(record)" v-if="principal.hasPermission('perms[email:delete]')">
                 <icon-font class="icon" type="icon-ashbin" />
                 <span class="hidden-xs">删除</span>
               </a-button>
@@ -102,7 +102,7 @@
         </a-col>
         <a-col :span="12">
           <a-form-item label="状态:">
-            <a-select v-model:value="form['filter_[status_eq]']">
+            <a-select v-model:value="form['filter_[execute_status_eq]']">
               <a-select-option value="">
                 全部
               </a-select-option>
@@ -153,7 +153,7 @@ export default {
       columns:[
         {
           title: "状态",
-          dataIndex: "status.name",
+          dataIndex: "executeStatus.name",
           ellipsis: true,
           width: 100
         },
@@ -208,7 +208,7 @@ export default {
         "filter_[title_like]":"",
         "filter_[content_eq]":"",
         "filter_[type_eq]":"",
-        "filter_[status_eq]":"",
+        "filter_[execute_status_eq]":"",
         "filter_[from_like]":"",
         "filter_[to_like]":"",
         "filter_[creation_time_between]":[]

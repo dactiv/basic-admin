@@ -15,7 +15,7 @@
     <a-spin :spinning="spinning" tip="数据加载中...">
 
       <a-space :size="10" class="margin-lg-bottom">
-        <a-button @click="this.searchDialogVisible=true;" :loading="spinning">
+        <a-button @click="searchDialogVisible=true;" :loading="spinning">
           <icon-font class="icon" v-if="!spinning" type="icon-search" />
           <span class="hidden-xs">搜索</span>
         </a-button>
@@ -35,7 +35,7 @@
         </template>
 
         <template #registrationTime="{ text:registrationTime }">
-          {{ this.timestampFormat(registrationTime)}}
+          {{ timestampFormat(registrationTime) }}
         </template>
 
       </a-table>

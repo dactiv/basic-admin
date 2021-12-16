@@ -65,7 +65,7 @@
               </template>
               <template #avatar>
                 <a-typography-text :type="item.status !== 'done' ? 'secondary' : item.status === 'error' ? 'danger' : 'success'">
-                  <icon-font class="icon file" :type="this.getFileIcon(item.name)" />
+                  <icon-font class="icon file" :type="getFileIcon(item.name)" />
                 </a-typography-text>
               </template>
             </a-list-item-meta>
@@ -81,12 +81,12 @@
 
       <a-space :size="10">
 
-        <a-button type="primary" :loading="sending" @click="submitForm" v-if="this.principal.hasPermission('perms[message:send]')">
+        <a-button type="primary" :loading="sending" @click="submitForm" v-if="principal.hasPermission('perms[message:send]')">
           <icon-font class="icon" v-if="!sending" type="icon-send" />
           <span class="hidden-xs">发送</span>
         </a-button>
 
-        <a-upload v-if="this.principal.hasPermission('perms[message:send]')" :showUploadList="false" :multiple="true" v-model:file-list="fileList" action="/message/attachment/upload/email" @change="fileListChange">
+        <a-upload v-if="principal.hasPermission('perms[message:send]')" :showUploadList="false" :multiple="true" v-model:file-list="fileList" action="/message/attachment/upload/email" @change="fileListChange">
           <a-button>
             <icon-font class="icon" type="icon-attachment" />
             <span class="hidden-xs">上传附件</span>
@@ -131,7 +131,7 @@
         <a-table class="ant-table-striped" :row-selection="{ selectedRowKeys: search.selectedIds, onChange:userTableSelectChange }" :rowKey="record=>record.id" :scroll="{ x: 800, y: 300 }" :pagination="false" :data-source="search.data" :columns="search.columns" bordered>
 
           <template #registrationTime="{ text:registrationTime }">
-            {{ this.timestampFormat(registrationTime)}}
+            {{ timestampFormat(registrationTime) }}
           </template>
 
         </a-table>

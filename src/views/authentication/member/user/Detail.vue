@@ -22,7 +22,7 @@
         <a-descriptions-item label="登陆账号">{{ form.username}} </a-descriptions-item>
         <a-descriptions-item label="手机号码">{{ form.phone}}</a-descriptions-item>
         <a-descriptions-item label="电子邮箱">{{ form.email }}</a-descriptions-item>
-        <a-descriptions-item label="注册时间">{{ this.timestampFormat(form.registrationTime) }}</a-descriptions-item>
+        <a-descriptions-item label="注册时间">{{ timestampFormat(form.registrationTime) }}</a-descriptions-item>
         <a-descriptions-item v-if="form.initialization" label="是否更新密码">{{ form.initialization.modifyPassword === 1 ? "是" : "否"}}</a-descriptions-item>
         <a-descriptions-item v-if="form.initialization" label="是否更新用户名">{{ form.initialization.modifyUsername === 1 ? "是" : "否" }}</a-descriptions-item>
         <a-descriptions-item label="状态" :span="2" ><a-badge :status="form.status === 1 ? 'success' : form.status === 2 ? 'default' : 'warning'" :text="form.statusName" /></a-descriptions-item>

@@ -15,16 +15,16 @@
     <a-spin :spinning="spinning" tip="数据加载中...">
 
       <a-space :size="10" class="margin-lg-bottom">
-        <a-button @click="this.searchDialogVisible=true;" :loading="spinning">
+        <a-button @click="searchDialogVisible=true;" :loading="spinning">
           <icon-font class="icon" v-if="!spinning" type="icon-search" />
           <span class="hidden-xs">搜索</span>
         </a-button>
-        <a-button @click="edit" v-if="this.principal.hasPermission('perms[access_crypto:save]')">
+        <a-button @click="edit" v-if="principal.hasPermission('perms[access_crypto:save]')">
           <icon-font class="icon" type="icon-add" />
           <span class="hidden-xs">添加</span>
         </a-button>
 
-        <a-button type="primary" @click="remove(null)" danger v-if="this.principal.hasPermission('perms[access_crypto:delete]')">
+        <a-button type="primary" @click="remove(null)" danger v-if="principal.hasPermission('perms[access_crypto:delete]')">
           <icon-font class="icon" type="icon-ashbin" />
           <span class="hidden-xs">删除选中</span>
         </a-button>
@@ -35,11 +35,11 @@
         <template #action="{ record }">
           <div class="text-center">
             <a-space :size="10">
-              <a-button size="small" @click="edit(record)" v-if="this.principal.hasPermission('perms[access_crypto:get]')">
+              <a-button size="small" @click="edit(record)" v-if="principal.hasPermission('perms[access_crypto:get]')">
                 <icon-font class="icon" type="icon-edit" />
                 <span class="hidden-xs">编辑</span>
               </a-button>
-              <a-button size="small" type="primary" danger @click="remove(record)" v-if="this.principal.hasPermission('perms[access_crypto:delete]')">
+              <a-button size="small" type="primary" danger @click="remove(record)" v-if="principal.hasPermission('perms[access_crypto:delete]')">
                 <icon-font class="icon" type="icon-ashbin" />
                 <span class="hidden-xs">删除</span>
               </a-button>
@@ -143,7 +143,7 @@ export default {
           width: 150
         },{
           title: "状态",
-          dataIndex: "status.name",
+          dataIndex: "enabled.name",
           ellipsis: true,
           width: 80
         },{

@@ -20,11 +20,11 @@
         </a-button>
       </template>
       <template #addonBefore>
-        <a-button type="text" @click="edit()" v-if="this.principal.hasPermission('perms[dictionary_type:save]')">
+        <a-button type="text" @click="edit()" v-if="principal.hasPermission('perms[dictionary_type:save]')">
           <icon-font class="icon" type="icon-add"/>
           <span class="hidden-xs">添加</span>
         </a-button>
-        <a-button type="text" danger @click="remove(null)" v-if="this.principal.hasPermission('perms[dictionary_type:delete]')">
+        <a-button type="text" danger @click="remove(null)" v-if="principal.hasPermission('perms[dictionary_type:delete]')">
           <icon-font class="icon" type="icon-ashbin" />
           <span class="hidden-xs">删除选中</span>
         </a-button>
@@ -38,11 +38,11 @@
         <template #action="{ record }">
           <div class="text-center">
             <a-space :size="10">
-              <a-button size="small" @click="edit(record)" v-if="this.principal.hasPermission('perms[dictionary_type:get]')">
+              <a-button size="small" @click="edit(record)" v-if="principal.hasPermission('perms[dictionary_type:get]')">
                 <icon-font class="icon" type="icon-edit" />
                 <span class="hidden-xs">编辑</span>
               </a-button>
-              <a-button size="small" type="primary" danger @click="remove(record)" v-if="this.principal.hasPermission('perms[dictionary_type:delete]')">
+              <a-button size="small" type="primary" danger @click="remove(record)" v-if="principal.hasPermission('perms[dictionary_type:delete]')">
                 <icon-font class="icon" type="icon-ashbin" />
                 <span class="hidden-xs">删除</span>
               </a-button>
