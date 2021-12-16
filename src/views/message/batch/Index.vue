@@ -132,7 +132,7 @@ export default {
       columns:[
         {
           title: "类型",
-          dataIndex: "typeName",
+          dataIndex: "type.name",
           ellipsis: true,
           width: 80
         },
@@ -185,7 +185,7 @@ export default {
     }
   },
   created() {
-    this.loadConfig({service:"message", enumerateName:"AttachmentType"}, r=> this.typeOptions = r.data.data);
+    this.loadConfig({service:"message", enumerateName:"AttachmentTypeEnum"}, r=> this.typeOptions = r.data.data);
   },
   methods:{
 

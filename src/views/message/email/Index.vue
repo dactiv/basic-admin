@@ -159,7 +159,7 @@ export default {
         },
         {
           title: "类型",
-          dataIndex: "typeName",
+          dataIndex: "type.name",
           ellipsis: true,
           width: 100
         },
@@ -226,7 +226,7 @@ export default {
     }
   },
   created() {
-    this.loadConfig({service:"message", enumerateName:"MessageType"}, r=> this.typeOptions = r.data.data);
+    this.loadConfig({service:"message", enumerateName:"MessageTypeEnum"}, r=> this.typeOptions = r.data.data);
     this.loadConfig({service:"config", enumerateName:"ExecuteStatus"}, r=> this.statusOptions = r.data.data);
   },
   methods:{

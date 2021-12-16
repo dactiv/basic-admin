@@ -21,8 +21,8 @@
           :column="{ xxl: 2, xl: 2, lg: 2, md: 2, sm: 2, xs: 1 }"
       >
 
-        <a-descriptions-item label="类型">{{ form.typeName }}</a-descriptions-item>
-        <a-descriptions-item label="状态"><a-badge :status="form.status === 0 ? 'processing' : form.status === 1 ? 'success' : 'error'" :text="form.statusName" /></a-descriptions-item>
+        <a-descriptions-item label="类型">{{ form.type.name }}</a-descriptions-item>
+        <a-descriptions-item label="状态"><a-badge :status="form.status.value === 0 ? 'processing' : form.status.value === 1 ? 'success' : 'error'" :text="form.status.name" /></a-descriptions-item>
         <a-descriptions-item label="创建时间">{{ this.timestampFormat(form.creationTime) }} </a-descriptions-item>
         <a-descriptions-item label="下次重试时间">{{ this.timestampFormat(form.nextRetryTime) }} </a-descriptions-item>
         <a-descriptions-item label="最后发送时间">{{ this.timestampFormat(form.lastSendTime) }} </a-descriptions-item>
@@ -114,12 +114,16 @@ export default {
       form: {
         id:"",
         creationTime: "",
-        type:"",
-        typeName: "",
         isPushName:"",
         isReadName:"",
-        status:"",
-        statusName: "",
+        type: {
+          name:"",
+          value:""
+        },
+        status:{
+          name:"",
+          value:""
+        },
         lastSendTime: "",
         successTime:"",
         nextRetryTime:"",

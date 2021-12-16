@@ -219,7 +219,7 @@ export default {
     },
   },
   created() {
-    this.loadConfig({service:"message", enumerateName:"MessageType"}, r=> this.typeOptions = r.data.data);
+    this.loadConfig({service:"message", enumerateName:"MessageTypeEnum"}, r=> this.typeOptions = r.data.data);
   },
   data() {
     return {

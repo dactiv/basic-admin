@@ -21,8 +21,8 @@
           :column="{ xxl: 2, xl: 2, lg: 2, md: 2, sm: 2, xs: 1 }"
       >
 
-        <a-descriptions-item label="类型"><icon-font class="icon" :type="form.type === 10 ? 'icon-notification' : form.type === 20 ? 'icon-email' : 'icon-sms'" /> {{ form.typeName }}</a-descriptions-item>
-        <a-descriptions-item label="状态"><a-badge :status="form.status === 0 ? 'processing' : form.status === 1 ? 'success' : 'error'" :text="form.statusName" /></a-descriptions-item>
+        <a-descriptions-item label="类型"><icon-font class="icon" :type="form.type.value === 10 ? 'icon-notification' : form.type.value === 20 ? 'icon-email' : 'icon-sms'" /> {{ form.type.name }}</a-descriptions-item>
+        <a-descriptions-item label="状态"><a-badge :status="form.status.value === 0 ? 'processing' : form.status.value === 1 ? 'success' : 'error'" :text="form.status.name" /></a-descriptions-item>
         <a-descriptions-item label="创建时间">{{ this.timestampFormat(form.creationTime) }} </a-descriptions-item>
         <a-descriptions-item label="完成时间">{{ this.timestampFormat(form.completeTime) }}</a-descriptions-item>
         <a-descriptions-item label="总发送数量">{{ form.count}}</a-descriptions-item>
@@ -32,7 +32,7 @@
 
       </a-descriptions>
 
-      <a-divider><a-typography-text type="secondary"><icon-font class="icon" :type="form.type === 10 ? 'icon-notification' : form.type === 20 ? 'icon-email' : 'icon-sms'" /> {{ form.typeName }}数据</a-typography-text></a-divider>
+      <a-divider><a-typography-text type="secondary"><icon-font class="icon" :type="form.type === 10 ? 'icon-notification' : form.type === 20 ? 'icon-email' : 'icon-sms'" /> {{ form.type.name }}数据</a-typography-text></a-divider>
 
       <a-table class="ant-table-striped" :rowKey="record=>record.id" :scroll="{ x: tableScrollX }" :pagination="false" :data-source="page.elements" :columns="columns" bordered>
 
