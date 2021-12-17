@@ -77,7 +77,7 @@
           </a-col>
           <a-col :span="19" class="height-100-percent">
             <div class="search">
-              <a-input placeholder="搜索" />
+              <a-input placeholder="搜索" v-model:value="tree.searchText" />
             </div>
             <div class="left-content">
               <a-menu v-show="tab === 'message'" @click="selectContact" :selectedKeys="selectedKeys" mode="vertical">
@@ -138,7 +138,7 @@
                   </template>
                   <template #title="{name, id}">
                     <div v-if="id.includes('user-') || id.includes('room-')" class="group-user">
-                      <a-avatar size="small" :src="id.includes('user-') ? this.getPrincipalAvatarByUserId(id.replace('user-','')) : ''" :shape="id.includes('user-') ? 'circle' : 'square'">
+                      <a-avatar size="small" :src="id.includes('user-') ? getPrincipalAvatarByUserId(id.replace('user-','')) : ''" :shape="id.includes('user-') ? 'circle' : 'square'">
                         {{name.substring(0,1) }}
                       </a-avatar>
                       <a-typography-text strong :content="name" />
@@ -178,13 +178,13 @@
                     <icon-font spin class="icon" type="icon-refresh" /> 数据加载中...
                   </a-typography-text>
                 </a-divider>
-                <div v-for="m of this.current.contact.messages" :key="m.id">
+                <div v-for="m of current.contact.messages" :key="m.id">
 
                   <div class="text-center margin-top margin-bottom">
                     <a-typography-text type="secondary">{{ timestampFormat(m.creationTime) }}</a-typography-text>
                   </div>
 
-                  <div v-for="c of m.contents" :key="c" :class="c.senderId !== this.principal.details.id ? 'margin-bottom' : 'margin-bottom text-right'">
+                  <div v-for="c of m.contents" :key="c" :class="c.senderId !== principal.details.id ? 'margin-bottom' : 'margin-bottom text-right'">
                     <a-space align="start">
                         <a-avatar v-if="c.senderId !== this.principal.details.id" :src="getPrincipalAvatarByUserId(this.current.contact.id)" class="basic-box-shadow" >
                           {{ current.contact.title.substring(0,1) }}
@@ -268,7 +268,7 @@
       </a-col>
       <a-col :span="16" class="padding height-100-percent overflow-auto">
         <a-card v-if="room.selectedUser.length > 0">
-          <a-card-grid v-for="u of this.room.selectedUser" :key="u.key" style="width: 25%; text-align: center">
+          <a-card-grid v-for="u of room.selectedUser" :key="u.key" style="width: 25%; text-align: center">
             <a-avatar :src="getPrincipalAvatarByUserId(u.key.replaceAll('user-',''))" >
               {{ u.props.name.substring(0,1) }}
             </a-avatar>
@@ -308,7 +308,7 @@
         </a-typography-text>
       </a-divider>
       <a-empty v-if="current.history.messages.length === 0"></a-empty>
-      <div v-for="c of this.current.history.messages" :key="c.id" :class="c.senderId === this.principal.details.id ? 'self' : ''">
+      <div v-for="c of this.current.history.messages" :key="c.id" :class="c.senderId === principal.details.id ? 'self' : ''">
         <p>
           <a-typography-paragraph>
             <a-typography-text strong >{{ getUsernameById(c.senderId) + " "}}</a-typography-text>
@@ -420,7 +420,10 @@ export default {
       this
           .$http
           .post("/socket-server/room/createRoom", this.formUrlencoded(param))
-          .then(() => this.room.visible = false);
+          .then(() => {
+            this.room.visible = false;
+            this.room.selectedUser = [];
+          });
     },
     showContactHistory() {
       if (this.current.contact.id === 0) {
@@ -941,8 +944,17 @@ export default {
             param["filter_[parent_id_eq]"] = treeNode.eventKey.replace("group-","");
           }
 
+          let headers = {};
+          headers[process.env.VUE_APP_HEADER_FILTER_RESULT_ID_NAME] = process.env.VUE_APP_HEADER_FILTER_CHAT_ID_VALUE;
+          let config = {
+            url:"/authentication/group/find",
+            params: param,
+            method: "POST",
+            headers: headers
+          }
+
           this.$http
-              .post("/authentication/group/find", this.formUrlencoded(param))
+              .request(config)
               .then(r => {
 
                 treeNode.dataRef.children = r.data.data || [];
@@ -968,10 +980,20 @@ export default {
       });
     },
     loadTreeUser(treeNode) {
+      let headers = {};
+      headers[process.env.VUE_APP_HEADER_FILTER_RESULT_ID_NAME] = process.env.VUE_APP_HEADER_FILTER_CHAT_ID_VALUE;
+      let config = {
+        url:"/authentication/console/user/find",
+        params: this.formUrlencoded({
+          "filter_[groups_info.id_jin]": treeNode.eventKey.replace("group-","") * 1
+        }),
+        method: "POST",
+        headers: headers
+      }
 
       this
           .$http
-          .get("/authentication/console/user/findByGroup?groupId=" + treeNode.eventKey.replace("group-",""))
+          .request(config)
           .then(u => {
             let users = u.data.data;
 
@@ -1171,6 +1193,7 @@ export default {
       tree: {
         users: JSON.parse(localStorage.getItem(process.env.VUE_APP_LOCAL_STORAGE_CHAT_USER_NAME)) || [],
         groups: JSON.parse(localStorage.getItem(process.env.VUE_APP_LOCAL_STORAGE_CHAT_GROUP_NAME)) || {},
+        searchText: "",
       },
       room: {
         visible:false,

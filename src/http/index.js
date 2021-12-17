@@ -22,7 +22,10 @@ const ignoreErrorStatus = [404];
  */
 function requestInterceptor(config) {
 
-    config.headers[process.env.VUE_APP_HEADER_FILTER_RESULT_ID_NAME] = process.env.VUE_APP_HEADER_FILTER_RESULT_ID_VALUE;
+    if (!config.headers[process.env.VUE_APP_HEADER_FILTER_RESULT_ID_NAME]) {
+        config.headers[process.env.VUE_APP_HEADER_FILTER_RESULT_ID_NAME] = process.env.VUE_APP_HEADER_FILTER_RESULT_ID_VALUE;
+    }
+
     config.headers[process.env.VUE_APP_HEADER_DATA_VERSION_NAME] = process.env.VUE_APP_HEADER_DATA_VERSION_VALUE;
 
     let deviceId = localStorage.getItem(process.env.VUE_APP_LOCAL_STORAGE_DEVICE_IDENTIFIED_NAME);
