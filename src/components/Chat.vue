@@ -88,7 +88,7 @@
                     <a-row type="flex" justify="space-around" align="middle">
                       <a-col :span="4">
                         <a-badge :count="c.messages.reduce((s, m) => s + m.contents.filter(ct => ct.status === 'unread').length, 0)" :offset="[x = -25, y = 0]">
-                          <a-avatar :src="c.type.value === 10 ? this.getPrincipalAvatarByUserId(c.id) : null" :shape="c.type.value === 10 ? 'circle' : 'square'">
+                          <a-avatar :src="c.type === 10 ? this.getPrincipalAvatarByUserId(c.id) : null" :shape="c.type === 10 ? 'circle' : 'square'">
                             {{ c.title.substring(0, 1) }}
                           </a-avatar>
                         </a-badge>
@@ -158,7 +158,7 @@
           <a-row>
             <a-col :span="20">
               <a-space v-if="current.contact.id > 0" :size="10" class="padding-left">
-                <a-avatar :src="current.contact.type.value === 10 ? this.getPrincipalAvatarByUserId(this.current.contact.id) : null" :shape="current.contact.type.value === 10 ? 'circle' : 'square'" >
+                <a-avatar :src="current.contact.type === 10 ? this.getPrincipalAvatarByUserId(this.current.contact.id) : null" :shape="current.contact.type === 10 ? 'circle' : 'square'" >
                   {{ current.contact.title.substring(0,1) }}
                 </a-avatar>
                 <a-typography-text strong>{{ current.contact.title }}</a-typography-text>
@@ -395,7 +395,7 @@ export default {
     },
     onRoomDelete(data) {
       let id = JSON.parse(data).data;
-      let c = this.contacts.find(c => c.id === id && c.type.value === 20);
+      let c = this.contacts.find(c => c.id === id && c.type === 20);
 
       if (!c) {
         return ;
@@ -467,6 +467,7 @@ export default {
               if (!data || data.length <= 0) {
                 return ;
               }
+              data.forEach(d => d.type = d.type.value);
               this.getRecentContactsProfile(data);
             });
       } else {
