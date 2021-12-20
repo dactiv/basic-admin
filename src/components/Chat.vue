@@ -1,9 +1,9 @@
 <template >
   <a-drawer :width="950" placement="right" :closable="false" :afterVisibleChange="visibleChange" v-model:visible="visible" class="chat">
 
-    <a-drawer width="250" :closable="false" :visible="groupDrawer.visible" :bodyStyle="{'padding':'0px'}">
+    <a-drawer :width="250" :closable="false" :visible="room.info.visible" :bodyStyle="{'padding':'0px'}">
       <div class="text-right">
-        <a-button type="text" @click="groupDrawer.visible = false" class="padding-xss-left padding-xss-right">
+        <a-button type="text" @click="room.info.visible = false" class="padding-xss-left padding-xss-right">
           <icon-font class="icon" type="icon-close" />
         </a-button>
       </div>
@@ -12,34 +12,36 @@
         <a-divider class="font-size-sm" orientation="left">名称</a-divider>
 
         <a-space>
-          <a-button type="text" class="padding-none" @click="groupDrawer.editable = !groupDrawer.editable">
-            <icon-font class="icon" :type="groupDrawer.editable ? 'icon-select' : 'icon-edit'" />
+          <a-button type="text" class="padding-none" @click="room.info.editable = !room.info.editable">
+            <icon-font class="icon" :type="room.info.editable ? 'icon-select' : 'icon-edit'" />
           </a-button>
-          <a-input v-if="groupDrawer.editable" @blur="groupDrawer.editable = false" @keyup.enter="groupDrawer.editable = false" v-model:value="current.contact.title" />
+          <a-input v-if="room.info.editable" @blur="room.info.editable = false" @keyup.enter="room.info.editable = false" v-model:value="current.contact.title" />
           <a-typography-text v-else :ellipsis="true" v-model:content="current.contact.title" style="width: 175px"/>
         </a-space>
 
         <a-divider class="font-size-sm" orientation="left">备注</a-divider>
-        <a-empty v-if="!current.contact.reamrk"></a-empty>
-        <p v-else>{{current.contact.reamrk}}</p>
+        <a-empty v-if="!current.contact.remark"></a-empty>
+        <p v-else>{{current.contact.remark}}</p>
 
         <a-divider class="font-size-sm" orientation="left">成员信息</a-divider>
 
         <a-row type="flex" justify="space-around" align="middle" class="margin-bottom">
           <a-col :span="24">
-            <a-input-search placeholder="搜索" v-model:value="groupDrawer.searchText" />
+            <a-input-search placeholder="搜索" v-model:value="room.info.searchText" />
           </a-col>
         </a-row>
 
         <a-row type="flex" justify="space-around" align="middle" class="margin-bottom" :gutter="[12,0]">
           <a-col :span="12">
-            <a-button @click="room.visible = true" block>
+            <a-button @click="room.info.visible = true" block>
               <icon-font class="icon" type="icon-add" /> 添加
             </a-button>
           </a-col>
           <a-col :span="12">
-            <a-button type="primary" danger block>
-              <icon-font class="icon" type="icon-ashbin" /> 解散
+            <a-button type="primary" @click="exitRoom" danger block>
+              <icon-font class="icon" type="icon-ashbin" />
+              <span v-if="current.contact.participants.find(r => r.userId === principal.id).role.value === 20">解散</span>
+              <span else>退出</span>
             </a-button>
           </a-col>
         </a-row>
@@ -85,8 +87,8 @@
                   <a-dropdown :trigger="['contextmenu']">
                     <a-row type="flex" justify="space-around" align="middle">
                       <a-col :span="4">
-                        <a-badge :count="c.messages.reduce((s, m) => s + m.contents.filter(c => c.status === 'unread').length, 0)" :offset="[x=-25, y=0]">
-                          <a-avatar :src="c.type === 10 ? this.getPrincipalAvatarByUserId(c.id) : null" :shape="c.type === 10 ? 'circle' : 'square'">
+                        <a-badge :count="c.messages.reduce((s, m) => s + m.contents.filter(ct => ct.status === 'unread').length, 0)" :offset="[x = -25, y = 0]">
+                          <a-avatar :src="c.type.value === 10 ? this.getPrincipalAvatarByUserId(c.id) : null" :shape="c.type.value === 10 ? 'circle' : 'square'">
                             {{ c.title.substring(0, 1) }}
                           </a-avatar>
                         </a-badge>
@@ -156,14 +158,14 @@
           <a-row>
             <a-col :span="20">
               <a-space v-if="current.contact.id > 0" :size="10" class="padding-left">
-                <a-avatar :src="current.contact.type === 10 ? this.getPrincipalAvatarByUserId(this.current.contact.id) : null" :shape="current.contact.type === 10 ? 'circle' : 'square'" >
+                <a-avatar :src="current.contact.type.value === 10 ? this.getPrincipalAvatarByUserId(this.current.contact.id) : null" :shape="current.contact.type.value === 10 ? 'circle' : 'square'" >
                   {{ current.contact.title.substring(0,1) }}
                 </a-avatar>
                 <a-typography-text strong>{{ current.contact.title }}</a-typography-text>
               </a-space>
             </a-col>
             <a-col :span="4" class="text-right">
-              <a-button type="text" @click="current.contact.id >= 0 && this.current.contact.type === 10 ? this.room.visible = true : this.groupDrawer.visible = true">
+              <a-button type="text" @click="current.contact.id >= 0 && this.current.contact.type === 10 ? this.room.visible = true : this.room.info.visible = true">
                 <icon-font class="icon" :type="current.contact.id >= 0 && this.current.contact.type === 10 ? 'icon-user-groups' : 'icon-image-text'" />
               </a-button>
             </a-col>
@@ -247,7 +249,7 @@
         </a-row>
         <a-divider class="font-size-sm"> <icon-font class="icon" type="icon-user-groups" /> 选择用户</a-divider>
         <div class="tree-content">
-          <a-tree checkable @check="roomUserCheck" show-icon :load-data="loadTreeData" :replaceFields="{title:'name', key:'id'}" :tree-data="room.contactData">
+          <a-tree checkable @check="selectRoomUser" show-icon :load-data="loadTreeData" :replaceFields="{title:'name', key:'id'}" :tree-data="room.contactData">
             <template #group>
               <icon-font class="icon" type="icon-folder-close" />
             </template>
@@ -382,9 +384,18 @@ export default {
     window.onblur = () => _this.hasFocus = false;
   },
   methods:{
+    exitRoom() {
+      this
+          .$http
+          .post("/socket-server/room/createRoom")
+          .then((r) => {
+            this.room.info.visible = false;
+            this.$message.success(r.data.message);
+          });
+    },
     onRoomDelete(data) {
       let id = JSON.parse(data).data;
-      let c = this.contacts.find(c => c.id === id && c.type === 20);
+      let c = this.contacts.find(c => c.id === id && c.type.value === 20);
 
       if (!c) {
         return ;
@@ -400,7 +411,7 @@ export default {
         type: 20
       });
     },
-    roomUserCheck(checkedKeys, e) {
+    selectRoomUser(checkedKeys, e) {
       this.room.selectedUser = e.checkedNodes.filter(c => c.key.indexOf('group-') < 0 && c.key !== 'contact');
     },
     createRoom() {
@@ -420,9 +431,10 @@ export default {
       this
           .$http
           .post("/socket-server/room/createRoom", this.formUrlencoded(param))
-          .then(() => {
+          .then((r) => {
             this.room.visible = false;
             this.room.selectedUser = [];
+            this.$message.success(r.data.message);
           });
     },
     showContactHistory() {
@@ -1203,6 +1215,11 @@ export default {
           id: 'contact',
           slots : { icon: 'contact' }
         }],
+        info:{
+          visible:false,
+          editable:false,
+          searchText:''
+        },
       },
       hasFocus:true,
       selectedToolBar:["message"],
@@ -1231,11 +1248,6 @@ export default {
             enabledDate:[]
           }
         }
-      },
-      groupDrawer:{
-        visible:false,
-        editable:false,
-        searchText:''
       },
       visible: false,
       contacts: JSON.parse(localStorage.getItem(this.getLocalStorageContactName(this.principal.details.id))) || [],
