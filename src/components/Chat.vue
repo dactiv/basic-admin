@@ -49,9 +49,9 @@
         <a-space direction="vertical">
           <a-space v-for="p of current.contact.participants" :key="p.id">
               <a-avatar :src="getPrincipalAvatarByUserId(p.userId)">
-                {{ getUsernameById(p.userId).substring(0,1) }}
+                {{ getUsernameById(p.userId, "用户 [" + p.userId + "]").substring(0,1) }}
               </a-avatar>
-              <a-typography-text strong>{{ getUsernameById(p.userId) }}</a-typography-text>
+              <a-typography-text strong>{{ getUsernameById(p.userId, "用户 [" + p.userId + "]") }}</a-typography-text>
           </a-space>
         </a-space>
       </div>
@@ -313,7 +313,7 @@
       <div v-for="c of this.current.history.messages" :key="c.id" :class="c.senderId === principal.details.id ? 'self' : ''">
         <p>
           <a-typography-paragraph>
-            <a-typography-text strong >{{ getUsernameById(c.senderId) + " "}}</a-typography-text>
+            <a-typography-text strong >{{ getUsernameById(c.senderId, "用户 [" + p.userId + "]") + " "}}</a-typography-text>
             <a-typography-text class="font-size-sm">{{ timestampFormat(c.creationTime) }}</a-typography-text>
           </a-typography-paragraph>
         </p>
@@ -366,6 +366,10 @@ export default {
     this.$store.dispatch(SOCKET_IO_ACTION_TYPE.SUBSCRIBE,{
       name:SOCKET_EVENT_TYPE.ROOM_DELETE,
       callback:this.onRoomDelete
+    });
+    this.$store.dispatch(SOCKET_IO_ACTION_TYPE.SUBSCRIBE,{
+      name:SOCKET_EVENT_TYPE.ROOM_RENAME,
+      callback:this.onRoomRename
     });
 
     this.current.contact = JSON.parse(JSON.stringify(this.defaultContactValue));
@@ -423,8 +427,28 @@ export default {
         this
             .$http
             .post("/socket-server/room/exitRoom", this.formUrlencoded({id: this.current.contact.id}))
-            .then((r) =>  this.$message.success(r.data.message));
+            .then((r) => this.$message.success(r.data.message));
       });
+    },
+    onRoomRename(data) {
+      let json = JSON.parse(data).data;
+      if (json.userId === this.principal.details.id) {
+        return ;
+      }
+
+      let c = this.contacts.find(c => c.id === json.id && c.type === 20);
+      if (!c) {
+        return ;
+      }
+
+      let current = this.contacts[this.contacts.indexOf(c)];
+      let username = this.getUsernameById(json.userId);
+
+      if (username) {
+        this.$message.success("用户 [" + username + "] 更改了 [" + current.title + "] 群聊名称为 [ " + json.name + " ]" )
+      }
+
+      current.title = json.name;
     },
     onRoomDelete(data) {
 
@@ -443,6 +467,8 @@ export default {
           let index = this.tree.groups.room.indexOf(room);
           this.tree.groups.room.splice(index, 1);
           localStorage.setItem(process.env.VUE_APP_LOCAL_STORAGE_CHAT_GROUP_NAME, JSON.stringify(this.tree.groups));
+          // FIXME 先随便写写。
+          this.$message.success("群聊 [" + room.title + "] 已移除");
         }
       }
     },
@@ -466,6 +492,7 @@ export default {
         });
         localStorage.setItem(process.env.VUE_APP_LOCAL_STORAGE_CHAT_GROUP_NAME, JSON.stringify(this.tree.groups));
       }
+      this.$message.success("您加入了 [" + json.name + "] 群聊");
     },
     selectRoomUser(checkedKeys, e) {
       this.room.selectedUser = e.checkedNodes.filter(c => c.key.indexOf('group-') < 0 && c.key !== 'contact');
@@ -1121,7 +1148,7 @@ export default {
           });
 
     },
-    getUsernameById(id) {
+    getUsernameById(id, defaultValue) {
       if (id === this.principal.details.id) {
         return this.getPrincipalName(this.principal.details);
       }
@@ -1138,7 +1165,7 @@ export default {
         return user.name;
       }
 
-      return "用户 [" + id + "]";
+      return defaultValue;
     },
     addContact(contact) {
 

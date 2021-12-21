@@ -21,7 +21,8 @@ export const SOCKET_EVENT_TYPE = {
     CHAT_READ_MESSAGE:"chat_read_message",
     ROOM_CREATE:"room_create",
     ROOM_JOIN:"room_join",
-    ROOM_DELETE:"room_delete"
+    ROOM_DELETE:"room_delete",
+    ROOM_RENAME:"room_rename"
 }
 
 export const SOCKET_IO_ACTION_TYPE = {
