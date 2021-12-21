@@ -12,10 +12,10 @@
         <a-divider class="font-size-sm" orientation="left">名称</a-divider>
 
         <a-space>
-          <a-button type="text" class="padding-none" @click="room.info.editable = !room.info.editable">
+          <a-button type="text" class="padding-none" @click="renameRoom()">
             <icon-font class="icon" :type="room.info.editable ? 'icon-select' : 'icon-edit'" />
           </a-button>
-          <a-input v-if="room.info.editable" @blur="room.info.editable = false" @keyup.enter="room.info.editable = false" v-model:value="current.contact.title" />
+          <a-input v-if="room.info.editable" v-model:value="current.contact.title" />
           <a-typography-text v-else :ellipsis="true" v-model:content="current.contact.title" style="width: 175px"/>
         </a-space>
 
@@ -40,18 +40,18 @@
           <a-col :span="12">
             <a-button type="primary" @click="exitRoom" danger block>
               <icon-font class="icon" type="icon-ashbin" />
-              <span v-if="current.contact.participants.find(r => r.userId === principal.id).role.value === 20">解散</span>
-              <span else>退出</span>
+              <span v-if="current.contact.type === 20 && current.contact.participants.find(r => r.userId === principal.details.id).role.value === 20">解散</span>
+              <span v-else>退出</span>
             </a-button>
           </a-col>
         </a-row>
 
         <a-space direction="vertical">
           <a-space v-for="p of current.contact.participants" :key="p.id">
-            <a-avatar :src="getPrincipalAvatarByUserId(p.userId)">
-              {{ getUsernameById(p.userId).substring(0,1) }}
-            </a-avatar>
-            <a-typography-text strong>{{ getUsernameById(p.userId) }}</a-typography-text>
+              <a-avatar :src="getPrincipalAvatarByUserId(p.userId)">
+                {{ getUsernameById(p.userId).substring(0,1) }}
+              </a-avatar>
+              <a-typography-text strong>{{ getUsernameById(p.userId) }}</a-typography-text>
           </a-space>
         </a-space>
       </div>
@@ -114,7 +114,7 @@
                       </a-col>
                     </a-row>
                     <template #overlay>
-                      <a-menu @click="contextMenuClick">
+                      <a-menu @click="contactContextMenuClick">
                         <a-menu-item :key="c.id + '-' + c.type + '-top'"><icon-font class="icon" :type="c.top ? 'icon-unstar' : 'icon-star'" /> {{c.top ? '取消置顶' : '置顶'}}</a-menu-item>
                         <a-menu-item :key="c.id + '-' + c.type + '-read'"><icon-font class="icon" type="icon-survey" /> 设置为已读</a-menu-item>
                         <a-menu-item v-if="!c.top" :key="c.id + '-' + c.type + '-disturb'">
@@ -384,16 +384,50 @@ export default {
     window.onblur = () => _this.hasFocus = false;
   },
   methods:{
+    participantsContextMenuClick(){
+
+    },
+    renameRoom(){
+      this.room.info.editable = !this.room.info.editable;
+      if (!this.room.info.editable) {
+        let param = {
+          name: this.current.contact.title,
+          id: this.current.contact.id
+        };
+
+        this
+            .$http
+            .post("/socket-server/room/renameRoom", this.formUrlencoded(param))
+            .then((r) =>  {
+              this.$message.success(r.data.message);
+              let c = this.contacts.find(r => r.id === this.current.contact.id && r.type === 20);
+              this.contacts[this.contacts.indexOf(c)].name = this.current.contact.title;
+              localStorage.setItem(this.getLocalStorageContactName(this.principal.details.id), JSON.stringify(this.contacts));
+            });
+
+      }
+    },
     exitRoom() {
-      this
-          .$http
-          .post("/socket-server/room/createRoom")
-          .then((r) => {
-            this.room.info.visible = false;
-            this.$message.success(r.data.message);
-          });
+
+      let confirmMessage = "确定要";
+
+      if (this.current.contact.participants.find(r => r.userId === this.principal.details.id).role.value === 20) {
+        confirmMessage += "解散";
+      } else {
+        confirmMessage += "退出";
+      }
+      confirmMessage += " [ " + this.current.contact.title + " ] 群聊吗?";
+
+      this.confirm(confirmMessage, () => {
+        this.room.info.visible = false;
+        this
+            .$http
+            .post("/socket-server/room/exitRoom", this.formUrlencoded({id: this.current.contact.id}))
+            .then((r) =>  this.$message.success(r.data.message));
+      });
     },
     onRoomDelete(data) {
+
       let id = JSON.parse(data).data;
       let c = this.contacts.find(c => c.id === id && c.type === 20);
 
@@ -401,15 +435,37 @@ export default {
         return ;
       }
 
-      this.contacts.splice(this.contacts.indexOf(c), 1);
+      this.deleteContact(c);
+      if (this.tree.groups.room) {
+        let room = this.tree.groups.room.find(r => r.id === "room-" + c.id);
+
+        if (room) {
+          let index = this.tree.groups.room.indexOf(room);
+          this.tree.groups.room.splice(index, 1);
+          localStorage.setItem(process.env.VUE_APP_LOCAL_STORAGE_CHAT_GROUP_NAME, JSON.stringify(this.tree.groups));
+        }
+      }
     },
     onRoomCreate(data) {
       let json = JSON.parse(data).data;
       this.addContact({
         id: json.id,
         title: json.name,
-        type: 20
+        type: 20,
+        remark:json.remark,
+        participants: json.participantList
       });
+      if (this.tree.groups.room) {
+        this.tree.groups.room.push({
+          id: "room-" + json.id,
+          name:json.name,
+          isLeaf: true,
+          remark:json.remark,
+          participants: json.participantList,
+          slots : { icon: 'room-children' }
+        });
+        localStorage.setItem(process.env.VUE_APP_LOCAL_STORAGE_CHAT_GROUP_NAME, JSON.stringify(this.tree.groups));
+      }
     },
     selectRoomUser(checkedKeys, e) {
       this.room.selectedUser = e.checkedNodes.filter(c => c.key.indexOf('group-') < 0 && c.key !== 'contact');
@@ -550,7 +606,7 @@ export default {
         this.$nextTick(() => this.$refs["message-content"].scrollTop = this.$refs["message-content"].scrollHeight);
       }
     },
-    contextMenuClick(o) {
+    contactContextMenuClick(o) {
       let button = o.key.substring(0, o.key.lastIndexOf("-"));
       let id = button.substring(0, o.key.indexOf("-")) * 1;
       let type = button.substring(o.key.indexOf("-") + 1, button.length) * 1;
@@ -562,16 +618,7 @@ export default {
       }
 
       if (key === "delete") {
-
-        let index = this.contacts.indexOf(target);
-        this.contacts.splice(index, 1);
-
-        if (this.current.contact.id > 0 && this.current.contact.id === id) {
-          this.current.contact = JSON.parse(JSON.stringify(this.defaultContactValue));
-          this.clearCurrentHistory();
-        }
-
-        localStorage.setItem(this.getLocalStorageContactName(this.principal.details.id), JSON.stringify(this.contacts));
+        this.deleteContact(target);
       } else if (key === "read") {
         this.readMessage(target);
       } else if (key === "disturb") {
@@ -584,6 +631,17 @@ export default {
         }
         localStorage.setItem(this.getLocalStorageContactName(this.principal.details.id), JSON.stringify(this.contacts));
       }
+    },
+    deleteContact(target) {
+      let index = this.contacts.indexOf(target);
+      this.contacts.splice(index, 1);
+
+      if (this.current.contact.id > 0 && this.current.contact.id === target.id) {
+        this.current.contact = JSON.parse(JSON.stringify(this.defaultContactValue));
+        this.clearCurrentHistory();
+      }
+
+      localStorage.setItem(this.getLocalStorageContactName(this.principal.details.id), JSON.stringify(this.contacts));
     },
     clearCurrentHistory() {
       this.current.history.lastLoadMessage = false;
@@ -931,19 +989,36 @@ export default {
         }
 
         if (treeNode.eventKey === "room") {
+          let rooms = this.tree.groups[treeNode.eventKey];
+
+          if (rooms) {
+            treeNode.dataRef.children = rooms;
+          }
+
+          let headers = {};
+          headers[process.env.VUE_APP_HEADER_FILTER_RESULT_ID_NAME] = process.env.VUE_APP_HEADER_FILTER_CHAT_ID_VALUE;
+          let config = {
+            url:"/socket-server/room/getCurrentPrincipalRooms",
+            method: "GET",
+            headers: headers
+          }
+
           this.$http
-              .get("/socket-server/room/getCurrentPrincipalRooms")
+              .request(config)
               .then(r => {
-                treeNode.dataRef.children = r.data.data || [];
-                if (treeNode.dataRef.children.length > 0) {
-                  treeNode.dataRef.children.forEach(c => {
-                    //c.slots = { icon: 'room' };
-                    c.id = "room-" + c.id;
-                    c.isLeaf = true
-                    c.slots = { icon: 'room-children' };
-                  });
-                }
-                this.tree.groups[treeNode.eventKey] = treeNode.dataRef.children;
+                this.tree.groups[treeNode.eventKey] = [];
+                let data = r.data.data || [];
+                data.forEach(d => {
+                  this.tree.groups[treeNode.eventKey].push({
+                    id:"room-" + d.id,
+                    name:d.name,
+                    isLeaf:true,
+                    remark:d.remark,
+                    participants: d.participantList,
+                    slots:{icon: "room-children"}
+                  })
+                });
+                treeNode.dataRef.children = this.tree.groups[treeNode.eventKey];
                 localStorage.setItem(process.env.VUE_APP_LOCAL_STORAGE_CHAT_GROUP_NAME, JSON.stringify(this.tree.groups));
                 resolve();
               })
@@ -1102,7 +1177,7 @@ export default {
       }
 
       if (type === 20) {
-        contact.participants = info.node.dataRef.participantList;
+        contact.participants = info.node.dataRef.participants;
       }
 
       this.selectedKeys = [contact.type + "-" + contact.id];

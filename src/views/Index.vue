@@ -31,47 +31,33 @@
                 </a-badge>
               </template>
               <template #title>{{ getPrincipalName(this.principal.details) }}</template>
-              <a-menu-item key="2-1"><a-button type="text" @click="profile()">
-                <icon-font class="icon" type="icon-setting" /> 系统设置</a-button>
+              <a-menu-item key="2-1">
+                <a-button type="text" @click="profile()">
+                  <icon-font class="icon" type="icon-setting" /> 系统设置
+                </a-button>
               </a-menu-item>
-              <a-menu-item-group title="聊天">
-                <a-menu-item key="2-2"><a-button type="text" >
-                  <icon-font class="icon" type="icon-wifi-on" /> 在线</a-button>
+              <a-menu-item-group title="状态">
+                <a-menu-item key="2-2">
+                  <a-button type="text" >
+                    <a-typography-text type="success">
+                      <icon-font class="icon" type="icon-wifi-on" />
+                    </a-typography-text>
+                    在线
+                  </a-button>
                 </a-menu-item>
-                <a-menu-item key="2-3"><a-button type="text" >
-                  <icon-font class="icon" type="icon-wifi-off" /> 离线</a-button>
+                <a-menu-item key="2-3">
+                  <a-button type="text" >
+                    <icon-font class="icon" type="icon-wifi-off" /> 离线
+                  </a-button>
                 </a-menu-item>
               </a-menu-item-group>
               <a-menu-divider />
-              <a-menu-item key="2-4"><a-button type="text" @click="logout()">
-                <icon-font class="icon" type="icon-sign-out" /> 注销账户</a-button>
+              <a-menu-item key="2-4">
+                <a-button type="text" @click="logout()">
+                  <icon-font class="icon" type="icon-sign-out" /> 注销账户
+                </a-button>
               </a-menu-item>
             </a-sub-menu>
-<!--            <a-sub-menu key="2">
-              <template #title>
-                <a-space :size="20">
-                  <span>{{ getPrincipalName(this.principal.details) }}</span>
-                  <a-badge dot status="connected ? 'success' : 'default'">
-                    <a-avatar :src="principal.details.avatar">
-                      {{ getPrincipalName(this.principal.details).substring(0, 1) }}
-                    </a-avatar>
-                  </a-badge>
-                </a-space>
-              </template>
-              <a-menu-item key="2-1"><a-button type="text" @click="profile()">
-                <icon-font class="icon" type="icon-setting" /> 系统设置</a-button>
-              </a-menu-item>
-              <a-menu-item key="2-2"><a-button type="text" >
-                <icon-font class="icon" type="icon-wifi-on" /> 在线</a-button>
-              </a-menu-item>
-              <a-menu-item key="2-3"><a-button type="text" >
-                <icon-font class="icon" type="icon-wifi-off" /> 离线</a-button>
-              </a-menu-item>
-              <a-menu-divider />
-              <a-menu-item key="2-4"><a-button type="text" @click="logout()">
-                <icon-font class="icon" type="icon-sign-out" /> 注销账户</a-button>
-              </a-menu-item>
-            </a-sub-menu>-->
           </a-menu>
 
         </a-col>
