@@ -1,6 +1,6 @@
 <template>
 
-  <chat ref="chat" @messageCountChange="messageCountChange"/>
+  <chat ref="chat" v-model:visible="chatVisible" @messageCountChange="messageCountChange"/>
 
   <a-layout class="height-100-percent">
 
@@ -11,7 +11,7 @@
             <a-menu-item key="1" @click="toggleCollapsed" class="hidden-xs">
               <icon-font class="icon" :type="menu.collapsed ? 'icon-arrow-right-circle' : 'icon-arrow-left-circle'" />
             </a-menu-item>
-            <a-menu-item key="2" v-if="connected" @click="visible">
+            <a-menu-item key="2" v-if="connected" @click="chatVisible = !chatVisible">
               <a-badge :count="messageCount">
                 <icon-font class="icon" type="icon-message" />
               </a-badge>
@@ -100,7 +100,7 @@
 <script>
 
 import RecursionMenu from '@/components/RecursionMenu.vue'
-import Chat from '@/components/Chat.vue'
+import Chat from '@/components/chat/Chat.vue'
 
 import { PRINCIPAL_MUTATION_TYPE } from "@/store/principal"
 import { SOCKET_IO_ACTION_TYPE } from "@/store/socketIo"
@@ -159,10 +159,6 @@ export default {
   methods: {
     messageCountChange(count) {
       this.messageCount = count;
-    },
-    visible() {
-      this.$refs['chat'].visible = !this.$refs['chat'].visible;
-      return this.$refs['chat'].visible;
     },
     postPrepare(r) {
       let data = r.data.data;
@@ -254,6 +250,7 @@ export default {
       screenWidth: document.body.clientWidth,
       messageCount:0,
       spinning: false,
+      chatVisible:false,
       menu: {
         collapsed: document.body.clientWidth <= 768,
         selectedKeys:[this.$route.meta.selectMenu ? this.$route.meta.selectMenu : this.$route.path],
