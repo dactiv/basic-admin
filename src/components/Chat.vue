@@ -158,15 +158,15 @@
           <a-row>
             <a-col :span="20">
               <a-space v-if="current.contact.id > 0" :size="10" class="padding-left">
-                <a-avatar :src="current.contact.type === 10 ? this.getPrincipalAvatarByUserId(this.current.contact.id) : null" :shape="current.contact.type === 10 ? 'circle' : 'square'" >
+                <a-avatar :src="current.contact.type === 10 ? getPrincipalAvatarByUserId(this.current.contact.id) : null" :shape="current.contact.type === 10 ? 'circle' : 'square'" >
                   {{ current.contact.title.substring(0,1) }}
                 </a-avatar>
                 <a-typography-text strong>{{ current.contact.title }}</a-typography-text>
               </a-space>
             </a-col>
             <a-col :span="4" class="text-right">
-              <a-button type="text" @click="current.contact.id >= 0 && this.current.contact.type === 10 ? this.room.visible = true : this.room.info.visible = true">
-                <icon-font class="icon" :type="current.contact.id >= 0 && this.current.contact.type === 10 ? 'icon-user-groups' : 'icon-image-text'" />
+              <a-button type="text" @click="openTarget">
+                <icon-font class="icon" :type="current.contact.id >= 0 && current.contact.type === 10 ? 'icon-user-groups' : 'icon-image-text'" />
               </a-button>
             </a-col>
           </a-row>
@@ -175,7 +175,7 @@
           <a-layout-content class="height-100-percent">
             <div id="message-content" class="message" ref="message-content" @scroll="messageContentScroll">
               <template v-if="current.contact.id > 0">
-                <a-divider class="font-size-sm margin-none" v-if="!this.current.contact.lastLoadMessage">
+                <a-divider class="font-size-sm margin-none" v-if="!current.contact.lastLoadMessage">
                   <a-typography-text type="secondary">
                     <icon-font spin class="icon" type="icon-refresh" /> 数据加载中...
                   </a-typography-text>
@@ -188,26 +188,26 @@
 
                   <div v-for="c of m.contents" :key="c" :class="c.senderId !== principal.details.id ? 'margin-bottom' : 'margin-bottom text-right'">
                     <a-space align="start">
-                        <a-avatar v-if="c.senderId !== this.principal.details.id" :src="getPrincipalAvatarByUserId(this.current.contact.id)" class="basic-box-shadow" >
+                        <a-avatar v-if="c.senderId !== principal.details.id" :src="getPrincipalAvatarByUserId(current.contact.id)" class="basic-box-shadow" >
                           {{ current.contact.title.substring(0,1) }}
                         </a-avatar>
                         <a-space>
-                          <a-tooltip v-if="c.senderId === this.principal.details.id">
+                          <a-tooltip v-if="c.senderId === principal.details.id">
                             <template #title><a-button v-if="c.status === 'fail'" type="link" class="padding-none" @click="retrySend(c.id)">[重试]</a-button>{{c.tooltip}} </template>
                             <a-typography-text :type="c.status === 'sending' || c.status === 'success' || c.status === 'unread' ? 'secondary' : c.status === 'read' ? 'success' : 'danger'">
                               <icon-font :spin="c.status === 'sending'" class="icon" :type="c.status === 'sending' ? 'icon-refresh' : c.status === 'fail' ? 'icon-error' :  'icon-success'" />
                             </a-typography-text>
                           </a-tooltip>
-                          <a-card :class="c.senderId === this.principal.details.id ? 'border-radius basic-box-shadow self' : 'border-radius basic-box-shadow'" v-html="c.content">
+                          <a-card :class="c.senderId === principal.details.id ? 'border-radius basic-box-shadow self' : 'border-radius basic-box-shadow'" v-html="c.content">
                           </a-card>
-                          <a-tooltip v-if="c.senderId !== this.principal.details.id">
+                          <a-tooltip v-if="c.senderId !== principal.details.id">
                             <template #title>{{c.tooltip}}</template>
                             <a-typography-text :type="c.status === 'sending' || c.status === 'success' || c.status === 'unread' ? 'secondary' : c.status === 'read' ? 'success' : 'danger'">
                               <icon-font :spin="c.status === 'sending'" class="icon" :type="c.status === 'sending' ? 'icon-refresh' : c.status === 'fail' ? 'icon-error' :  'icon-success'" />
                             </a-typography-text>
                           </a-tooltip>
                         </a-space>
-                        <a-avatar v-if="c.senderId === this.principal.details.id" :src="principal.details.avatar" class="basic-box-shadow">
+                        <a-avatar v-if="c.senderId === principal.details.id" :src="principal.details.avatar" class="basic-box-shadow">
                           我
                         </a-avatar>
                     </a-space>
@@ -304,13 +304,13 @@
     </a-divider>
 
     <div id="history-content" class="message-content" ref="history-content" @scroll="messageContentScroll">
-      <a-divider class="font-size-sm margin-none" v-if="!this.current.history.lastLoadMessage">
+      <a-divider class="font-size-sm margin-none" v-if="!current.history.lastLoadMessage">
         <a-typography-text type="secondary">
           <icon-font spin class="icon" type="icon-refresh" /> 数据加载中...
         </a-typography-text>
       </a-divider>
       <a-empty v-if="current.history.messages.length === 0"></a-empty>
-      <div v-for="c of this.current.history.messages" :key="c.id" :class="c.senderId === principal.details.id ? 'self' : ''">
+      <div v-for="c of current.history.messages" :key="c.id" :class="c.senderId === principal.details.id ? 'self' : ''">
         <p>
           <a-typography-paragraph>
             <a-typography-text strong >{{ getUsernameById(c.senderId, "用户 [" + p.userId + "]") + " "}}</a-typography-text>
@@ -388,8 +388,12 @@ export default {
     window.onblur = () => _this.hasFocus = false;
   },
   methods:{
-    participantsContextMenuClick(){
-
+    openTarget(){
+      if (this.current.contact.id >= 0 && this.current.contact.type === 10) {
+        this.room.visible = true;
+      } else {
+        this.room.info.visible = true;
+      }
     },
     renameRoom(){
       this.room.info.editable = !this.room.info.editable;
@@ -458,6 +462,8 @@ export default {
       if (!c) {
         return ;
       }
+      // FIXME 先随便写写。
+      this.$message.success("群聊 [" + c.title + "] 已移除");
 
       this.deleteContact(c);
       if (this.tree.groups.room) {
@@ -467,8 +473,6 @@ export default {
           let index = this.tree.groups.room.indexOf(room);
           this.tree.groups.room.splice(index, 1);
           localStorage.setItem(process.env.VUE_APP_LOCAL_STORAGE_CHAT_GROUP_NAME, JSON.stringify(this.tree.groups));
-          // FIXME 先随便写写。
-          this.$message.success("群聊 [" + room.title + "] 已移除");
         }
       }
     },
@@ -481,6 +485,7 @@ export default {
         remark:json.remark,
         participants: json.participantList
       });
+      this.$message.success("您加入了 [" + json.name + "] 群聊");
       if (this.tree.groups.room) {
         this.tree.groups.room.push({
           id: "room-" + json.id,
@@ -492,7 +497,6 @@ export default {
         });
         localStorage.setItem(process.env.VUE_APP_LOCAL_STORAGE_CHAT_GROUP_NAME, JSON.stringify(this.tree.groups));
       }
-      this.$message.success("您加入了 [" + json.name + "] 群聊");
     },
     selectRoomUser(checkedKeys, e) {
       this.room.selectedUser = e.checkedNodes.filter(c => c.key.indexOf('group-') < 0 && c.key !== 'contact');
@@ -1313,6 +1317,7 @@ export default {
       room: {
         visible:false,
         selectedUser:[],
+        hiddenUser:[],
         contactData:[{
           name: '联系人',
           id: 'contact',
