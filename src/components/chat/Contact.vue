@@ -29,7 +29,7 @@
                 <a-col :span="4">
                   <a-badge :count="c.messages.reduce((s, m) => s + m.contents.filter(ct => ct.status === 'unread').length, 0)" :offset="[x = -25, y = 0]">
                     <a-avatar :src="c.type === 10 ? this.getPrincipalAvatarByUserId(c.id) : null" :shape="c.type === 10 ? 'circle' : 'square'">
-                      {{ c.title.substring(0, 1) }}
+                      {{ c.name.substring(0, 1) }}
                     </a-avatar>
                   </a-badge>
                 </a-col>
@@ -39,7 +39,7 @@
                       <a-typography-text strong :ellipsis="true" class="contacts-name display-block" >
                         <icon-font v-if="c.top" class="icon" type="icon-star" />
                         <icon-font v-else-if="c.disturb" class="icon" type="icon-stop" />
-                        {{c.title}}
+                        {{c.name}}
                       </a-typography-text>
                     </a-col>
                     <a-col :span="8" class="text-right">
@@ -67,7 +67,7 @@
           </a-menu-item>
         </a-menu>
         <div v-show="tab === 'group'">
-          <a-tree @select="selectTreeContact" show-icon :replaceFields="{title:'name', key:'id'}" :tree-data="groupData">
+          <a-tree @select="selectTreeContact" show-icon :load-data="loadTreeData" :replaceFields="{title:'name', key:'id'}" :tree-data="tree.data">
             <template #group>
               <icon-font class="icon" type="icon-folder-close" />
             </template>
@@ -110,18 +110,116 @@ export default {
       selectedKeys:[],
       selectedToolBar:["message"],
       tab:"message",
-      groupData:[{
-        name: '联系人',
-        id: 'contact',
-        slots : { icon: 'contact' }
-      }, {
-        name:'群组',
-        id: 'room',
-        slots : { icon: 'room' }
-      }]
+      tree: {
+        data:[{
+          name: '联系人',
+          id: 'contact',
+          slots : { icon: 'contact' },
+          children:[]
+        }, {
+          name:'群组',
+          id: 'room',
+          slots : { icon: 'room' },
+          children:[]
+        }]
+      }
     }
   },
   methods:{
+    loadTreeData(treeNode) {
+      return new Promise((resolve) => {
+        if (treeNode.eventKey === "room") {
+          this.loadRoomTreeNode(resolve, treeNode);
+        } else if (treeNode.eventKey === "contact") {
+          this.loadGroupTreeNode(resolve, treeNode);
+        } else if (treeNode.eventKey.includes("group-")) {
+          this.loadGroupTreeNode(resolve, treeNode, );
+        }
+      });
+    },
+    loadUserTreeNode(group, resolve) {
+
+      let param = {};
+
+      param["filter_[groups_info.id_jin]"] = group.id.replace("group-","");
+      param["filter_[status_eq]"] = 1;
+      param["filter_[id_ne]"] = this.principal.details.id;
+
+      let headers = {};
+      headers[process.env.VUE_APP_HEADER_FILTER_RESULT_ID_NAME] = process.env.VUE_APP_HEADER_FILTER_CHAT_ID_VALUE;
+
+      this.$http
+          .post("/authentication/console/user/find", this.formUrlencoded(param), {headers: headers})
+          .then(r => {
+            let data = r.data.data || [];
+
+            data.forEach(d => {
+              group.children.push({
+                name : this.getPrincipalName(d),
+                id: "user-" + d.id,
+                isLeaf: true
+              });
+            });
+            resolve();
+          });
+    },
+    loadGroupTreeNode(resolve, treeNode) {
+      let param = {};
+      param["filter_[sources_jin]"] = ["\"CONSOLE\""];
+      param["filter_[status_eq]"] = 1;
+
+      if (treeNode.eventKey.includes("group-")) {
+        param["filter_[parent_id_eq]"] = treeNode.eventKey.replace("group-","");
+      } else {
+        param["filter_[parent_id_eqn]"] = "true";
+      }
+
+      let headers = {};
+      headers[process.env.VUE_APP_HEADER_FILTER_RESULT_ID_NAME] = process.env.VUE_APP_HEADER_FILTER_CHAT_ID_VALUE;
+
+      this.$http
+          .post("/authentication/group/find", this.formUrlencoded(param), {headers: headers})
+          .then(r => {
+            let data = r.data.data || [];
+
+            data.forEach(d => {
+              let newOne = d;
+
+              newOne.id = "group-" + d.id;
+              newOne.slots = { icon: 'group' }
+              newOne.children = [];
+              treeNode.dataRef.children.push(newOne);
+            });
+
+            if (treeNode.eventKey.includes("group-")) {
+              this.loadUserTreeNode(treeNode.dataRef, resolve);
+            } else {
+              resolve();
+            }
+          });
+    },
+    loadRoomTreeNode(resolve, treeNode) {
+      let param = {};
+      param["filter_[r.status_eq]"] = 1;
+
+      let headers = {};
+      headers[process.env.VUE_APP_HEADER_FILTER_RESULT_ID_NAME] = process.env.VUE_APP_HEADER_FILTER_CHAT_ID_VALUE;
+      this.$http
+          .post("/socket-server/room/getCurrentPrincipalRooms", this.formUrlencoded(param), {headers: headers})
+          .then(r => {
+            let data = r.data.data || [];
+            data.forEach(d => {
+              let newOne = d;
+
+              newOne.id = "room-" + d.id
+              newOne.isLeaf = true;
+              newOne.slots = {icon: "room-children"};
+
+              treeNode.dataRef.children.push(newOne);
+            });
+            resolve();
+          });
+    },
     toolbarSelect(info) {
       this.tab = info.key;
       this.selectedToolBar = [info.key];
@@ -158,20 +256,22 @@ export default {
         return ;
       }
 
-      let key = selectedKeys[0];
-      let type = key.indexOf("user-") >= 0 ? 10: 20;
+      let key = info.node.dataRef.id;
+      let type = key.includes("user-") ? 10: 20;
 
       let contact = {
-        id: (type === 10 ? key.replaceAll("user-", "") : key.replaceAll("room-", ""))  * 1,
-        title: info.node.dataRef.name,
+        id: (type === 10 ? key.replace("user-", "") : key.replace("room-", ""))  * 1,
+        name: info.node.dataRef.name,
         type:type
       }
 
       if (type === 20) {
-        contact.participants = info.node.dataRef.participants;
+        contact.participants = info.node.dataRef.participantList;
       }
 
-      this.selectedKeys = [contact.type + "-" + contact.id];
+      this.selectedKeys = [key];
+      this.tab = "message";
+      this.selectedToolBar = ["message"];
       this.$emit("selectTreeContact", contact);
     }
   }

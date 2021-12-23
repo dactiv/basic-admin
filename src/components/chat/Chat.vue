@@ -3,7 +3,7 @@
     <a-layout class="height-100-percent">
 
       <a-layout-sider class="main-aside border-right" :width="280">
-        <chat-contact ref="contact" @selectMessageContact="onSelectMessageContact" :contact-data="contacts"/>
+        <chat-contact ref="contact" @selectMessageContact="onSelectMessageContact" @selectTreeContact="onSelectTreeContact" :contact-data="contacts"/>
       </a-layout-sider>
 
       <a-layout class="overflow-hidden">
@@ -73,7 +73,7 @@ export default {
       hasFocus:true,
       contacts: JSON.parse(localStorage.getItem(process.env.VUE_APP_LOCAL_STORAGE_CHAT_CONTACT_NAME + "_" + this.principal.details.id)) || [],
       current:{
-        title:"",
+        name:"",
         lastLoadMessage: true,
         type:10,
         id:0,
@@ -92,8 +92,8 @@ export default {
             .get("/socket-server/chat/getRecentContacts")
             .then((r) => {
 
-              let data = r.data.data;
-              if (!data || data.length <= 0) {
+              let data = r.data.data || [];
+              if (data.length <= 0) {
                 return ;
               }
               data.forEach(d => d.type = d.type.value);
@@ -141,7 +141,7 @@ export default {
               let current = data.find((d) => d.id === p.id);
               this.addContact({
                 id:p.id,
-                title:this.getPrincipalName(p),
+                name:this.getPrincipalName(p),
                 type: current.type
               });
               this.getSocketTempMessages();
@@ -153,7 +153,7 @@ export default {
       let currentContact = this.contacts.find(c => c.id === contact.id && c.type === contact.type);
       if (currentContact) {
         this.contacts.splice(this.contacts.indexOf(currentContact),1);
-        currentContact.title = contact.title;
+        currentContact.name = contact.name;
       } else {
         currentContact = contact;
         currentContact.lastLoadMessage = false;
@@ -163,7 +163,7 @@ export default {
         currentContact.disturb = false;
         currentContact.top = false;
       }
-      this.contacts.unshift(currentContact);
+
       this.saveContact(currentContact)
 
       return currentContact;
@@ -275,6 +275,19 @@ export default {
           .post("/socket-server/chat/getHistoryMessageDateList", this.formUrlencoded({targetId}))
           .then((r) => this.current.history.calendar.enabledDate = r.data.data || []);
     },
+    onSelectTreeContact(contact) {
+      console.log(contact);
+
+      let exist = this.contacts.find(c => c.id === contact.id);
+
+      if (!exist) {
+        exist = JSON.parse(JSON.stringify(contact));
+        exist.lastLoadMessage = true;
+        exist.messages = [];
+      }
+      this.addContact(exist);
+      this.onSelectMessageContact(exist);
+    },
     onSelectMessageContact(contact) {
       if (this.current.id === contact.id) {
         return ;
@@ -345,7 +358,7 @@ export default {
       if (exist) {
         this.contacts[this.contacts.indexOf(exist)] = contact;
       } else {
-        this.contacts.push(contact);
+        this.contacts.unshift(contact);
       }
       let key = process.env.VUE_APP_LOCAL_STORAGE_CHAT_CONTACT_NAME + "_" + this.principal.details.id;
       localStorage.setItem(key, JSON.stringify(this.contacts));
@@ -386,13 +399,7 @@ export default {
       let contact = this.contacts.find(u => u.id === c.senderId && u.type === 10);
 
       if (contact) {
-        return contact.title + " ";
-      }
-
-      let user = this.tree.users.find(u => u.id === c.senderId);
-
-      if (user) {
-        return user.name + " ";
+        return contact.name + " ";
       }
 
       return "用户 [" + c.senderId + "] ";

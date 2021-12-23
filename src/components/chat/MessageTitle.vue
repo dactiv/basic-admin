@@ -3,9 +3,9 @@
     <a-col :span="20">
       <a-space v-if="data.id > 0" :size="10" class="padding-left">
         <a-avatar :src="data.type === 10 ? getPrincipalAvatarByUserId(data.id) : null" :shape="data.type === 10 ? 'circle' : 'square'" >
-          {{ data.title.substring(0,1) }}
+          {{ data.name.substring(0,1) }}
         </a-avatar>
-        <a-typography-text strong>{{ data.title }}</a-typography-text>
+        <a-typography-text strong>{{ data.name }}</a-typography-text>
       </a-space>
     </a-col>
     <a-col :span="4" class="text-right">
