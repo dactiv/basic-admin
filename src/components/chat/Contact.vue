@@ -23,7 +23,7 @@
       </div>
       <div class="left-content">
         <a-menu v-show="tab === 'message'" @click="selectContact" :selectedKeys="selectedKeys" mode="vertical">
-          <a-menu-item v-for="c of contacts" :key="c.type + '-' + c.id" >
+          <a-menu-item v-for="c of contactData" :key="c.type + '-' + c.id" >
             <a-dropdown :trigger="['contextmenu']">
               <a-row type="flex" justify="space-around" align="middle">
                 <a-col :span="4">
@@ -98,9 +98,10 @@
 export default {
   name:"ChatContact",
   emits: ["selectMessageContact", "selectTreeContact", "contactContextMenuClick"],
+  props: ["contactData"],
   computed:{
     messageCount() {
-      return this.contacts.reduce((sum, o) => sum + o.messages.reduce((s, m) => s + m.contents.filter(c => c.status === "unread").length, 0), 0);
+      return this.contactData.reduce((sum, o) => sum + o.messages.reduce((s, m) => s + m.contents.filter(c => c.status === "unread").length, 0), 0);
     }
   },
   data() {
@@ -108,8 +109,6 @@ export default {
       searchText:"",
       selectedKeys:[],
       selectedToolBar:["message"],
-      inputContent:"",
-      contacts:JSON.parse(localStorage.getItem(this.getLocalStorageContactName(this.principal.details.id))) || [],
       tab:"message",
       groupData:[{
         name: '联系人',
@@ -127,38 +126,29 @@ export default {
       this.tab = info.key;
       this.selectedToolBar = [info.key];
     },
-    getLocalStorageContactName(id) {
-      return process.env.VUE_APP_LOCAL_STORAGE_CHAT_CONTACT_NAME + "_" + id;
-    },
     contactContextMenuClick(o) {
       let button = o.key.substring(0, o.key.lastIndexOf("-"));
       let id = button.substring(0, o.key.indexOf("-")) * 1;
       let type = button.substring(o.key.indexOf("-") + 1, button.length) * 1;
       let key = o.key.substring(o.key.lastIndexOf("-") + 1, o.key.length);
 
-      let target = this.contacts.find(c => c.id === id && c.type === type);
+      let target = this.contactData.find(c => c.id === id && c.type === type);
 
       if (!target) {
         return ;
       }
 
       if (key === "delete") {
-        this.deleteContact(target);
-      } else if (key === "read") {
-        this.readMessage(target);
+        this.$emit("contactContextMenuClick", {key:"delete", target})
       } else if (key === "top") {
-        target.top = !target.top;
-        if (target.top) {
-          target.disturb = false;
-        }
-        localStorage.setItem(this.getLocalStorageContactName(this.principal.details.id), JSON.stringify(this.contacts));
+        this.$emit("contactContextMenuClick", {key:"top", target})
       }
     },
     selectContact(record){
       let id = record.key.substring(record.key.indexOf("-") + 1, record.key.length) * 1;
       let type = record.key.substring(0, record.key.indexOf("-")) * 1;
 
-      let result = this.contacts.find(c => c.id === id && c.type === type);
+      let result = this.contactData.find(c => c.id === id && c.type === type);
 
       this.selectedKeys = [record.key];
       this.$emit("selectMessageContact", result);
@@ -183,12 +173,6 @@ export default {
 
       this.selectedKeys = [contact.type + "-" + contact.id];
       this.$emit("selectTreeContact", contact);
-      /*this.current.history.visible = false;
-
-      this.current.contact = this.addContact(contact);
-      this.readMessage(this.current.contact);
-      this.tab = "message";
-      this.selectedToolBar = ["message"];*/
     }
   }
 }
