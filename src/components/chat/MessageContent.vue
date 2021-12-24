@@ -1,5 +1,5 @@
 <template>
-  <div id="message-content" class="message" ref="message-content" @scroll="messageContentScroll">
+  <div id="message-content" class="message" ref="message-content" @mouseleave="hasFocus = false" @mouseenter="hasFocus = true" @scroll="messageContentScroll">
     <template v-if="data">
       <a-divider class="font-size-sm margin-none" v-if="!lastLoadMessage">
         <a-typography-text type="secondary">
@@ -51,19 +51,45 @@ export default {
   name:"ChatMessageContent",
   props:["data", "lastLoadMessage", "recipientId", "renderUsername"],
   emits: ["retrySendClick","messageContentScroll"],
-  computed:{
-    messages() {
-      return this.data;
-    }
-  },
   watch:{
-    messages(newValue, oldValue) {
-      console.log(newValue, oldValue);
+    data:{
+      handler (newValue, oldValue) {
+
+        let newContents = newValue.flatMap(o => o.contents);
+        let oldContents = oldValue.flatMap(o => o.contents);
+
+        if (!this.hasFocus && oldContents.length > 0) {
+          this.fixedScrollPosition();
+          return ;
+        }
+        // FIXME 重复选择时候改值获取不到数据
+        if (!this.index.first) {
+          this.index.first = newContents[0];
+        }
+
+        if (newContents.indexOf(this.index.first) > 0) {
+          this.fixedScrollPosition();
+        } else if (!this.index.last || newContents.indexOf(this.index.last) <= newContents.length - 1) {
+          this.setScrollBottom();
+        }
+
+        this.index.first = newContents[0];
+        this.index.last = newContents[newContents.length - 1];
+      },
+      deep:true
     }
   },
   data() {
     return {
-
+      hasFocus: false,
+      scroll: {
+        top:0,
+        height:0
+      },
+      index: {
+        last:null,
+        first:null,
+      }
     }
   },
   methods:{
@@ -71,8 +97,40 @@ export default {
       let content = this.contact.messages.flatMap(m => m.contents).find(c => c.id === id);
       this.$emit('retrySendClick', content);
     },
+    clearCurrentRecord(){
+      this.scroll.top = 0;
+      this.height = 0;
+      this.index.last = null;
+      this.index.first = null;
+      this.hasFocus = false;
+      this.setScrollBottom();
+    },
+    fixedScrollPosition(){
+      let el = this.$refs["message-content"];
+      if (!el) {
+        return ;
+      }
+      this.$nextTick(() => {
+        el.scrollTop = this.scroll.top + el.scrollHeight - this.scroll.height;
+        this.scroll.top = el.scrollTop;
+        this.scroll.height = el.scrollHeight;
+      });
+    },
+    setScrollBottom() {
+      let el = this.$refs["message-content"];
+      if (!el) {
+        return ;
+      }
+      this.$nextTick(() => {
+        el.scrollTop = el.scrollHeight;
+        this.scroll.top = el.scrollTop;
+        this.scroll.height = el.scrollHeight;
+      });
+    },
     messageContentScroll(d) {
       if (d.target.scrollTop !== 0) {
+        this.scroll.top = d.target.scrollTop
+        this.scroll.height = d.target.scrollHeight
         return ;
       }
       this.$emit("messageContentScroll", d)

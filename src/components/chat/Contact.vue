@@ -240,6 +240,8 @@ export default {
         this.$emit("contactContextMenuClick", {key:"delete", target})
       } else if (key === "top") {
         this.$emit("contactContextMenuClick", {key:"top", target})
+      } else if (key === "disturb") {
+        this.$emit("contactContextMenuClick", {key:"disturb", target})
       }
     },
     selectContact(record){

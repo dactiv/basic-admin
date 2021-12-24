@@ -3,7 +3,7 @@
     <a-layout class="height-100-percent">
 
       <a-layout-sider class="main-aside border-right" :width="280">
-        <chat-contact ref="contact" @selectMessageContact="onSelectMessageContact" @selectTreeContact="onSelectTreeContact" :contact-data="contacts"/>
+        <chat-contact ref="contact" @selectMessageContact="onSelectMessageContact" @contactContextMenuClick="onContactContextMenuClick" @selectTreeContact="onSelectTreeContact" :contact-data="contacts"/>
       </a-layout-sider>
 
       <a-layout class="overflow-hidden">
@@ -12,9 +12,9 @@
         </a-layout-header>
         <a-layout>
           <a-layout-content class="height-100-percent">
-            <chat-message-content ref="message-content" :render-username="getUsername" :data="current.messages" :last-load-message="current.lastLoadMessage" />
+            <chat-message-content ref="message-content" @message-content-scroll="onMessageContentScroll" :render-username="getUsername" :data="current.messages" :last-load-message="current.lastLoadMessage" />
 
-            <chat-message-input ref="message-input" :render-username="getUsername" :visible="current.id > 0" :date-pattern="message.datePattern" :enabled-date="current.history.enabledDate" :history-messages="current.messages.flatMap(m => m.contents)" :last-load-message="current.lastLoadMessage" @sendMessage="onSendMessage"/>
+            <chat-message-input ref="message-input" @history-message-content-scroll="onMessageContentScroll" :render-username="getUsername" :visible="current.id > 0" :date-pattern="message.datePattern" :enabled-date="current.history.enabledDate" :history-messages="current.messages.flatMap(m => m.contents)" :last-load-message="current.lastLoadMessage" @sendMessage="onSendMessage"/>
           </a-layout-content>
         </a-layout>
       </a-layout>
@@ -28,12 +28,13 @@ import ChatContact from "@/components/chat/Contact";
 import ChatMessageTitle from "@/components/chat/MessageTitle";
 import ChatMessageContent from "@/components/chat/MessageContent";
 import ChatMessageInput from "@/components/chat/MessateInput";
+
 import {SOCKET_EVENT_TYPE, SOCKET_IO_ACTION_TYPE} from "@/store/socketIo";
 
 export default {
   name:"Chat",
   components: {ChatMessageContent, ChatMessageTitle, ChatContact, ChatMessageInput},
-  emits: ['messageCountChange','update:visible'],
+  emits: ["messageCountChange","update:visible"],
   computed: {
     visible: {
       get() {
@@ -45,6 +46,7 @@ export default {
     }
   },
   created() {
+    this.current = JSON.parse(JSON.stringify(this.defaultContactValue));
     this.$store.dispatch(SOCKET_IO_ACTION_TYPE.IS_CONNECTED).then(this.onSocketConnect);
   },
   mounted() {
@@ -71,8 +73,9 @@ export default {
         }
       },
       hasFocus:true,
-      contacts: JSON.parse(localStorage.getItem(process.env.VUE_APP_LOCAL_STORAGE_CHAT_CONTACT_NAME + "_" + this.principal.details.id)) || [],
-      current:{
+      contacts: JSON.parse(localStorage.getItem(this.getContactStorageKey(this.principal.details.id))) || [],
+      install:JSON.parse(localStorage.getItem(this.getInstallStorageKey(this.principal.details.id))) || {recentContacts: false},
+      defaultContactValue:{
         name:"",
         lastLoadMessage: true,
         type:10,
@@ -81,12 +84,32 @@ export default {
         history: {
           enabledDate:[]
         }
-      }
+      },
+      current: null
     }
   },
   methods:{
+    onContactContextMenuClick(event){
+      if (event.key === "delete") {
+        this.deleteContact(event.target);
+      } else if (event.key === "disturb") {
+        let index = this.contacts.indexOf(event.target);
+        let contact = this.contacts[index];
+        contact.disturb = !contact.disturb;
+        this.saveContact(contact);
+      } else if (event.key === "top") {
+        let index = this.contacts.indexOf(event.target);
+        let contact = this.contacts[index];
+        contact.top = !contact.top;
+        if (contact.top) {
+          contact.disturb = false;
+        }
+        this.saveContact(contact);
+      }
+    },
     onSocketConnect() {
-      if (!this.contacts || this.contacts.length <= 0) {
+
+      if ((!this.contacts || this.contacts.length <= 0) && !this.install.recentContacts) {
         this
             .$http
             .get("/socket-server/chat/getRecentContacts")
@@ -98,6 +121,8 @@ export default {
               }
               data.forEach(d => d.type = d.type.value);
               this.getRecentContactsProfile(data);
+              this.install.recentContacts = true;
+              this.saveInstall()
             });
       } else {
         this.getSocketTempMessages()
@@ -199,12 +224,12 @@ export default {
         appendMessages.push(result);
       } else {
         let lastMessage = unshift ? appendMessages[0] : appendMessages[this.current.messages.length - 1];
-        let intervalTimeUnit = process.env.VUE_APP_SOCKET_CHAT_MESSAGE_GROUP_INTERVAL_TIME_UNIT;
+        let intervalTimeUnit = this.message.intervalTime.unit;
         let currentIntervalTime = unshift ?
             this.$moment(lastMessage.creationTime).diff(content.creationTime, intervalTimeUnit) :
             content.creationTime.diff(this.$moment(lastMessage.creationTime), intervalTimeUnit);
 
-        let intervalTime = process.env.VUE_APP_SOCKET_CHAT_MESSAGE_GROUP_INTERVAL_TIME * 1;
+        let intervalTime = this.message.intervalTime.value;
 
         if (currentIntervalTime >= intervalTime) {
           if (unshift) {
@@ -300,19 +325,29 @@ export default {
 
       this.current = selected;
 
-      this.$refs["message-input"].clearCurrentHistory();
-
       this.$http
           .post("/socket-server/chat/getHistoryMessageDateList", this.formUrlencoded({targetId: this.current.id}))
           .then((r) => this.current.history.enabledDate = r.data.data || []);
 
       this.$nextTick(() => {
+
+        this.$refs["message-input"].clearCurrentHistory();
+        this.$refs["message-content"].clearCurrentRecord();
+
         if (this.current.messages.length < this.message.pageSize && !this.current.lastLoadMessage) {
           this.loadHistoryMessage();
         }
         this.readMessage(this.current);
       });
 
+    },
+    onMessageContentScroll() {
+      let time = this.$moment.now();
+      let contents = this.current.messages[0].contents;
+      if (contents.length > 0) {
+        time = this.$moment(contents[0].creationTime);
+      }
+      this.loadHistoryMessage(time);
     },
     loadHistoryMessage(time) {
 
@@ -327,7 +362,7 @@ export default {
       let param = {
         targetId: this.current.id,
         time: time,
-        size: process.env.VUE_APP_SOCKET_CHAT_MESSAGE_PAGE_SIZE * 1
+        size: this.message.pageSize
       };
 
       this
@@ -360,8 +395,31 @@ export default {
       } else {
         this.contacts.unshift(contact);
       }
-      let key = process.env.VUE_APP_LOCAL_STORAGE_CHAT_CONTACT_NAME + "_" + this.principal.details.id;
+      let key = this.getContactStorageKey(this.principal.details.id);
       localStorage.setItem(key, JSON.stringify(this.contacts));
+    },
+    deleteContact(contact) {
+      let exist = this.contacts.find(c => c.id === contact.id);
+      if (!exist) {
+        return;
+      }
+      let index = this.contacts.indexOf(exist);
+      this.contacts.splice(index, 1);
+      if (contact.id === this.current.id) {
+        this.current = JSON.parse(JSON.stringify(this.defaultContactValue));
+      }
+      let key = this.getContactStorageKey(this.principal.details.id);
+      localStorage.setItem(key, JSON.stringify(this.contacts));
+    },
+    saveInstall() {
+      let key = this.getInstallStorageKey(this.principal.details.id);
+      localStorage.setItem(key, JSON.stringify(this.install));
+    },
+    getInstallStorageKey(id) {
+      return process.env.VUE_APP_LOCAL_STORAGE_CHAT_INSTALL_NAME + "_" + id;
+    },
+    getContactStorageKey(id) {
+      return process.env.VUE_APP_LOCAL_STORAGE_CHAT_CONTACT_NAME + "_" + id;
     },
     readMessage() {
 

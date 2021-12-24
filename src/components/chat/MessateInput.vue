@@ -17,7 +17,7 @@
     </QuillEditor>
   </div>
 
-  <a-modal v-model:visible="history.visible" :destroyOnClose="true" :mask="false" :maskClosable="false" :footer="null" class="history" title="聊天记录" width="500px">
+  <a-modal v-model:visible="history.visible" :destroyOnClose="true" @cancel="onHistoryModalClose" :mask="false" :maskClosable="false" :footer="null" class="history" title="聊天记录" width="500px">
     <a-input v-model:value="history.search.text">
       <template #addonAfter>
         <a-popover v-model:visible="history.calendar.visible" title="选择时间" trigger="click">
@@ -65,10 +65,38 @@ export default {
   name:"ChatMessageInput",
   components: {QuillEditor},
   props:["lastLoadMessage", "historyMessages", "renderUsername", "enabledDate", "visible", "datePattern"],
-  emits: ["sendMessage", "messageContentScroll", "selectCalendar"],
+  emits: ["sendMessage", "historyMessageContentScroll", "selectCalendar"],
+  watch:{
+    historyMessages:{
+      handler (newContents) {
+
+        if (!this.index.first) {
+          this.index.first = newContents[0];
+        }
+
+        if (newContents.indexOf(this.index.first) > 0 && this.history.visible) {
+          this.fixedScrollPosition();
+        } else if ((!this.index.last || newContents.indexOf(this.index.last) <= newContents.length - 1) && this.history.visible) {
+          this.setScrollBottom();
+        }
+
+        this.index.first = newContents[0];
+        this.index.last = newContents[newContents.length - 1];
+      },
+      deep:true
+    }
+  },
   data() {
     return {
       inputContent:"",
+      index: {
+        last:null,
+        first:null
+      },
+      scroll: {
+        top:0,
+        height:0
+      },
       history: {
         visible:false,
         search: {
@@ -83,11 +111,38 @@ export default {
     }
   },
   methods:{
-    messageContentScroll(d) {
-      if (d.target.scrollTop !== 0) {
+    onHistoryModalClose() {
+      this.setScrollBottom();
+    },
+    fixedScrollPosition(){
+      let el = this.$refs["history-content"];
+      if (!el) {
         return ;
       }
-      this.$emit("messageContentScroll", d);
+      this.$nextTick(() => {
+        el.scrollTop = this.scroll.top + el.scrollHeight - this.scroll.height;
+        this.scroll.top = el.scrollTop;
+        this.scroll.height = el.scrollHeight;
+      });
+    },
+    setScrollBottom() {
+      let el = this.$refs["history-content"];
+      if (!el) {
+        return ;
+      }
+      this.$nextTick(() => {
+        el.scrollTop = el.scrollHeight;
+        this.scroll.top = el.scrollTop;
+        this.scroll.height = el.scrollHeight;
+      });
+    },
+    messageContentScroll(d) {
+      if (d.target.scrollTop !== 0) {
+        this.scroll.top = d.target.scrollTop
+        this.scroll.height = d.target.scrollHeight
+        return ;
+      }
+      this.$emit("historyMessageContentScroll", d);
     },
     selectCalendar(date) {
 
