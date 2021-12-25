@@ -47,6 +47,8 @@
 <script>
 
 
+import {SOCKET_EVENT_TYPE, SOCKET_IO_ACTION_TYPE} from "@/store/socketIo";
+
 export default {
   name:"ChatMessageContent",
   props:["data", "lastLoadMessage", "recipientId", "renderUsername"],
@@ -78,6 +80,17 @@ export default {
       },
       deep:true
     }
+  },
+  created() {
+    this.$store.dispatch(SOCKET_IO_ACTION_TYPE.SUBSCRIBE, {
+      name: SOCKET_EVENT_TYPE.CHAT_READ_MESSAGE,
+      callback:this.onReadMessage
+    });
+
+    this.$store.dispatch(SOCKET_IO_ACTION_TYPE.SUBSCRIBE,{
+      name:SOCKET_EVENT_TYPE.CHAT_MESSAGE,
+      callback:this.onChatMessage
+    });
   },
   data() {
     return {

@@ -48,6 +48,26 @@ export default {
   created() {
     this.current = JSON.parse(JSON.stringify(this.defaultContactValue));
     this.$store.dispatch(SOCKET_IO_ACTION_TYPE.IS_CONNECTED).then(this.onSocketConnect);
+
+    this.$store.dispatch(SOCKET_IO_ACTION_TYPE.SUBSCRIBE, {
+      name: SOCKET_EVENT_TYPE.CONNECT,
+      callback:this.onSocketConnect
+    });
+
+    this.$store.dispatch(SOCKET_IO_ACTION_TYPE.SUBSCRIBE,{
+      name:SOCKET_EVENT_TYPE.ROOM_CREATE,
+      callback:this.onRoomCreate
+    });
+
+    this.$store.dispatch(SOCKET_IO_ACTION_TYPE.SUBSCRIBE,{
+      name:SOCKET_EVENT_TYPE.ROOM_DELETE,
+      callback:this.onRoomDelete
+    });
+
+    this.$store.dispatch(SOCKET_IO_ACTION_TYPE.SUBSCRIBE,{
+      name:SOCKET_EVENT_TYPE.ROOM_RENAME,
+      callback:this.onRoomRename
+    });
   },
   mounted() {
     let _this = this;
@@ -89,6 +109,44 @@ export default {
     }
   },
   methods:{
+    onRoomDelete(data) {
+
+      let id = JSON.parse(data).data;
+      let c = this.contacts.find(c => c.id === id && c.type === 20);
+
+      if (!c) {
+        return ;
+      }
+      // FIXME 先随便写写。
+      this.$message.success("群聊 [" + c.title + "] 已移除");
+      this.deleteContact(c);
+    },
+    onRoomRename(data) {
+      let json = JSON.parse(data).data;
+
+      let c = this.contacts.find(c => c.id === json.id && c.type === 20);
+      if (!c) {
+        return ;
+      }
+
+      let current = this.contacts[this.contacts.indexOf(c)];
+
+      current.name = json.name;
+    },
+    onRoomCreate(data) {
+
+      let json = JSON.parse(data).data;
+
+      this.addContact({
+        id: json.id,
+        name: json.name,
+        type: 20,
+        remark:json.remark,
+        participantList: json.participantList
+      });
+
+      this.$message.success("您加入了 [" + json.name + "] 群聊");
+    },
     onContactContextMenuClick(event){
       if (event.key === "delete") {
         this.deleteContact(event.target);
@@ -399,15 +457,18 @@ export default {
       localStorage.setItem(key, JSON.stringify(this.contacts));
     },
     deleteContact(contact) {
-      let exist = this.contacts.find(c => c.id === contact.id);
+      let exist = this.contacts.find(c => c.id === contact.id && c.type === contact.type);
       if (!exist) {
         return;
       }
+
       let index = this.contacts.indexOf(exist);
       this.contacts.splice(index, 1);
+
       if (contact.id === this.current.id) {
         this.current = JSON.parse(JSON.stringify(this.defaultContactValue));
       }
+
       let key = this.getContactStorageKey(this.principal.details.id);
       localStorage.setItem(key, JSON.stringify(this.contacts));
     },

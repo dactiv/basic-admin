@@ -54,14 +54,14 @@
         <a-col :span="12">
           <a-button type="primary" @click="exitRoom" danger block>
             <icon-font class="icon" type="icon-ashbin" />
-            <span v-if="data.type === 20 && data.participants.find(r => r.userId === principal.details.id).role.value === 20">解散</span>
+            <span v-if="data.type === 20 && data.participantList.find(r => r.userId === principal.details.id).role.value === 20">解散</span>
             <span v-else>退出</span>
           </a-button>
         </a-col>
       </a-row>
 
       <a-space direction="vertical">
-        <template v-for="p of data.participants" :key="p.id">
+        <template v-for="p of data.participantList" :key="p.id">
           <a-space v-if="getUsername(p).includes(this.room.searchText)">
             <a-avatar :src="getPrincipalAvatarByUserId(p.userId)">
               {{ getUsername(p).substring(0,1) }}
@@ -147,7 +147,12 @@ export default {
   watch:{
     data:{
       handler (newValue) {
-        this.addSelectedUser({id:newValue.id, name: newValue.name});
+        let data = {id:newValue.id, name: newValue.name};
+        let existUser = this.group.selectedUser.find(s => s.id === data.id);
+        if (!existUser) {
+          this.group.selectedUser.push(data);
+          this.group.checkedKeys = ["user-" + data.id]
+        }
       },
       deep:true
     }
@@ -239,6 +244,7 @@ export default {
               newOne.id = "group-" + d.id;
               newOne.slots = { icon: 'group' }
               newOne.children = [];
+
               treeNode.dataRef.children.push(newOne);
             });
 
@@ -266,21 +272,11 @@ export default {
     },
     selectGroupUser(checkedKeys, e) {
       let nodes = e.checkedNodes.filter(c => c.key.indexOf('group-') < 0 && c.key !== 'contact');
+      this.group.selectedUser = [];
       nodes.forEach(node => {
         let id = node.key.replace("user-", "") * 1;
-        this.addSelectedUser({id:id, name:node.props.name});
+        this.group.selectedUser.push({id:id, name:node.props.name});
       });
-    },
-    addSelectedUser(data) {
-      let existUser = this.group.selectedUser.find(s => s.id === data.id);
-      if (!existUser) {
-        this.group.selectedUser.push(data);
-      }
-      let checkedId = "user-" + data.id;
-      let existChecked = this.group.checkedKeys.find(s => s === checkedId);
-      if (!existChecked) {
-        this.group.checkedKeys.push(checkedId);
-      }
     },
     renameRoom(){
       this.room.editable.name = !this.room.editable.name;
@@ -294,7 +290,6 @@ export default {
             .$http
             .post("/socket-server/room/renameRoom", this.formUrlencoded(param))
             .then((r) =>  this.$message.success(r.data.message));
-
       }
     },
     createGroup() {
@@ -302,18 +297,20 @@ export default {
         return ;
       }
 
-      let userIds = this.group.selectedUser.map((v) => v.key.replaceAll("user-",""));
+      let userIds = this.group.selectedUser.map((v) => v.id);
       let array = [];
       let defaultNameSize = process.env.VUE_APP_SOCKET_CHAT_ROOM_DEFAULT_NAME_SIZE * 1;
       for (let i = 0; i < Math.min(this.group.selectedUser.length, defaultNameSize); i++) {
-        array.push(this.group.selectedUser[i].props.name);
+        array.push(this.group.selectedUser[i].name);
       }
 
       let name = array.join(process.env.VUE_APP_SOCKET_CHAT_ROOM_DEFAULT_NAME_SEPARATOR);
       let param = {name, userIds};
 
       this.group.visible = false;
+
       this.group.selectedUser = [];
+      this.group.checkedKeys = [];
 
       this
           .$http

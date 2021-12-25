@@ -95,6 +95,8 @@
 
 <script>
 
+import {SOCKET_EVENT_TYPE, SOCKET_IO_ACTION_TYPE} from "@/store/socketIo";
+
 export default {
   name:"ChatContact",
   emits: ["selectMessageContact", "selectTreeContact", "contactContextMenuClick"],
@@ -103,6 +105,22 @@ export default {
     messageCount() {
       return this.contactData.reduce((sum, o) => sum + o.messages.reduce((s, m) => s + m.contents.filter(c => c.status === "unread").length, 0), 0);
     }
+  },
+  created() {
+    this.$store.dispatch(SOCKET_IO_ACTION_TYPE.SUBSCRIBE,{
+      name:SOCKET_EVENT_TYPE.ROOM_CREATE,
+      callback:this.onRoomCreate
+    });
+
+    this.$store.dispatch(SOCKET_IO_ACTION_TYPE.SUBSCRIBE,{
+      name:SOCKET_EVENT_TYPE.ROOM_DELETE,
+      callback:this.onRoomDelete
+    });
+
+    this.$store.dispatch(SOCKET_IO_ACTION_TYPE.SUBSCRIBE,{
+      name:SOCKET_EVENT_TYPE.ROOM_RENAME,
+      callback:this.onRoomRename
+    });
   },
   data() {
     return {
@@ -126,6 +144,43 @@ export default {
     }
   },
   methods:{
+    onRoomDelete(data) {
+      let id = JSON.parse(data).data;
+      let room = this.tree.data.find(d => d.id === "room");
+
+      let exist = room.children.find(r => r.id === "room-" + id);
+      if (!exist) {
+        return;
+      }
+
+      let index = room.children.indexOf(exist);
+      room.children.splice(index, 1);
+    },
+    onRoomCreate(data) {
+      let json = JSON.parse(data).data;
+      let room = this.tree.data.find(d => d.id === "room");
+
+      room.children.push({
+        id: "room-" + json.id,
+        name:json.name,
+        isLeaf: true,
+        remark:json.remark,
+        participantList: json.participantList,
+        slots : { icon: 'room-children' }
+      });
+    },
+    onRoomRename(data) {
+      let json = JSON.parse(data).data;
+
+      let room = this.tree.data.find(d => d.id === "room");
+
+      let exist = room.children.find(r => r.id === "room-" + json.id);
+      if (!exist) {
+        return;
+      }
+
+      room.children[room.children.indexOf(exist)].name = json.name;
+    },
     loadTreeData(treeNode) {
       return new Promise((resolve) => {
         if (treeNode.eventKey === "room") {
