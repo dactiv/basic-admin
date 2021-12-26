@@ -204,7 +204,7 @@ export default {
     getUsername(c) {
       let username = "用户 [" + c.senderId + "] ";
       if (this.renderUsername) {
-        username = this.renderUsername(c);
+        username = this.renderUsername(c.senderId);
       }
       return username;
     }

@@ -323,7 +323,7 @@ export default {
       }
 
       if (type === 20) {
-        contact.participants = info.node.dataRef.participantList;
+        contact.participantList = info.node.dataRef.participantList;
       }
 
       this.selectedKeys = [key];

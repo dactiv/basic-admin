@@ -21,8 +21,8 @@
         <a-col :span="16">
 
           <a-menu mode="horizontal" class="right">
-            <a-menu-item key="1"><icon-font class="icon" type="icon-moon" /></a-menu-item>
-            <a-sub-menu key="2">
+            <a-menu-item key="dark"><icon-font class="icon" type="icon-moon" /></a-menu-item>
+            <a-sub-menu key="profile">
               <template #icon>
                 <a-badge dot :status="connected ? 'success' : 'default'" :offset="[-3, 45]">
                   <a-avatar :src="principal.details.avatar">
@@ -31,28 +31,30 @@
                 </a-badge>
               </template>
               <template #title>{{ getPrincipalName(this.principal.details) }}</template>
-              <a-menu-item key="2-1">
+              <a-menu-item key="setting">
                 <a-button type="text" @click="profile()">
                   <icon-font class="icon" type="icon-setting" /> 系统设置
                 </a-button>
               </a-menu-item>
-              <a-menu-item-group title="状态">
-                <a-menu-item key="2-2">
-                  <a-button type="text" >
-                    <a-typography-text type="success">
-                      <icon-font class="icon" type="icon-wifi-on" />
-                    </a-typography-text>
-                    在线
+              <a-menu-item-group title="聊天">
+                <a-menu-item key="clear-chat-cache">
+                  <a-button type="text" @click="clearChatCache()">
+                    <icon-font class="icon" type="icon-ashbin" /> 清除聊天缓存
                   </a-button>
                 </a-menu-item>
-                <a-menu-item key="2-3">
+                <a-menu-item key="online">
+                  <a-button type="text" >
+                    <icon-font class="icon" type="icon-wifi-on" /> 在线
+                  </a-button>
+                </a-menu-item>
+                <a-menu-item key="ofline">
                   <a-button type="text" >
                     <icon-font class="icon" type="icon-wifi-off" /> 离线
                   </a-button>
                 </a-menu-item>
               </a-menu-item-group>
               <a-menu-divider />
-              <a-menu-item key="2-4">
+              <a-menu-item key="logout">
                 <a-button type="text" @click="logout()">
                   <icon-font class="icon" type="icon-sign-out" /> 注销账户
                 </a-button>
@@ -157,6 +159,10 @@ export default {
     }
   },
   methods: {
+    clearChatCache() {
+      this.refs["chat"].clearCache();
+      location.reload();
+    },
     messageCountChange(count) {
       this.messageCount = count;
     },

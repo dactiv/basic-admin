@@ -8,7 +8,7 @@
 
       <a-layout class="overflow-hidden">
         <a-layout-header class="border-bottom">
-          <chat-message-title ref="contact" :data="current" />
+          <chat-message-title ref="message-title" v-model:data="current" :render-username="getUsername" />
         </a-layout-header>
         <a-layout>
           <a-layout-content class="height-100-percent">
@@ -109,6 +109,10 @@ export default {
     }
   },
   methods:{
+    clearCache() {
+      localStorage.removeItem(this.getContactStorageKey(this.principal.details.id));
+      localStorage.removeItem(this.getInstallStorageKey(this.principal.details.id));
+    },
     onRoomDelete(data) {
 
       let id = JSON.parse(data).data;
@@ -118,20 +122,33 @@ export default {
         return ;
       }
       // FIXME 先随便写写。
-      this.$message.success("群聊 [" + c.title + "] 已移除");
+      this.$message.success("群聊 [" + c.name + "] 已移除");
       this.deleteContact(c);
     },
     onRoomRename(data) {
-      let json = JSON.parse(data).data;
+      let json = JSON.parse(data);
 
-      let c = this.contacts.find(c => c.id === json.id && c.type === 20);
+      let c = this.contacts.find(c => c.id === json.data.id && c.type === 20);
       if (!c) {
         return ;
       }
 
-      let current = this.contacts[this.contacts.indexOf(c)];
+      let contact = this.contacts[this.contacts.indexOf(c)];
+      contact.name = json.data.name;
 
-      current.name = json.name;
+      if (this.current.id === contact.id && this.current.type === 20) {
+        this.current.name = contact.name;
+      }
+
+      if (this.principal.details.id !== json.data.userId) {
+        let message = {
+          type:"notice",
+          creationTime:json.timestamp,
+          content:"用户 [ " + this.getUsername(json.userId) + " ] 将群聊改名为 [" + contact.name + "]"
+        }
+        this.addMessage(message, contact.messages)
+        this.saveContact(contact);
+      }
     },
     onRoomCreate(data) {
 
@@ -254,11 +271,21 @@ export default {
     addMessage(message, appendMessages, unshift) {
 
       let content = {
-        senderId:message.senderId,
         content:message.content,
-        tooltip:message.tooltip,
-        status:message.status
       };
+
+      if (message.type) {
+        content["type"] = message.type;
+      }
+      if (message.senderId) {
+        content["senderId"] = message.senderId;
+      }
+      if (message.tooltip) {
+        content["tooltip"] = message.tooltip;
+      }
+      if (message.status) {
+        content["status"] = message.status;
+      }
 
       if (message.id) {
         let currentContents = appendMessages.flatMap(m => m.contents);
@@ -282,14 +309,16 @@ export default {
         appendMessages.push(result);
       } else {
         let lastMessage = unshift ? appendMessages[0] : appendMessages[this.current.messages.length - 1];
-        let intervalTimeUnit = this.message.intervalTime.unit;
-        let currentIntervalTime = unshift ?
-            this.$moment(lastMessage.creationTime).diff(content.creationTime, intervalTimeUnit) :
-            content.creationTime.diff(this.$moment(lastMessage.creationTime), intervalTimeUnit);
 
-        let intervalTime = this.message.intervalTime.value;
+        let currentIntervalTime = this.message.intervalTime.value;
 
-        if (currentIntervalTime >= intervalTime) {
+        if (lastMessage) {
+          currentIntervalTime = unshift ?
+              this.$moment(lastMessage.creationTime).diff(content.creationTime, this.message.intervalTime.unit) :
+              content.creationTime.diff(this.$moment(lastMessage.creationTime), this.message.intervalTime.unit);
+        }
+
+        if (currentIntervalTime >= this.message.intervalTime.value) {
           if (unshift) {
             appendMessages.unshift(result)
           } else {
@@ -349,15 +378,6 @@ export default {
         this.sendGroupMessage(message);
       }
     },
-    installContactHistory() {
-      let targetId = this.current.id;
-
-      this.clearCurrentHistory();
-
-      this.$http
-          .post("/socket-server/chat/getHistoryMessageDateList", this.formUrlencoded({targetId}))
-          .then((r) => this.current.history.calendar.enabledDate = r.data.data || []);
-    },
     onSelectTreeContact(contact) {
       console.log(contact);
 
@@ -387,10 +407,15 @@ export default {
           .post("/socket-server/chat/getHistoryMessageDateList", this.formUrlencoded({targetId: this.current.id}))
           .then((r) => this.current.history.enabledDate = r.data.data || []);
 
+      let messageTitle = this.$refs["message-title"];
+
       this.$nextTick(() => {
 
         this.$refs["message-input"].clearCurrentHistory();
         this.$refs["message-content"].clearCurrentRecord();
+
+        messageTitle.clearCurrentRecord();
+        messageTitle.setSelectedKeys({id:this.current.id, name:this.current.name})
 
         if (this.current.messages.length < this.message.pageSize && !this.current.lastLoadMessage) {
           this.loadHistoryMessage();
@@ -510,18 +535,18 @@ export default {
             });
       }
     },
-    getUsername(c) {
-      if (c.senderId === this.principal.details.id) {
-        return this.getPrincipalName(this.principal.details) + " ";
+    getUsername(userId) {
+      if (userId === this.principal.details.id) {
+        return this.getPrincipalName(this.principal.details);
       }
 
-      let contact = this.contacts.find(u => u.id === c.senderId && u.type === 10);
+      let contact = this.contacts.find(u => u.id === userId && u.type === 10);
 
       if (contact) {
-        return contact.name + " ";
+        return contact.name;
       }
 
-      return "用户 [" + c.senderId + "] ";
+      return "加载中...";
     }
   }
 }

@@ -27,15 +27,15 @@
 
       <a-space>
         <a-button type="text" class="padding-none" @click="renameRoom()">
-          <icon-font class="icon" :type="room.editable.name ? 'icon-select' : 'icon-edit'" />
+          <icon-font class="icon" :type="room.editable.name.edit ? 'icon-select' : 'icon-edit'" />
         </a-button>
-        <a-input v-if="room.editable.name" v-model:value="name" />
-        <a-typography-text v-else :ellipsis="true" v-model:content="name" style="width: 175px"/>
+        <a-input v-if="room.editable.name.edit" v-model:value="room.editable.name.text" />
+        <a-typography-text v-else :ellipsis="true" v-model:content="room.editable.name.text" style="width: 175px"/>
       </a-space>
 
       <a-divider class="font-size-sm" orientation="left">备注</a-divider>
-      <a-empty v-if="!remark"></a-empty>
-      <p v-else>{{remark}}</p>
+      <a-empty v-if="!room.editable.remark.text"></a-empty>
+      <p v-else>{{room.editable.remark.text}}</p>
 
       <a-divider class="font-size-sm" orientation="left">成员信息</a-divider>
 
@@ -73,7 +73,7 @@
     </div>
   </a-drawer>
 
-  <a-modal v-model:visible="group.visible" @cancel="onGroupModalCancel" @ok="createGroup" :mask="false" :maskClosable="false" title="创建多人聊天" class="room">
+  <a-modal v-model:visible="group.visible" @cancel="clearCurrentRecord" @ok="createGroup" :mask="false" :maskClosable="false" title="创建多人聊天" class="room">
     <a-row class="height-100-percent">
       <a-col :span="8" class="border-right padding height-100-percent">
         <a-row>
@@ -125,34 +125,12 @@
 export default {
   name:"ChatMessageTitle",
   props:["data", "renderUsername"],
-  emits: ["toolbarClick", "update:data.name", "update:data.remark"],
-  computed: {
-    name:{
-      get(){
-        return this.data.name
-      },
-      set(value) {
-        this.$emit('update:data.name', value);
-      }
-    },
-    remark:{
-      get(){
-        return this.data.remark
-      },
-      set(value) {
-        this.$emit('update:data.remark', value);
-      }
-    }
-  },
+  emits: ["toolbarClick"],
   watch:{
     data:{
       handler (newValue) {
-        let data = {id:newValue.id, name: newValue.name};
-        let existUser = this.group.selectedUser.find(s => s.id === data.id);
-        if (!existUser) {
-          this.group.selectedUser.push(data);
-          this.group.checkedKeys = ["user-" + data.id]
-        }
+        this.room.editable.name.text = newValue.name;
+        this.room.editable.remark.text = newValue.remark;
       },
       deep:true
     }
@@ -174,15 +152,29 @@ export default {
       room: {
         searchText:"",
         editable:{
-          name:false,
-          remark: false,
+          name: {
+            text:"",
+            edit:false
+          },
+          remark: {
+            text:"",
+            edit:false
+          },
         },
         visible:false
       }
     }
   },
   methods:{
-    onGroupModalCancel() {
+    setSelectedKeys(data) {
+      let existUser = this.group.selectedUser.find(s => s.id === data.id);
+
+      if (!existUser) {
+        this.group.selectedUser.push(data);
+        this.group.checkedKeys = ["user-" + data.id]
+      }
+    },
+    clearCurrentRecord() {
       this.group.selectedUser = [];
       this.group.checkedKeys = [];
     },
@@ -264,9 +256,9 @@ export default {
       this.$emit('toolbarClick', this.data);
     },
     getUsername(c) {
-      let username = "用户 [" + c.senderId + "] ";
+      let username = "用户 [" + c.userId + "] ";
       if (this.renderUsername) {
-        username = this.renderUsername(c);
+        username = this.renderUsername(c.userId);
       }
       return username;
     },
@@ -279,10 +271,10 @@ export default {
       });
     },
     renameRoom(){
-      this.room.editable.name = !this.room.editable.name;
-      if (!this.room.editable.name) {
+      this.room.editable.name.edit = !this.room.editable.name.edit;
+      if (!this.room.editable.name.edit) {
         let param = {
-          name: this.name,
+          name: this.room.editable.name.text,
           id: this.data.id
         };
 
@@ -321,7 +313,7 @@ export default {
 
       let confirmMessage = "确定要";
 
-      if (this.data.participants.find(r => r.userId === this.principal.details.id).role.value === 20) {
+      if (this.data.participantList.find(r => r.userId === this.principal.details.id).role.value === 20) {
         confirmMessage += "解散";
       } else {
         confirmMessage += "退出";
@@ -329,10 +321,10 @@ export default {
       confirmMessage += " [ " + this.data.name + " ] 群聊吗?";
 
       this.confirm(confirmMessage, () => {
-        this.room.info.visible = false;
+        this.room.visible = false;
         this
             .$http
-            .post("/socket-server/room/exitRoom", this.formUrlencoded({id: this.current.contact.id}))
+            .post("/socket-server/room/exitRoom", this.formUrlencoded({id: this.data.id}))
             .then((r) => this.$message.success(r.data.message));
       });
     },
