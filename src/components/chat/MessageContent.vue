@@ -20,9 +20,7 @@
           </a-row>
           <div v-else :class="c.senderId !== principal.details.id ? '' : 'text-right'">
             <a-space align="start">
-              <a-avatar v-if="c.senderId !== principal.details.id" :src="getPrincipalAvatarByUserId(c.senderId)" class="basic-box-shadow" >
-                {{ getUsername(c).substring(0,1) }}
-              </a-avatar>
+              <a-avatar v-if="c.senderId !== principal.details.id" :src="getPrincipalAvatarByUserId(c.senderId)" class="basic-box-shadow" />
               <a-space>
                 <a-tooltip v-if="c.senderId === principal.details.id">
                   <template #title><a-button v-if="c.status === 'fail'" type="link" class="padding-none" @click="retrySend(c.id)">[重试]</a-button>{{c.tooltip}} </template>
@@ -39,9 +37,7 @@
                   </a-typography-text>
                 </a-tooltip>
               </a-space>
-              <a-avatar v-if="c.senderId === principal.details.id" :src="principal.details.avatar" class="basic-box-shadow">
-                我
-              </a-avatar>
+              <a-avatar v-if="c.senderId === principal.details.id" :src="principal.details.avatar" class="basic-box-shadow" />
             </a-space>
           </div>
         </div>
@@ -76,10 +72,14 @@ export default {
           this.index.first = newContents[0];
         }
 
-        if (newContents.indexOf(this.index.first) > 0) {
+        if (newContents.indexOf(this.index.first) > 0 && this.scroll.top === 0) {
           this.fixedScrollPosition();
         } else if (!this.index.last || newContents.indexOf(this.index.last) <= newContents.length - 1) {
-          this.setScrollBottom();
+          if (this.scroll.top + this.scroll.clientHeight === this.scroll.scrollHeight) {
+            this.setScrollBottom();
+          } else {
+            console.log("等等在处理");
+          }
         }
 
         this.index.first = newContents[0];
@@ -104,7 +104,8 @@ export default {
       hasFocus: false,
       scroll: {
         top:0,
-        height:0
+        height:0,
+        clientHeight:0
       },
       index: {
         last:null,
@@ -151,16 +152,20 @@ export default {
       if (d.target.scrollTop !== 0) {
         this.scroll.top = d.target.scrollTop
         this.scroll.height = d.target.scrollHeight
+        this.scroll.clientHeight = d.target.clientHeight;
         return ;
       }
       this.$emit("messageContentScroll", d)
     },
     getUsername(c) {
-      let username = "用户 [" + c.senderId + "]";
+
+      c.name = c.name || "加载中..";
+
       if (this.renderUsername) {
-        username = this.renderUsername(c.senderId);
+        return this.renderUsername(c, c.senderId);
       }
-      return username;
+
+      return c;
     }
   }
 }

@@ -25,9 +25,7 @@
             <a-sub-menu key="profile">
               <template #icon>
                 <a-badge dot :status="connected ? 'success' : 'default'" :offset="[-3, 45]">
-                  <a-avatar :src="principal.details.avatar">
-                    {{ getPrincipalName(this.principal.details).substring(0, 1) }}
-                  </a-avatar>
+                  <a-avatar :src="principal.details.avatar" />
                 </a-badge>
               </template>
               <template #title>{{ getPrincipalName(this.principal.details) }}</template>

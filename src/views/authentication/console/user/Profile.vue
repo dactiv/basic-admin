@@ -31,9 +31,7 @@
 
       <a-divider v-if="historyAvatar.values.length > 0" />
 
-      <a-avatar :size="64" :src="principal.details.avatar">
-        {{ getPrincipalName(this.principal.details).substring(0, 1) }}
-      </a-avatar>
+      <a-avatar :size="64" :src="principal.details.avatar" />
       <p class="margin-md-top">
       <a-upload :showUploadList="false" action="/authentication/user/avatar/upload" @change="fileListChange" :before-upload="beforeUpload">
         <a-button size="small">

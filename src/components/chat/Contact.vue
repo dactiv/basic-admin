@@ -2,9 +2,7 @@
   <a-row class="height-100-percent">
     <a-col :span="5" class="tool-bar border-right">
       <div class="text-center margin-md-top">
-        <a-avatar :src="principal.details.avatar">
-          {{ getPrincipalName(principal.details).substring(0, 1) }}
-        </a-avatar>
+        <a-avatar :src="principal.details.avatar" />
         <a-menu mode="vertical" class="margin-top" @select="toolbarSelect" :selectedKeys="selectedToolBar">
           <a-menu-item key="message">
             <a-badge :count="messageCount" :offset="[x=-20, y=0]">
@@ -28,9 +26,7 @@
               <a-row type="flex" justify="space-around" align="middle">
                 <a-col :span="4">
                   <a-badge :count="c.messages.reduce((s, m) => s + m.contents.filter(ct => ct.status === 'unread').length, 0)" :offset="[x = -25, y = 0]">
-                    <a-avatar :src="c.type === 10 ? this.getPrincipalAvatarByUserId(c.id) : null" :shape="c.type === 10 ? 'circle' : 'square'">
-                      {{ c.name.substring(0, 1) }}
-                    </a-avatar>
+                    <a-avatar :src="c.type === 10 ? this.getPrincipalAvatarByUserId(c.id) : null" :shape="c.type === 10 ? 'circle' : 'square'" />
                   </a-badge>
                 </a-col>
                 <a-col :span="20" class="padding-left">
@@ -79,9 +75,7 @@
             </template>
             <template #title="{name, id}">
               <div v-if="id.includes('user-') || id.includes('room-')" class="group-user">
-                <a-avatar size="small" :src="id.includes('user-') ? getPrincipalAvatarByUserId(id.replace('user-','')) : ''" :shape="id.includes('user-') ? 'circle' : 'square'">
-                  {{name.substring(0,1) }}
-                </a-avatar>
+                <a-avatar size="small" :src="id.includes('user-') ? getPrincipalAvatarByUserId(id.replace('user-','')) : ''" :shape="id.includes('user-') ? 'circle' : 'square'" />
                 <a-typography-text strong :content="name" />
               </div>
               <a-typography-text v-else :content="name" />

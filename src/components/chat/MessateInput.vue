@@ -46,7 +46,7 @@
       <div v-for="c of historyMessages" :key="c.id" :class="c.senderId === principal.details.id ? 'self' : ''">
         <p>
           <a-typography-paragraph>
-            <a-typography-text strong >{{ getUsername(c) }}</a-typography-text>
+            <a-typography-text strong >{{ getUsername(c).name }}</a-typography-text>
             <a-typography-text class="font-size-sm">{{ timestampFormat(c.creationTime) }}</a-typography-text>
           </a-typography-paragraph>
         </p>
@@ -202,11 +202,14 @@ export default {
       this.inputContent = "";
     },
     getUsername(c) {
-      let username = "用户 [" + c.senderId + "] ";
+
+      c.name = c.name || "加载中..";
+
       if (this.renderUsername) {
-        username = this.renderUsername(c.senderId);
+        return this.renderUsername(c, c.senderId);
       }
-      return username;
+
+      return c;
     }
   }
 }

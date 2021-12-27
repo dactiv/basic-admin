@@ -13,7 +13,6 @@
         <a-layout>
           <a-layout-content class="height-100-percent">
             <chat-message-content ref="message-content" @message-content-scroll="onMessageContentScroll" :render-username="getUsername" :data="current.messages" :last-load-message="current.lastLoadMessage" />
-
             <chat-message-input ref="message-input" @history-message-content-scroll="onMessageContentScroll" :render-username="getUsername" :visible="current.id > 0" :date-pattern="message.datePattern" :enabled-date="current.history.enabledDate" :history-messages="current.messages.flatMap(m => m.contents)" :last-load-message="current.lastLoadMessage" @sendMessage="onSendMessage"/>
           </a-layout-content>
         </a-layout>
@@ -92,6 +91,7 @@ export default {
           unit: process.env.VUE_APP_SOCKET_CHAT_MESSAGE_GROUP_INTERVAL_TIME_UNIT
         }
       },
+      cache:JSON.parse(localStorage.getItem(process.env.VUE_APP_SOCKET_CHAT_CACHE)) || {profiles:[]},
       hasFocus:true,
       contacts: JSON.parse(localStorage.getItem(this.getContactStorageKey(this.principal.details.id))) || [],
       install:JSON.parse(localStorage.getItem(this.getInstallStorageKey(this.principal.details.id))) || {recentContacts: false},
@@ -121,7 +121,6 @@ export default {
       if (!c) {
         return ;
       }
-      // FIXME 先随便写写。
       this.$message.success("群聊 [" + c.name + "] 已移除");
       this.deleteContact(c);
     },
@@ -136,19 +135,15 @@ export default {
       let contact = this.contacts[this.contacts.indexOf(c)];
       contact.name = json.data.name;
 
-      if (this.current.id === contact.id && this.current.type === 20) {
-        this.current.name = contact.name;
-      }
-
       if (this.principal.details.id !== json.data.userId) {
         let message = {
           type:"notice",
           creationTime:json.timestamp,
-          content:"用户 [ " + this.getUsername(json.userId) + " ] 将群聊改名为 [" + contact.name + "]"
+          content:"用户 [ " + this.getUsername({name:"加载中..."}, json.data.userId).name + " ] 将群聊改名为 [" + contact.name + "]"
         }
         this.addMessage(message, contact.messages)
-        this.saveContact(contact);
       }
+      this.saveContact(contact);
     },
     onRoomCreate(data) {
 
@@ -228,25 +223,47 @@ export default {
           });
     },
     getRecentContactsProfile(data) {
+      this
+          .getPrincipalProfiles(data.map((v) => v.id), 10)
+          .then(result => {
+            result.forEach(r => this.addContact(r));
+            this.getSocketTempMessages();
+          });
+    },
+    getPrincipalProfiles(userIds, type) {
       let param = {
         type:"CONSOLE",
-        ids:data.map((v) => v.id)
+        ids:userIds
       }
-      this
-          .$http
-          .post("/authentication/getPrincipalProfile",this.formUrlencoded(param))
-          .then(r => {
-            let profile = r.data.data;
-            profile.forEach(p => {
-              let current = data.find((d) => d.id === p.id);
-              this.addContact({
-                id:p.id,
-                name:this.getPrincipalName(p),
-                type: current.type
+      return new Promise((resolve) => {
+        this
+            .$http
+            .post("/authentication/getPrincipalProfile", this.formUrlencoded(param))
+            .then(r => {
+              let profile = r.data.data;
+              let result = [];
+              profile.forEach(p => {
+
+                let cache ={
+                  id:p.id,
+                  name:this.getPrincipalName(p),
+                  type: type
+                };
+
+                let exist = this.cache.profiles.find(p => p.id === cache.id && p.type === type);
+
+                if (exist) {
+                  this.cache.profiles[this.cache.profiles.indexOf(exist)] = cache;
+                } else {
+                  this.cache.profiles.push(cache);
+                }
+
+                localStorage.setItem(process.env.VUE_APP_SOCKET_CHAT_CACHE, JSON.stringify(this.cache));
+                result.push(cache);
+                resolve(result);
               });
-              this.getSocketTempMessages();
             })
-          })
+      });
     },
     addContact(contact) {
 
@@ -379,7 +396,6 @@ export default {
       }
     },
     onSelectTreeContact(contact) {
-      console.log(contact);
 
       let exist = this.contacts.find(c => c.id === contact.id);
 
@@ -396,12 +412,11 @@ export default {
         return ;
       }
 
-      let selected = JSON.parse(JSON.stringify(contact));
-      selected.history = {
+      contact.history = {
         enabledDate:[]
       }
 
-      this.current = selected;
+      this.current = contact;
 
       this.$http
           .post("/socket-server/chat/getHistoryMessageDateList", this.formUrlencoded({targetId: this.current.id}))
@@ -535,18 +550,26 @@ export default {
             });
       }
     },
-    getUsername(userId) {
+    getUsername(c, userId) {
       if (userId === this.principal.details.id) {
-        return this.getPrincipalName(this.principal.details);
+        c.name = this.getPrincipalName(this.principal.details);
       }
 
       let contact = this.contacts.find(u => u.id === userId && u.type === 10);
 
       if (contact) {
-        return contact.name;
+        c.name = contact.name;
       }
 
-      return "加载中...";
+      let profile = this.cache.profiles.find(u => u.id === userId);
+
+      if (profile) {
+        c.name = profile.name;
+      } else {
+        this.getPrincipalProfiles([userId], 10).then(result => c.name = result[0].name);
+      }
+
+      return c;
     }
   }
 }
