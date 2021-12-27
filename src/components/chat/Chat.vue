@@ -136,12 +136,21 @@ export default {
       contact.name = json.data.name;
 
       if (this.principal.details.id !== json.data.userId) {
+        let nameModel = this.getUsername({}, json.data.userId);
         let message = {
           type:"notice",
           creationTime:json.timestamp,
-          content:"用户 [ " + this.getUsername({name:"加载中..."}, json.data.userId).name + " ] 将群聊改名为 [" + contact.name + "]"
         }
-        this.addMessage(message, contact.messages)
+        if (nameModel.name) {
+          message.content = "用户 [ " + nameModel.name + " ] 将群聊改名为 [" + contact.name + "]";
+          this.addMessage(message, contact.messages);
+        } else {
+          this.getPrincipalProfiles([json.data.userId], 10).then(r => {
+            message.content = "用户 [ " + r[0].name + " ] 将群聊改名为 [" + contact.name + "]";
+            this.addMessage(message, contact.messages);
+          });
+        }
+
       }
       this.saveContact(contact);
     },
@@ -550,22 +559,25 @@ export default {
             });
       }
     },
-    getUsername(c, userId) {
+    getUsername(c, userId, unload) {
+
       if (userId === this.principal.details.id) {
         c.name = this.getPrincipalName(this.principal.details);
+        return c;
       }
 
       let contact = this.contacts.find(u => u.id === userId && u.type === 10);
 
       if (contact) {
         c.name = contact.name;
+        return c;
       }
 
       let profile = this.cache.profiles.find(u => u.id === userId);
 
       if (profile) {
         c.name = profile.name;
-      } else {
+      } else if (!unload) {
         this.getPrincipalProfiles([userId], 10).then(result => c.name = result[0].name);
       }
 
