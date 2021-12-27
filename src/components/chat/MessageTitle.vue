@@ -2,9 +2,7 @@
   <a-row>
     <a-col :span="20">
       <a-space v-if="data.id > 0" :size="10" class="padding-left">
-        <a-avatar :src="data.type === 10 ? getPrincipalAvatarByUserId(data.id) : null" :shape="data.type === 10 ? 'circle' : 'square'" >
-          {{ data.name.substring(0,1) }}
-        </a-avatar>
+        <a-avatar :src="data.type === 10 ? getPrincipalAvatarByUserId(data.id) : null" :shape="data.type === 10 ? 'circle' : 'square'" />
         <a-typography-text strong>{{ data.name }}</a-typography-text>
       </a-space>
     </a-col>
@@ -62,11 +60,9 @@
 
       <a-space direction="vertical">
         <template v-for="p of data.participantList" :key="p.id">
-          <a-space v-if="getUsername(p).includes(this.room.searchText)">
-            <a-avatar :src="getPrincipalAvatarByUserId(p.userId)">
-              {{ getUsername(p).substring(0,1) }}
-            </a-avatar>
-            <a-typography-text strong>{{ getUsername(p) }}</a-typography-text>
+          <a-space>
+            <a-avatar :src="getPrincipalAvatarByUserId(p.userId)" />
+            <a-typography-text strong>{{ getUsername(p).name }}</a-typography-text>
           </a-space>
         </template>
       </a-space>
@@ -92,9 +88,7 @@
             </template>
             <template #title="{name, id}">
               <div v-if="id.includes('user-')" class="group-user">
-                <a-avatar size="small" :src="getPrincipalAvatarByUserId(id.replace('user-',''))">
-                  {{name.substring(0,1) }}
-                </a-avatar>
+                <a-avatar size="small" :src="getPrincipalAvatarByUserId(id.replace('user-',''))" />
                 <a-typography-text strong class="margin-left" :content="name" />
               </div>
               <a-typography-text v-else :content="name" />
@@ -105,9 +99,7 @@
       <a-col :span="16" class="padding height-100-percent overflow-auto">
         <a-card v-if="group.selectedUser.length > 0">
           <a-card-grid v-for="u of group.selectedUser" :key="u.id" style="width: 25%; text-align: center">
-            <a-avatar :src="getPrincipalAvatarByUserId(u.id)" >
-              {{ u.name.substring(0,1) }}
-            </a-avatar>
+            <a-avatar :src="getPrincipalAvatarByUserId(u.id)" />
             <div>
               <a-typography-text :ellipsis="true" wid strong>{{ u.name }}</a-typography-text>
             </div>
@@ -125,7 +117,6 @@
 export default {
   name:"ChatMessageTitle",
   props:["data", "renderUsername"],
-  emits: ["toolbarClick"],
   watch:{
     data:{
       handler (newValue) {
@@ -179,13 +170,7 @@ export default {
       this.group.checkedKeys = [];
     },
     loadTreeData(treeNode) {
-      return new Promise((resolve) => {
-        if (treeNode.eventKey === "contact") {
-          this.loadGroupTreeNode(resolve, treeNode);
-        } else if (treeNode.eventKey.includes("group-")) {
-          this.loadGroupTreeNode(resolve, treeNode, );
-        }
-      });
+      return new Promise((resolve) => this.loadGroupTreeNode(resolve, treeNode));
     },
     loadUserTreeNode(group, resolve) {
       let param = {};
@@ -253,14 +238,16 @@ export default {
       } else {
         this.group.visible = !this.group.visible;
       }
-      this.$emit('toolbarClick', this.data);
     },
     getUsername(c) {
-      let username = "用户 [" + c.userId + "] ";
+
+      c.name = c.name || "加载中..";
+
       if (this.renderUsername) {
-        username = this.renderUsername(c.userId);
+        return this.renderUsername(c, c.userId);
       }
-      return username;
+
+      return c;
     },
     selectGroupUser(checkedKeys, e) {
       let nodes = e.checkedNodes.filter(c => c.key.indexOf('group-') < 0 && c.key !== 'contact');
