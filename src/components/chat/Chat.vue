@@ -1,5 +1,5 @@
 <template>
-  <a-drawer :width="950" placement="right" :closable="false" v-model:visible="visible" class="chat">
+  <a-drawer :width="950" placement="right" :closable="false" v-model:visible="show" class="chat">
     <a-layout class="height-100-percent">
 
       <a-layout-sider class="main-aside border-right" :width="280">
@@ -33,9 +33,10 @@ import {SOCKET_EVENT_TYPE, SOCKET_IO_ACTION_TYPE} from "@/store/socketIo";
 export default {
   name:"Chat",
   components: {ChatMessageContent, ChatMessageTitle, ChatContact, ChatMessageInput},
+  props:["visible"],
   emits: ["messageCountChange","update:visible"],
   computed: {
-    visible: {
+    show: {
       get() {
         return this.visible
       },
@@ -67,6 +68,17 @@ export default {
       name:SOCKET_EVENT_TYPE.ROOM_RENAME,
       callback:this.onRoomRename
     });
+
+    this.$store.dispatch(SOCKET_IO_ACTION_TYPE.SUBSCRIBE, {
+      name: SOCKET_EVENT_TYPE.CHAT_READ_MESSAGE,
+      callback:this.onReadMessage
+    });
+
+    this.$store.dispatch(SOCKET_IO_ACTION_TYPE.SUBSCRIBE,{
+      name:SOCKET_EVENT_TYPE.CHAT_MESSAGE,
+      callback:this.onChatMessage
+    });
+
   },
   mounted() {
     let _this = this;
@@ -123,6 +135,69 @@ export default {
       }
       this.$message.success("群聊 [" + c.name + "] 已移除");
       this.deleteContact(c);
+    },
+    onReadMessage(data) {
+
+      let json = data;
+
+      if (typeof(data) === 'string') {
+        json = JSON.parse(data).data;
+      }
+
+      let contact = this.contacts.find(c => c.id === json.id && c.type === json.type);
+      let contents = contact.messages.flatMap(m => m.contents)
+
+      json.messageIds.forEach(id => {
+        let content = contents.find(m => m.id === id);
+        if (content) {
+          content.status = "read";
+          content.tooltip = content.senderId === this.principal.detail.id ? "对方已查阅" : "您已查阅";
+        }
+      });
+
+      this.saveContact(contact);
+    },
+    onChatMessage(data) {
+
+      let json = data;
+
+      if (typeof(data) === 'string') {
+        json = JSON.parse(data).data;
+      }
+
+      let contact = this.contacts.find(c => c.id === json.id && c.type === json.type);
+
+      json.messages.forEach(m => {
+        m.status = "unread";
+        m.tooltip = "待查阅";
+      });
+
+      if (contact) {
+        json.messages.forEach(m => this.addMessage(contact, m));
+
+        contact.lastMessage = json.lastMessage;
+        contact.lastSendTime = json.lastSendTime;
+
+        if (this.hasFocus && this.visible && this.current.id === contact.id) {
+          this.readMessage();
+        }
+        this.saveContact(contact);
+        this.$emit('messageCountChange', this.messageCount);
+      } else {
+        this.getPrincipalProfiles([json.id], json.type).then(result => {
+          let data = result[0];
+
+          data.lastLoadMessage = false;
+          data.lastMessage = json.lastMessage;
+          data.lastSendTime = json.lastSendTime;
+          data.messages = [];
+
+          json.messages.forEach(m => this.addMessage(m, data.messages));
+          this.addContact(data);
+          this.$emit('messageCountChange', this.messageCount);
+        });
+      }
+
     },
     onRoomRename(data) {
       let json = JSON.parse(data);
@@ -406,7 +481,7 @@ export default {
     },
     onSelectTreeContact(contact) {
 
-      let exist = this.contacts.find(c => c.id === contact.id);
+      let exist = this.contacts.find(c => c.id === contact.id && c.type === contact.type);
 
       if (!exist) {
         exist = JSON.parse(JSON.stringify(contact));
@@ -442,9 +517,11 @@ export default {
         messageTitle.setSelectedKeys({id:this.current.id, name:this.current.name})
 
         if (this.current.messages.length < this.message.pageSize && !this.current.lastLoadMessage) {
-          this.loadHistoryMessage();
+          this.loadHistoryMessage().then(this.readMessage);
+        } else {
+          this.readMessage();
         }
-        this.readMessage(this.current);
+
       });
 
     },
@@ -472,7 +549,7 @@ export default {
         size: this.message.pageSize
       };
 
-      this
+      return this
           .$http
           .post("/socket-server/chat/getHistoryMessagePage", this.formUrlencoded(param))
           .then((r) => {
