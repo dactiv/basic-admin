@@ -165,7 +165,7 @@ export default {
         json = JSON.parse(data).data;
       }
 
-      let contact = this.contacts.find(c => c.id === json.id && c.type === json.type);
+      let contact = this.contacts.find(c => c.id === json.id && c.type === json.type.value);
 
       json.messages.forEach(m => {
         m.status = "unread";
@@ -173,7 +173,7 @@ export default {
       });
 
       if (contact) {
-        json.messages.forEach(m => this.addMessage(contact, m));
+        json.messages.forEach(m => this.addMessage(m, contact.messages));
 
         contact.lastMessage = json.lastMessage;
         contact.lastSendTime = json.lastSendTime;
@@ -182,9 +182,9 @@ export default {
           this.readMessage();
         }
         this.saveContact(contact);
-        this.$emit('messageCountChange', this.messageCount);
+        this.$emit('messageCountChange', this.$refs["contact"].messageCount);
       } else {
-        this.getPrincipalProfiles([json.id], json.type).then(result => {
+        this.getPrincipalProfiles([json.id], json.type.value).then(result => {
           let data = result[0];
 
           data.lastLoadMessage = false;
@@ -194,7 +194,7 @@ export default {
 
           json.messages.forEach(m => this.addMessage(m, data.messages));
           this.addContact(data);
-          this.$emit('messageCountChange', this.messageCount);
+          this.$emit('messageCountChange', this.$refs["contact"].messageCount);
         });
       }
 
@@ -632,7 +632,7 @@ export default {
                 m.tooltip = m.senderId === this.principal.details.id ? "对方已查阅" : "您已查阅";
               });
               this.saveContact(this.current);
-              this.$emit('messageCountChange', this.messageCount);
+              this.$emit('messageCountChange', this.$refs["contact"].messageCount);
             });
       }
     },
