@@ -1,4 +1,5 @@
 <template>
+
   <a-drawer :width="950" placement="right" :closable="false" v-model:visible="show" class="chat">
     <a-layout class="height-100-percent">
 
@@ -182,7 +183,7 @@ export default {
           this.readMessage();
         }
         this.saveContact(contact);
-        this.$emit('messageCountChange', this.$refs["contact"].messageCount);
+        this.$emit('messageCountChange', this.getMessageCount());
       } else {
         this.getPrincipalProfiles([json.id], json.type.value).then(result => {
           let data = result[0];
@@ -194,7 +195,7 @@ export default {
 
           json.messages.forEach(m => this.addMessage(m, data.messages));
           this.addContact(data);
-          this.$emit('messageCountChange', this.$refs["contact"].messageCount);
+          this.$emit('messageCountChange', this.getMessageCount());
         });
       }
 
@@ -282,6 +283,9 @@ export default {
         this.getSocketTempMessages()
       }
     },
+    getMessageCount() {
+      return this.contacts.reduce((sum, o) => sum + o.messages.reduce((s, m) => s + m.contents.filter(c => c.status === "unread").length, 0), 0);
+    },
     getSocketTempMessages() {
       let param = {types:[SOCKET_EVENT_TYPE.CHAT_READ_MESSAGE, SOCKET_EVENT_TYPE.CHAT_MESSAGE]};
       this
@@ -358,11 +362,17 @@ export default {
       } else {
         currentContact = contact;
         currentContact.lastLoadMessage = false;
-        currentContact.messages = [];
-        currentContact.lastMessage = "";
-        currentContact.lastSendTime = "";
         currentContact.disturb = false;
         currentContact.top = false;
+        if (!currentContact.messages) {
+          currentContact.messages = [];
+        }
+        if (!currentContact.lastMessage) {
+          currentContact.lastMessage = "";
+        }
+        if (!currentContact.lastSendTime) {
+          currentContact.lastSendTime = "";
+        }
       }
 
       this.saveContact(currentContact)
@@ -526,6 +536,10 @@ export default {
 
     },
     onMessageContentScroll() {
+      if (this.current.messages.length <= 0) {
+        return ;
+      }
+
       let time = this.$moment.now();
       let contents = this.current.messages[0].contents;
       if (contents.length > 0) {
@@ -632,7 +646,7 @@ export default {
                 m.tooltip = m.senderId === this.principal.details.id ? "对方已查阅" : "您已查阅";
               });
               this.saveContact(this.current);
-              this.$emit('messageCountChange', this.$refs["contact"].messageCount);
+              this.$emit('messageCountChange', this.getMessageCount());
             });
       }
     },
