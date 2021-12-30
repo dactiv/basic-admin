@@ -35,11 +35,6 @@
                 </a-button>
               </a-menu-item>
               <a-menu-item-group title="聊天">
-                <a-menu-item key="clear-chat-cache">
-                  <a-button type="text" @click="clearChatCache()">
-                    <icon-font class="icon" type="icon-ashbin" /> 清除聊天缓存
-                  </a-button>
-                </a-menu-item>
                 <a-menu-item key="online">
                   <a-button type="text" >
                     <icon-font class="icon" type="icon-wifi-on" /> 在线
@@ -157,10 +152,6 @@ export default {
     }
   },
   methods: {
-    clearChatCache() {
-      this.refs["chat"].clearCache();
-      location.reload();
-    },
     messageCountChange(count) {
       this.messageCount = count;
     },
@@ -209,20 +200,18 @@ export default {
       localStorage.setItem(process.env.VUE_APP_LOCAL_STORAGE_MENU_COLLAPSED_NAME, this.menu.collapsed);
     },
     logout() {
+      localStorage.clear();
       this.$router.push(process.env.VUE_APP_LOGIN_PAGE);
     },
     setMenus(response) {
 
       let details = JSON.parse(JSON.stringify(this.principal.details));
-
       details.menus = response.data.data;
 
       this.$store.commit(PRINCIPAL_MUTATION_TYPE.SET_PRINCIPAL, details);
-
       this.spinning = false;
 
       let requestPath = sessionStorage.getItem(process.env.VUE_APP_SESSION_STORAGE_REQUEST_PATH_NAME);
-
       if (requestPath !== null) {
         this.$router.push(requestPath);
         sessionStorage.removeItem(process.env.VUE_APP_SESSION_STORAGE_REQUEST_PATH_NAME);

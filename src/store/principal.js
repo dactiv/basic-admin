@@ -57,6 +57,9 @@ export default {
             }
 
             state.avatar = process.env.VUE_APP_USER_AVATAR_URI_PREFIX  + "current_" + state.id + "?date=" + new Date().getTime();
+            if (!state.menus) {
+                state.menus = [];
+            }
 
         },
         clearPrincipal(state) {

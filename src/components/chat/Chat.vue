@@ -125,10 +125,6 @@ export default {
     }
   },
   methods:{
-    clearCache() {
-      localStorage.removeItem(this.getContactStorageKey(this.principal.details.id));
-      localStorage.removeItem(this.getInstallStorageKey(this.principal.details.id));
-    },
     onRoomDelete(data) {
 
       let id = JSON.parse(data).data;
@@ -169,12 +165,17 @@ export default {
         json = JSON.parse(data).data;
       }
 
-      let contact = this.contacts.find(c => c.id === json.id && c.type === json.type.value);
-
-      json.messages.forEach(m => {
+      json.messages.filter(m => m.type.value === 10).forEach(m => {
         m.status = "unread";
         m.tooltip = "待查阅";
       });
+
+      json.messages.filter(m => m.type.value === 20).forEach(m => {
+        m.readCount = 0;
+        m.readers = [];
+      });
+
+      let contact = this.contacts.find(c => c.id === json.id && c.type === json.type.value);
 
       if (contact) {
         json.messages.forEach(m => this.addMessage(m, contact.messages));
@@ -186,8 +187,8 @@ export default {
           this.readMessage();
         }
         this.saveContact(contact);
-        this.$emit('messageCountChange', this.messageCount);
-      } else {
+        this.$nextTick(() => this.$emit('messageCountChange', this.messageCount));
+      } else if (json.type.value === 10) {
         this.getPrincipalProfiles([json.id], json.type.value).then(result => {
           let data = result[0];
 
@@ -198,7 +199,7 @@ export default {
 
           json.messages.forEach(m => this.addMessage(m, data.messages));
           this.addContact(data);
-          this.$emit('messageCountChange', this.messageCount);
+          this.$nextTick(() => this.$emit('messageCountChange', this.messageCount));
         });
       }
 
@@ -217,7 +218,7 @@ export default {
       if (this.principal.details.id !== json.data.userId) {
         let nameModel = this.getUsername({}, json.data.userId);
         let message = {
-          type:"notice",
+          type:900,
           creationTime:json.timestamp,
         }
         if (nameModel.name) {
@@ -285,9 +286,6 @@ export default {
       } else {
         this.getSocketTempMessages()
       }
-    },
-    getMessageCount() {
-      return this.contacts.reduce((sum, o) => sum + o.messages.reduce((s, m) => s + m.contents.filter(c => c.status === "unread").length, 0), 0);
     },
     getSocketTempMessages() {
       let param = {types:[SOCKET_EVENT_TYPE.CHAT_READ_MESSAGE, SOCKET_EVENT_TYPE.CHAT_MESSAGE]};
@@ -453,13 +451,14 @@ export default {
 
       return result;
     },
-    sendGroupMessage(content) {
-      console.log(content);
-    },
-    sendPersonMessage(message) {
+    onSendMessage(content) {
+      content.type = this.current.type;
+      let message = this.addMessage(content, this.current.messages);
+
       let param = {
         recipientId:this.current.id,
-        content:message.contents[0].content
+        content:message.contents[0].content,
+        type:this.current.type
       };
 
       let currentMessage = this.current.messages[message.messageIndex].contents[message.currentIndex];
@@ -468,29 +467,27 @@ export default {
           .$http
           .post("/socket-server/chat/sendMessage", this.formUrlencoded(param))
           .then((r) =>{
+
             currentMessage.id = r.data.data.id;
+            currentMessage.type = r.data.data.type.value;
             currentMessage.status = "success";
-            currentMessage.tooltip = "待查阅";
+
+            if (currentMessage.type === 10) {
+              currentMessage.tooltip = "待查阅";
+            } else if (currentMessage.type === 20) {
+              currentMessage.readCount = 0;
+              currentMessage.readers = [];
+            }
 
             this.current.lastMessage = param.content.replace(/<[^<>]+>/g, '');
             this.current.lastSendTime = message.creationTime;
 
             this.saveContact(this.current);
-          })
-          .catch((r) => {
+          }).catch((r) => {
             currentMessage.status = "fail";
             currentMessage.tooltip = r.data.message;
             this.saveContact(this.current);
           });
-    },
-    onSendMessage(content) {
-      let message = this.addMessage(content, this.current.messages);
-
-      if (this.current.type === 10) {
-        this.sendPersonMessage(message);
-      } else {
-        this.sendGroupMessage(message);
-      }
     },
     onSelectTreeContact(contact) {
 
@@ -530,7 +527,7 @@ export default {
         messageTitle.setSelectedKeys({id:this.current.id, name:this.current.name})
 
         if (this.current.messages.length < this.message.pageSize && !this.current.lastLoadMessage) {
-          this.loadHistoryMessage().then(this.readMessage);
+          this.loadHistoryMessage(this.current.type).then(this.readMessage);
         } else {
           this.readMessage();
         }
@@ -548,9 +545,9 @@ export default {
       if (contents.length > 0) {
         time = this.$moment(contents[0].creationTime);
       }
-      this.loadHistoryMessage(time);
+      this.loadHistoryMessage(this.current.type, time);
     },
-    loadHistoryMessage(time) {
+    loadHistoryMessage(type, time) {
 
       if (this.current.lastLoadMessage) {
         return ;
@@ -563,7 +560,8 @@ export default {
       let param = {
         targetId: this.current.id,
         time: time,
-        size: this.message.pageSize
+        size: this.message.pageSize,
+        type: type
       };
 
       return this
@@ -577,6 +575,7 @@ export default {
               data.elements.forEach(d => {
                 d.status = d.read ? "read" : d.senderId === this.principal.details.id ? "success" : "unread";
                 d.tooltip = d.read ? d.senderId === this.principal.details.id ? "对方已查阅" : "您已查阅" : "待查阅";
+                d.type = d.type.value;
                 this.addMessage(d, this.current.messages, true);
               });
 
@@ -649,7 +648,7 @@ export default {
                 m.tooltip = m.senderId === this.principal.details.id ? "对方已查阅" : "您已查阅";
               });
               this.saveContact(this.current);
-              this.$emit('messageCountChange', this.messageCount);
+              this.$nextTick(() => this.$emit('messageCountChange', this.messageCount));
             });
       }
     },

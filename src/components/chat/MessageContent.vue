@@ -13,18 +13,18 @@
         </div>
 
         <div v-for="c of m.contents" :key="c" class="margin-bottom">
-          <a-row v-if="c.type === 'notice'">
+          <a-row v-if="c.type === 900">
             <a-col :span="24" class="text-center">
               <a-typography-text :code="true" type="secondary">{{c.content}}</a-typography-text>
             </a-col>
           </a-row>
-          <div v-else :class="c.senderId !== principal.details.id ? '' : 'text-right'">
+          <div v-else-if="c.type === 10 || c.type === 20" :class="c.senderId !== principal.details.id ? '' : 'text-right'">
             <a-space align="start">
               <a-avatar v-if="c.senderId !== principal.details.id" :src="getPrincipalAvatarByUserId(c.senderId)" class="basic-box-shadow" />
               <a-space>
                 <a-tooltip v-if="c.senderId === principal.details.id">
                   <template #title><a-button v-if="c.status === 'fail'" type="link" class="padding-none" @click="retrySend(c.id)">[重试]</a-button>{{c.tooltip}} </template>
-                  <a-typography-text :type="c.status === 'sending' || c.status === 'success' || c.status === 'unread' ? 'secondary' : c.status === 'read' ? 'success' : 'danger'">
+                  <a-typography-text v-if="c.type === 10" :type="c.status === 'sending' || c.status === 'success' || c.status === 'unread' ? 'secondary' : c.status === 'read' ? 'success' : 'danger'">
                     <icon-font :spin="c.status === 'sending'" class="icon" :type="c.status === 'sending' ? 'icon-refresh' : c.status === 'fail' ? 'icon-error' :  'icon-success'" />
                   </a-typography-text>
                 </a-tooltip>
@@ -32,7 +32,7 @@
                 </a-card>
                 <a-tooltip v-if="c.senderId !== principal.details.id">
                   <template #title>{{c.tooltip}}</template>
-                  <a-typography-text :type="c.status === 'sending' || c.status === 'success' || c.status === 'unread' ? 'secondary' : c.status === 'read' ? 'success' : 'danger'">
+                  <a-typography-text v-if="c.type === 10" :type="c.status === 'sending' || c.status === 'success' || c.status === 'unread' ? 'secondary' : c.status === 'read' ? 'success' : 'danger'">
                     <icon-font :spin="c.status === 'sending'" class="icon" :type="c.status === 'sending' ? 'icon-refresh' : c.status === 'fail' ? 'icon-error' :  'icon-success'" />
                   </a-typography-text>
                 </a-tooltip>
