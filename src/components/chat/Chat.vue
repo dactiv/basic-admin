@@ -4,7 +4,7 @@
     <a-layout class="height-100-percent">
 
       <a-layout-sider class="main-aside border-right" :width="280">
-        <chat-contact ref="contact" @selectMessageContact="onSelectMessageContact" @contactContextMenuClick="onContactContextMenuClick" @selectTreeContact="onSelectTreeContact" :contact-data="contacts"/>
+        <chat-contact ref="contact" :unread-message-count="messageCount" @selectMessageContact="onSelectMessageContact" @contactContextMenuClick="onContactContextMenuClick" @selectTreeContact="onSelectTreeContact" :contact-data="contacts"/>
       </a-layout-sider>
 
       <a-layout class="overflow-hidden">
@@ -37,6 +37,9 @@ export default {
   props:["visible"],
   emits: ["messageCountChange","update:visible"],
   computed: {
+    messageCount() {
+      return this.contacts.reduce((sum, o) => sum + o.messages.reduce((s, m) => s + m.contents.filter(c => c.status === "unread").length, 0), 0);
+    },
     show: {
       get() {
         return this.visible
@@ -152,7 +155,7 @@ export default {
         let content = contents.find(m => m.id === id);
         if (content) {
           content.status = "read";
-          content.tooltip = content.senderId === this.principal.detail.id ? "对方已查阅" : "您已查阅";
+          content.tooltip = content.senderId === this.principal.details.id ? "对方已查阅" : "您已查阅";
         }
       });
 
@@ -183,7 +186,7 @@ export default {
           this.readMessage();
         }
         this.saveContact(contact);
-        this.$emit('messageCountChange', this.getMessageCount());
+        this.$emit('messageCountChange', this.messageCount);
       } else {
         this.getPrincipalProfiles([json.id], json.type.value).then(result => {
           let data = result[0];
@@ -195,7 +198,7 @@ export default {
 
           json.messages.forEach(m => this.addMessage(m, data.messages));
           this.addContact(data);
-          this.$emit('messageCountChange', this.getMessageCount());
+          this.$emit('messageCountChange', this.messageCount);
         });
       }
 
@@ -646,7 +649,7 @@ export default {
                 m.tooltip = m.senderId === this.principal.details.id ? "对方已查阅" : "您已查阅";
               });
               this.saveContact(this.current);
-              this.$emit('messageCountChange', this.getMessageCount());
+              this.$emit('messageCountChange', this.messageCount);
             });
       }
     },

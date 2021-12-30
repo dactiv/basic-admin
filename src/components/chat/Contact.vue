@@ -5,7 +5,7 @@
         <a-avatar :src="principal.details.avatar" />
         <a-menu mode="vertical" class="margin-top" @select="toolbarSelect" :selectedKeys="selectedToolBar">
           <a-menu-item key="message">
-            <a-badge :count="messageCount" :offset="[x=-20, y=0]">
+            <a-badge :count="unreadMessageCount" :offset="[x=-20, y=0]">
               <icon-font class="icon" type="icon-message" />
             </a-badge>
           </a-menu-item>
@@ -94,12 +94,7 @@ import {SOCKET_EVENT_TYPE, SOCKET_IO_ACTION_TYPE} from "@/store/socketIo";
 export default {
   name:"ChatContact",
   emits: ["selectMessageContact", "selectTreeContact", "contactContextMenuClick"],
-  props: ["contactData"],
-  computed:{
-    messageCount() {
-      return this.contactData.reduce((sum, o) => sum + o.messages.reduce((s, m) => s + m.contents.filter(c => c.status === "unread").length, 0), 0);
-    }
-  },
+  props: ["contactData", "unreadMessageCount"],
   created() {
     this.$store.dispatch(SOCKET_IO_ACTION_TYPE.SUBSCRIBE,{
       name:SOCKET_EVENT_TYPE.ROOM_CREATE,
