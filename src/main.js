@@ -40,6 +40,7 @@ import {
     Descriptions,
     Collapse,
     Empty,
+    Comment,
     Upload,
     Tooltip,
     List,
@@ -303,5 +304,6 @@ application
     .use(Radio)
     .use(Popover)
     .use(Calendar)
+    .use(Comment)
     .component('IconFont', IconFont)
     .mount('#app');

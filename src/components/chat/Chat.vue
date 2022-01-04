@@ -381,23 +381,7 @@ export default {
       return currentContact;
     },
     addMessage(message, appendMessages, unshift) {
-
-      let content = {
-        content:message.content,
-      };
-
-      if (message.type) {
-        content["type"] = message.type;
-      }
-      if (message.senderId) {
-        content["senderId"] = message.senderId;
-      }
-      if (message.tooltip) {
-        content["tooltip"] = message.tooltip;
-      }
-      if (message.status) {
-        content["status"] = message.status;
-      }
+      let content = message;
 
       if (message.id) {
         let currentContents = appendMessages.flatMap(m => m.contents);
@@ -471,6 +455,7 @@ export default {
             currentMessage.id = r.data.data.id;
             currentMessage.type = r.data.data.type.value;
             currentMessage.status = "success";
+            currentMessage.filename = r.data.data.filename;
 
             if (currentMessage.type === 10) {
               currentMessage.tooltip = "待查阅";
@@ -513,7 +498,7 @@ export default {
       this.current = contact;
 
       this.$http
-          .post("/socket-server/chat/getHistoryMessageDateList", this.formUrlencoded({targetId: this.current.id}))
+          .post("/socket-server/chat/getHistoryMessageDateList", this.formUrlencoded({targetId: this.current.id, type:this.current.type}))
           .then((r) => this.current.history.enabledDate = r.data.data || []);
 
       let messageTitle = this.$refs["message-title"];
@@ -633,11 +618,16 @@ export default {
       let unreadMessages = this.current.messages.flatMap(m => m.contents).filter(m => m.status === "unread");
 
       if (unreadMessages.length > 0) {
-        let messages = [];
+        let messagesMap = {};
 
-        unreadMessages.forEach(m => messages.push(m.id));
+        unreadMessages.forEach(m => {
+          if (!messagesMap[m.filename]) {
+            messagesMap[m.filename] = [];
+          }
+          messagesMap[m.filename].push(m.id);
+        });
 
-        let param = {senderId:this.current.id, messageIds:messages};
+        let param = {targetId:this.current.id, type: this.current.type, messageMap:messagesMap};
 
         this
             .$http

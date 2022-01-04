@@ -42,16 +42,22 @@
           <icon-font spin class="icon" type="icon-refresh" /> 数据加载中...
         </a-typography-text>
       </a-divider>
-      <a-empty v-if="historyMessages.length === 0"></a-empty>
-      <div v-for="c of historyMessages" :key="c.id" :class="c.senderId === principal.details.id ? 'self' : ''">
-        <p>
-          <a-typography-paragraph>
-            <a-typography-text strong >{{ getUsername(c).name }}</a-typography-text>
-            <a-typography-text class="font-size-sm">{{ timestampFormat(c.creationTime) }}</a-typography-text>
-          </a-typography-paragraph>
-        </p>
-        <div class="margin-xss-left" v-html="c.content"/>
-      </div>
+      <a-list class="comment-list" item-layout="horizontal" :data-source="historyMessages">
+        <template #renderItem="{ item }">
+          <a-list-item>
+            <a-comment :author="getUsername(item).name" :avatar="getPrincipalAvatarByUserId(item.senderId)">
+              <template #content>
+                <div v-html="item.content"/>
+              </template>
+              <template #datetime>
+                <a-tooltip :title="timestampFormat(item.creationTime)">
+                  <span>{{ $moment(item.creationTime).fromNow() }}</span>
+                </a-tooltip>
+              </template>
+            </a-comment>
+          </a-list-item>
+        </template>
+      </a-list>
     </div>
   </a-modal>
   
