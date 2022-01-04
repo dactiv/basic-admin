@@ -96,6 +96,8 @@ export default {
     };
 
     window.onblur = () => _this.hasFocus = false;
+
+    this.$nextTick(() => this.$emit('messageCountChange', this.messageCount));
   },
   data() {
     return {
@@ -144,14 +146,23 @@ export default {
         json = JSON.parse(data).data;
       }
 
-      let contact = this.contacts.find(c => c.id === json.id && c.type === json.type);
+      let targetId = json.id;
+      if (json.type === 20) {
+        targetId = json.targetId;
+      }
+
+      let contact = this.contacts.find(c => c.id === targetId && c.type === json.type);
       let contents = contact.messages.flatMap(m => m.contents)
 
       json.messageIds.forEach(id => {
         let content = contents.find(m => m.id === id);
         if (content) {
           content.status = "read";
+          // TODO 这里直接写死不好。应该在 html 里面判断
           content.tooltip = content.senderId === this.principal.details.id ? "对方已查阅" : "您已查阅";
+          if (json.type === 20) {
+            content.readerInfo.push({creationTime: json.creationTime, id: json.id})
+          }
         }
       });
 
@@ -165,17 +176,21 @@ export default {
         json = JSON.parse(data).data;
       }
 
-      json.messages.filter(m => m.type.value === 10).forEach(m => {
+      json.messages.forEach(m => {
+        if (m.type.value === 20) {
+          m.readerInfo = [];
+        }
         m.status = "unread";
         m.tooltip = "待查阅";
+        m.type = m.type.value;
       });
 
-      json.messages.filter(m => m.type.value === 20).forEach(m => {
-        m.readCount = 0;
-        m.readers = [];
-      });
+      let targetId = json.id;
+      if (json.type.value === 20) {
+        targetId = json.targetId;
+      }
 
-      let contact = this.contacts.find(c => c.id === json.id && c.type === json.type.value);
+      let contact = this.contacts.find(c => c.id === targetId && c.type === json.type.value);
 
       if (contact) {
         json.messages.forEach(m => this.addMessage(m, contact.messages));
@@ -183,25 +198,26 @@ export default {
         contact.lastMessage = json.lastMessage;
         contact.lastSendTime = json.lastSendTime;
 
+        this.saveContact(contact);
         if (this.hasFocus && this.visible && this.current.id === contact.id) {
           this.readMessage();
         }
-        this.saveContact(contact);
         this.$nextTick(() => this.$emit('messageCountChange', this.messageCount));
-      } else if (json.type.value === 10) {
-        this.getPrincipalProfiles([json.id], json.type.value).then(result => {
-          let data = result[0];
-
-          data.lastLoadMessage = false;
-          data.lastMessage = json.lastMessage;
-          data.lastSendTime = json.lastSendTime;
-          data.messages = [];
-
-          json.messages.forEach(m => this.addMessage(m, data.messages));
-          this.addContact(data);
-          this.$nextTick(() => this.$emit('messageCountChange', this.messageCount));
-        });
+        return ;
       }
+
+      this.getPrincipalProfiles([targetId], json.type.value).then(result => {
+        let data = result[0];
+
+        data.lastLoadMessage = false;
+        data.lastMessage = json.lastMessage;
+        data.lastSendTime = json.lastSendTime;
+        data.messages = [];
+
+        json.messages.forEach(m => this.addMessage(m, data.messages));
+        this.addContact(data);
+        this.$nextTick(() => this.$emit('messageCountChange', this.messageCount));
+      });
 
     },
     onRoomRename(data) {
@@ -319,40 +335,60 @@ export default {
             this.getSocketTempMessages();
           });
     },
-    getPrincipalProfiles(userIds, type) {
-      let param = {
-        type:"CONSOLE",
-        ids:userIds
-      }
+    getPrincipalProfiles(targetIds, type) {
       return new Promise((resolve) => {
-        this
-            .$http
-            .post("/authentication/getPrincipalProfile", this.formUrlencoded(param))
-            .then(r => {
-              let profile = r.data.data;
-              let result = [];
-              profile.forEach(p => {
-
-                let cache ={
-                  id:p.id,
-                  name:this.getPrincipalName(p),
-                  type: type
-                };
-
-                let exist = this.cache.profiles.find(p => p.id === cache.id && p.type === type);
-
-                if (exist) {
-                  this.cache.profiles[this.cache.profiles.indexOf(exist)] = cache;
-                } else {
-                  this.cache.profiles.push(cache);
-                }
-
-                localStorage.setItem(process.env.VUE_APP_SOCKET_CHAT_CACHE, JSON.stringify(this.cache));
-                result.push(cache);
+        // TODO 这里要不要用多态
+        if (type === 10) {
+          let param = {
+            type:"CONSOLE",
+            ids:targetIds
+          };
+          this
+              .$http
+              .post("/authentication/getPrincipalProfile", this.formUrlencoded(param))
+              .then(r => {
+                let result = this.resolveProfile(r.data.data, type, this.getPrincipalName)
                 resolve(result);
               });
-            })
+        } else if (type === 20) {
+          let param = {
+            ids:targetIds
+          };
+          this
+              .$http
+              .post("/socket-server/room/getRooms", this.formUrlencoded(param))
+              .then(r => {
+                let result = this.resolveProfile(r.data.data, type, (p) => p.name)
+                resolve(result);
+              })
+        }
+
       });
+    },
+    resolveProfile(profile, type, renderName) {
+
+      let result = [];
+
+      profile.forEach(p => {
+
+        let cache = p;
+
+        cache.name = renderName(p)
+        cache.type = type;
+
+        let exist = this.cache.profiles.find(p => p.id === cache.id && p.type === type);
+
+        if (exist) {
+          this.cache.profiles[this.cache.profiles.indexOf(exist)] = cache;
+        } else {
+          this.cache.profiles.push(cache);
+        }
+
+        localStorage.setItem(process.env.VUE_APP_SOCKET_CHAT_CACHE, JSON.stringify(this.cache));
+        result.push(cache);
+      });
+
+      return result;
     },
     addContact(contact) {
 
@@ -456,12 +492,10 @@ export default {
             currentMessage.type = r.data.data.type.value;
             currentMessage.status = "success";
             currentMessage.filename = r.data.data.filename;
+            currentMessage.tooltip = "待查阅";
 
-            if (currentMessage.type === 10) {
-              currentMessage.tooltip = "待查阅";
-            } else if (currentMessage.type === 20) {
-              currentMessage.readCount = 0;
-              currentMessage.readers = [];
+            if (currentMessage.type === 20) {
+              currentMessage.readerInfo = [];
             }
 
             this.current.lastMessage = param.content.replace(/<[^<>]+>/g, '');

@@ -24,7 +24,7 @@
               <a-space>
                 <a-tooltip v-if="c.senderId === principal.details.id">
                   <template #title><a-button v-if="c.status === 'fail'" type="link" class="padding-none" @click="retrySend(c.id)">[重试]</a-button>{{c.tooltip}} </template>
-                  <a-typography-text v-if="c.type === 10" :type="c.status === 'sending' || c.status === 'success' || c.status === 'unread' ? 'secondary' : c.status === 'read' ? 'success' : 'danger'">
+                  <a-typography-text v-if="!c.readerInfo || c.readerInfo.length <= 0" :type="c.status === 'sending' || c.status === 'success' || c.status === 'unread' ? 'secondary' : c.status === 'read' ? 'success' : 'danger'">
                     <icon-font :spin="c.status === 'sending'" class="icon" :type="c.status === 'sending' ? 'icon-refresh' : c.status === 'fail' ? 'icon-error' :  'icon-success'" />
                   </a-typography-text>
                 </a-tooltip>
@@ -32,7 +32,7 @@
                 </a-card>
                 <a-tooltip v-if="c.senderId !== principal.details.id">
                   <template #title>{{c.tooltip}}</template>
-                  <a-typography-text v-if="c.type === 10" :type="c.status === 'sending' || c.status === 'success' || c.status === 'unread' ? 'secondary' : c.status === 'read' ? 'success' : 'danger'">
+                  <a-typography-text v-if="!c.readerInfo || c.readerInfo.length <= 0" :type="c.status === 'sending' || c.status === 'success' || c.status === 'unread' ? 'secondary' : c.status === 'read' ? 'success' : 'danger'">
                     <icon-font :spin="c.status === 'sending'" class="icon" :type="c.status === 'sending' ? 'icon-refresh' : c.status === 'fail' ? 'icon-error' :  'icon-success'" />
                   </a-typography-text>
                 </a-tooltip>
