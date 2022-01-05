@@ -30,6 +30,7 @@ import ChatMessageContent from "@/components/chat/MessageContent";
 import ChatMessageInput from "@/components/chat/MessateInput";
 
 import {SOCKET_EVENT_TYPE, SOCKET_IO_ACTION_TYPE} from "@/store/socketIo";
+import {getUUID} from "ant-design-vue/es/vc-select/utils/commonUtil";
 
 export default {
   name:"Chat",
@@ -417,14 +418,16 @@ export default {
       return currentContact;
     },
     addMessage(message, appendMessages, unshift) {
+
+      let currentContents = appendMessages.flatMap(m => m.contents);
+      if (currentContents.find(c => c.id === message.id)) {
+        return ;
+      }
+
       let content = message;
 
-      if (message.id) {
-        let currentContents = appendMessages.flatMap(m => m.contents);
-        if (currentContents.find(c => c.id === message.id)) {
-          return ;
-        }
-        content.id = message.id;
+      if (!content.id) {
+        content.id = getUUID();
       }
 
       content.creationTime = this.$moment.isMoment(message.creationTime) ?
@@ -652,16 +655,13 @@ export default {
       let unreadMessages = this.current.messages.flatMap(m => m.contents).filter(m => m.status === "unread");
 
       if (unreadMessages.length > 0) {
-        let messagesMap = {};
+        let messagesIds = [];
 
         unreadMessages.forEach(m => {
-          if (!messagesMap[m.filename]) {
-            messagesMap[m.filename] = [];
-          }
-          messagesMap[m.filename].push(m.id);
+          messagesIds.push(m.id);
         });
 
-        let param = {targetId:this.current.id, type: this.current.type, messageMap:messagesMap};
+        let param = {targetId:this.current.id, type: this.current.type, messagesIds:messagesIds};
 
         this
             .$http
