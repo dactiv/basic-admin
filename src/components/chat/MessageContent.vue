@@ -55,7 +55,7 @@ import {SOCKET_EVENT_TYPE, SOCKET_IO_ACTION_TYPE} from "@/store/socketIo";
 export default {
   name:"ChatMessageContent",
   props:["data", "lastLoadMessage", "recipientId", "renderUsername"],
-  emits: ["retrySendClick","messageContentScroll"],
+  emits: ["retrySend","messageContentScroll"],
   watch:{
     data:{
       handler (newValue, oldValue) {
@@ -115,8 +115,8 @@ export default {
   },
   methods:{
     retrySend(id){
-      let content = this.contact.messages.flatMap(m => m.contents).find(c => c.id === id);
-      this.$emit('retrySendClick', content);
+      let content = this.data.flatMap(m => m.contents).find(c => c.id === id);
+      this.$emit('retrySend', content);
     },
     clearCurrentRecord(){
       this.scroll.top = 0;

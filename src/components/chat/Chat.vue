@@ -13,7 +13,7 @@
         </a-layout-header>
         <a-layout>
           <a-layout-content class="height-100-percent">
-            <chat-message-content ref="message-content" @message-content-scroll="onMessageContentScroll" :render-username="getUsername" :data="current.messages" :last-load-message="current.lastLoadMessage" />
+            <chat-message-content ref="message-content" @retry-send="onRetrySend" @message-content-scroll="onMessageContentScroll" :render-username="getUsername" :data="current.messages" :last-load-message="current.lastLoadMessage" />
             <chat-message-input ref="message-input" @history-message-content-scroll="onMessageContentScroll" :render-username="getUsername" :visible="current.id > 0" :date-pattern="message.datePattern" :enabled-date="current.history.enabledDate" :history-messages="current.messages.flatMap(m => m.contents)" :last-load-message="current.lastLoadMessage" @sendMessage="onSendMessage"/>
           </a-layout-content>
         </a-layout>
@@ -128,6 +128,18 @@ export default {
     }
   },
   methods:{
+    onRetrySend(content) {
+
+      let message = this.current.messages.find(m => m.contents.find(c => c.id === content.id));
+      let index = message.contents.indexOf(content);
+
+      message.contents.splice(index, 1);
+      if (message.contents.length === 0) {
+        this.current.messages.splice(this.current.messages.indexOf(message), 1);
+      }
+
+      this.onSendMessage(content);
+    },
     onRoomDelete(data) {
 
       let id = JSON.parse(data).data;
@@ -655,13 +667,13 @@ export default {
       let unreadMessages = this.current.messages.flatMap(m => m.contents).filter(m => m.status === "unread");
 
       if (unreadMessages.length > 0) {
-        let messagesIds = [];
+        let messageIds = [];
 
         unreadMessages.forEach(m => {
-          messagesIds.push(m.id);
+          messageIds.push(m.id);
         });
 
-        let param = {targetId:this.current.id, type: this.current.type, messagesIds:messagesIds};
+        let param = {targetId:this.current.id, type: this.current.type, messageIds:messageIds};
 
         this
             .$http
