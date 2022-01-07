@@ -310,13 +310,10 @@ export default {
             .then((r) => {
 
               let data = r.data.data || [];
-              if (data.length <= 0) {
-                return ;
-              }
               data.forEach(d => d.type = d.type.value);
               this.getRecentContactsProfile(data);
               this.install.recentContacts = true;
-              this.saveInstall()
+              this.saveInstall();
             });
       } else {
         this.getSocketTempMessages()
@@ -347,12 +344,16 @@ export default {
           });
     },
     getRecentContactsProfile(data) {
-      this
-          .getPrincipalProfiles(data.map((v) => v.id), 10)
-          .then(result => {
-            result.forEach(r => this.addContact(r));
-            this.getSocketTempMessages();
-          });
+      if (data.length > 0) {
+        this
+            .getPrincipalProfiles(data.map((v) => v.id), 10)
+            .then(result => {
+              result.forEach(r => this.addContact(r));
+              this.getSocketTempMessages();
+            });
+      } else {
+        this.getSocketTempMessages();
+      }
     },
     getPrincipalProfiles(targetIds, type) {
       return new Promise((resolve) => {

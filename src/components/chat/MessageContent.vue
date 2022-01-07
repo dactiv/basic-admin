@@ -43,19 +43,19 @@
                   </a-typography-text>
                 </a-tooltip>
 
-                <a-popover title="查询信息情况" trigger="hover" placement="left" v-else-if="c.senderId === principal.details.id && c.type === 20">
+                <a-popover title="查阅信息情况" trigger="hover" placement="left" v-else-if="c.senderId === principal.details.id && c.type === 20">
                   <template #content>
                     <a-tabs>
                       <a-tab-pane key="read">
                         <template #tab>
                           <icon-font class="icon" type="icon-success" /> {{c.readerInfo.length}} 人已查询
                         </template>
-                        <a-list item-layout="horizontal" :data-source="c.readerInfo">
+                        <a-list item-layout="horizontal" size="small" :data-source="c.readerInfo">
                           <template #renderItem="{ item }">
                             <a-list-item>
                               <a-list-item-meta>
                                 <template #title>
-                                  <a-typography-text strong>{{ getUsername({senderId:item.id}).name }}</a-typography-text> 在 {{$moment(c.creationTime).fromNow()}}已查询
+                                  {{ getUsername({senderId:item.id}).name }} 在 {{$moment(item.creationTime).fromNow()}}已查询
                                 </template>
                                 <template #avatar>
                                   <a-avatar :src="getPrincipalAvatarByUserId(item.id)" />
@@ -67,9 +67,9 @@
                       </a-tab-pane>
                       <a-tab-pane key="unread">
                         <template #tab>
-                          <icon-font class="icon" type="icon-error" /> {{data.participantList.length - c.readerInfo.length}}人未查询
+                          <icon-font class="icon" type="icon-error" /> {{data.participantList.filter(p => p.userId !== principal.details.id).length - c.readerInfo.length}} 人未查询
                         </template>
-                        <a-list item-layout="horizontal" :data-source="data.participantList.filter(p => !c.readerInfo.map(r => r.id).includes(p.userId))">
+                        <a-list item-layout="horizontal" :data-source="data.participantList.filter(p => p.userId !== principal.details.id).filter(p => !c.readerInfo.map(r => r.id).includes(p.userId))">
                           <template #renderItem="{ item }">
                             <a-list-item>
                               <a-list-item-meta>
@@ -86,7 +86,7 @@
                       </a-tab-pane>
                     </a-tabs>
                   </template>
-                <a-badge v-if="c.type === 20" :count="c.readerInfo.length" />
+                  <a-badge v-if="c.type === 20" :title="''" :number-style="{ backgroundColor: '#52c41a' }" :count="c.readerInfo.length" />
                 </a-popover>
 
                 <a-card :class="c.senderId === principal.details.id ? 'border-radius basic-box-shadow self' : 'border-radius basic-box-shadow'" v-html="c.content" />
