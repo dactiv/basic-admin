@@ -1,12 +1,12 @@
 <template>
   <div id="message-content" class="message" ref="message-content" @mouseleave="hasFocus = false" @mouseenter="hasFocus = true" @scroll="messageContentScroll">
-    <template v-if="data">
+    <template v-if="data.messages">
       <a-divider class="font-size-sm margin-none" v-if="!lastLoadMessage">
         <a-typography-text type="secondary">
           <icon-font spin class="icon" type="icon-refresh" /> 数据加载中...
         </a-typography-text>
       </a-divider>
-      <div v-for="m of data" :key="m.id">
+      <div v-for="m of data.messages" :key="m.id">
 
         <div class="text-center margin-top margin-bottom">
           <a-typography-text type="secondary">{{ timestampFormat(m.creationTime) }}</a-typography-text>
@@ -18,24 +18,79 @@
               <a-typography-text :code="true" type="secondary">{{c.content}}</a-typography-text>
             </a-col>
           </a-row>
-          <div v-else-if="c.type === 10 || c.type === 20" :class="c.senderId !== principal.details.id ? '' : 'text-right'">
+          <div v-else :class="c.senderId !== principal.details.id ? '' : 'text-right'">
             <a-space align="start">
               <a-avatar v-if="c.senderId !== principal.details.id" :src="getPrincipalAvatarByUserId(c.senderId)" class="basic-box-shadow" />
               <a-space>
-                <a-tooltip v-if="c.senderId === principal.details.id">
-                  <template #title><a-button v-if="c.status === 'fail'" type="link" class="padding-none" @click="retrySend(c.id)">[重试]</a-button>{{c.tooltip}} </template>
-                  <a-typography-text v-if="!c.readerInfo || c.readerInfo.length <= 0" :type="c.status === 'sending' || c.status === 'success' || c.status === 'unread' ? 'secondary' : c.status === 'read' ? 'success' : 'danger'">
-                    <icon-font :spin="c.status === 'sending'" class="icon" :type="c.status === 'sending' ? 'icon-refresh' : c.status === 'fail' ? 'icon-error' :  'icon-success'" />
+
+                <a-tooltip v-if="c.senderId === principal.details.id && !c.type">
+                  <template #title v-if="c.status === 'fail'">
+                    发送失败 <a-button type="link" class="padding-none" @click="retrySend(c.id)">[点击重试]</a-button>
+                  </template>
+                  <template #title v-else-if="c.status === 'sending'">消息发送中...</template>
+                  <a-typography-text :type="c.status === 'sending' ? 'secondary' : 'danger'">
+                    <icon-font :spin="c.status === 'sending'" class="icon" :type="c.status === 'sending' ? 'icon-refresh' : 'icon-error'" />
                   </a-typography-text>
                 </a-tooltip>
-                <a-card :class="c.senderId === principal.details.id ? 'border-radius basic-box-shadow self' : 'border-radius basic-box-shadow'" v-html="c.content">
-                </a-card>
-                <a-tooltip v-if="c.senderId !== principal.details.id">
-                  <template #title>{{c.tooltip}}</template>
-                  <a-typography-text v-if="!c.readerInfo || c.readerInfo.length <= 0" :type="c.status === 'sending' || c.status === 'success' || c.status === 'unread' ? 'secondary' : c.status === 'read' ? 'success' : 'danger'">
-                    <icon-font :spin="c.status === 'sending'" class="icon" :type="c.status === 'sending' ? 'icon-refresh' : c.status === 'fail' ? 'icon-error' :  'icon-success'" />
+
+                <a-tooltip v-else-if="c.senderId === principal.details.id && c.type === 10">
+                  <template #title v-if=" c.type === 10">
+                    <template v-if="c.status === 'success' || c.status === 'unread'">您在 {{$moment(c.creationTime).fromNow()}}已发送成功</template>
+                    <template v-else-if="c.status === 'read'">对方已在 {{$moment(c.readTime).fromNow()}}查阅</template>
+                  </template>
+                  <a-typography-text :type="c.status === 'success' ? 'secondary' : 'success'">
+                    <icon-font  class="icon" type="icon-success" />
                   </a-typography-text>
                 </a-tooltip>
+
+                <a-popover title="查询信息情况" trigger="hover" placement="left" v-else-if="c.senderId === principal.details.id && c.type === 20">
+                  <template #content>
+                    <a-tabs>
+                      <a-tab-pane key="read">
+                        <template #tab>
+                          <icon-font class="icon" type="icon-success" /> {{c.readerInfo.length}} 人已查询
+                        </template>
+                        <a-list item-layout="horizontal" :data-source="c.readerInfo">
+                          <template #renderItem="{ item }">
+                            <a-list-item>
+                              <a-list-item-meta>
+                                <template #title>
+                                  <a-typography-text strong>{{ getUsername({senderId:item.id}).name }}</a-typography-text> 在 {{$moment(c.creationTime).fromNow()}}已查询
+                                </template>
+                                <template #avatar>
+                                  <a-avatar :src="getPrincipalAvatarByUserId(item.id)" />
+                                </template>
+                              </a-list-item-meta>
+                            </a-list-item>
+                          </template>
+                        </a-list>
+                      </a-tab-pane>
+                      <a-tab-pane key="unread">
+                        <template #tab>
+                          <icon-font class="icon" type="icon-error" /> {{data.participantList.length - c.readerInfo.length}}人未查询
+                        </template>
+                        <a-list item-layout="horizontal" :data-source="data.participantList.filter(p => !c.readerInfo.map(r => r.id).includes(p.userId))">
+                          <template #renderItem="{ item }">
+                            <a-list-item>
+                              <a-list-item-meta>
+                                <template #title>
+                                  {{getUsername({senderId:item.userId}).name}}
+                                </template>
+                                <template #avatar>
+                                  <a-avatar :src="getPrincipalAvatarByUserId(item.userId)" />
+                                </template>
+                              </a-list-item-meta>
+                            </a-list-item>
+                          </template>
+                        </a-list>
+                      </a-tab-pane>
+                    </a-tabs>
+                  </template>
+                <a-badge v-if="c.type === 20" :count="c.readerInfo.length" />
+                </a-popover>
+
+                <a-card :class="c.senderId === principal.details.id ? 'border-radius basic-box-shadow self' : 'border-radius basic-box-shadow'" v-html="c.content" />
+
               </a-space>
               <a-avatar v-if="c.senderId === principal.details.id" :src="principal.details.avatar" class="basic-box-shadow" />
             </a-space>
@@ -57,7 +112,7 @@ export default {
   props:["data", "lastLoadMessage", "recipientId", "renderUsername"],
   emits: ["retrySend","messageContentScroll"],
   watch:{
-    data:{
+    "data.messages":{
       handler (newValue, oldValue) {
 
         let newContents = newValue.flatMap(o => o.contents);
@@ -115,7 +170,7 @@ export default {
   },
   methods:{
     retrySend(id){
-      let content = this.data.flatMap(m => m.contents).find(c => c.id === id);
+      let content = this.data.messages.flatMap(m => m.contents).find(c => c.id === id);
       this.$emit('retrySend', content);
     },
     clearCurrentRecord(){

@@ -13,7 +13,7 @@
         </a-layout-header>
         <a-layout>
           <a-layout-content class="height-100-percent">
-            <chat-message-content ref="message-content" @retry-send="onRetrySend" @message-content-scroll="onMessageContentScroll" :render-username="getUsername" :data="current.messages" :last-load-message="current.lastLoadMessage" />
+            <chat-message-content ref="message-content" @retry-send="onRetrySend" @message-content-scroll="onMessageContentScroll" :render-username="getUsername" :data="current" :last-load-message="current.lastLoadMessage" />
             <chat-message-input ref="message-input" @history-message-content-scroll="onMessageContentScroll" :render-username="getUsername" :visible="current.id > 0" :date-pattern="message.datePattern" :enabled-date="current.history.enabledDate" :history-messages="current.messages.flatMap(m => m.contents)" :last-load-message="current.lastLoadMessage" @sendMessage="onSendMessage"/>
           </a-layout-content>
         </a-layout>
@@ -30,7 +30,6 @@ import ChatMessageContent from "@/components/chat/MessageContent";
 import ChatMessageInput from "@/components/chat/MessateInput";
 
 import {SOCKET_EVENT_TYPE, SOCKET_IO_ACTION_TYPE} from "@/store/socketIo";
-import {getUUID} from "ant-design-vue/es/vc-select/utils/commonUtil";
 
 export default {
   name:"Chat",
@@ -171,10 +170,10 @@ export default {
         let content = contents.find(m => m.id === id);
         if (content) {
           content.status = "read";
-          // TODO 这里直接写死不好。应该在 html 里面判断
-          content.tooltip = content.senderId === this.principal.details.id ? "对方已查阅" : "您已查阅";
-          if (json.type === 20) {
-            content.readerInfo.push({creationTime: json.creationTime, id: json.id})
+          if (json.type === 20 && !content.readerInfo.find(r => r.id === json.id)) {
+            content.readerInfo.push({creationTime: this.$moment(json.creationTime), id: json.id})
+          } else if (json.type === 10){
+            content.readTime = this.$moment(json.creationTime);
           }
         }
       });
@@ -189,13 +188,16 @@ export default {
         json = JSON.parse(data).data;
       }
 
+      if (json.id === this.principal.details.id) {
+        return ;
+      }
+
       json.messages.forEach(m => {
-        if (m.type.value === 20) {
-          m.readerInfo = [];
-        }
-        m.status = "unread";
-        m.tooltip = "待查阅";
         m.type = m.type.value;
+        m.status = "unread";
+        if (m.type === 20) {
+          m.readerInfo = m.readerInfo || [];
+        }
       });
 
       let targetId = json.id;
@@ -212,9 +214,13 @@ export default {
         contact.lastSendTime = json.lastSendTime;
 
         this.saveContact(contact);
-        if (this.hasFocus && this.visible && this.current.id === contact.id) {
+
+        let isReadMessage = this.hasFocus && this.visible;
+        let isCurrentContact = this.current.id === contact.id && this.current.type === contact.type;
+        if (isReadMessage && isCurrentContact) {
           this.readMessage();
         }
+
         this.$nextTick(() => this.$emit('messageCountChange', this.messageCount));
         return ;
       }
@@ -439,7 +445,7 @@ export default {
       let content = message;
 
       if (!content.id) {
-        content.id = getUUID();
+        content.id = this.$moment().valueOf();
       }
 
       content.creationTime = this.$moment.isMoment(message.creationTime) ?
@@ -487,7 +493,6 @@ export default {
       return result;
     },
     onSendMessage(content) {
-      content.type = this.current.type;
       let message = this.addMessage(content, this.current.messages);
 
       let param = {
@@ -504,22 +509,19 @@ export default {
           .then((r) =>{
 
             currentMessage.id = r.data.data.id;
-            currentMessage.type = r.data.data.type.value;
             currentMessage.status = "success";
-            currentMessage.filename = r.data.data.filename;
-            currentMessage.tooltip = "待查阅";
+            currentMessage.type = this.current.type;
 
             if (currentMessage.type === 20) {
-              currentMessage.readerInfo = [];
+              currentMessage.readerInfo = r.data.data.readerInfo || [];
             }
 
             this.current.lastMessage = param.content.replace(/<[^<>]+>/g, '');
             this.current.lastSendTime = message.creationTime;
 
             this.saveContact(this.current);
-          }).catch((r) => {
+          }).catch(() => {
             currentMessage.status = "fail";
-            currentMessage.tooltip = r.data.message;
             this.saveContact(this.current);
           });
     },
@@ -607,9 +609,15 @@ export default {
 
             if (data.elements && data.elements.length > 0) {
               data.elements.forEach(d => {
-                d.status = d.read ? "read" : d.senderId === this.principal.details.id ? "success" : "unread";
-                d.tooltip = d.read ? d.senderId === this.principal.details.id ? "对方已查阅" : "您已查阅" : "待查阅";
                 d.type = d.type.value;
+                if (d.type === 10) {
+                  d.status = d.read ? "read" : d.senderId === this.principal.details.id ? "success" : "unread";
+                  d.readTime = this.$moment(d.readTime);
+                } else if (d.type === 20) {
+                  d.readerInfo = d.readerInfo || [];
+                  let reader = d.readerInfo.find(r => r.id === this.principal.details.id);
+                  d.status = reader ? "read" : d.senderId === this.principal.details.id ? "success" : "unread";
+                }
                 this.addMessage(d, this.current.messages, true);
               });
 
@@ -666,27 +674,44 @@ export default {
 
       let unreadMessages = this.current.messages.flatMap(m => m.contents).filter(m => m.status === "unread");
 
-      if (unreadMessages.length > 0) {
-        let messageIds = [];
-
-        unreadMessages.forEach(m => {
-          messageIds.push(m.id);
-        });
-
-        let param = {targetId:this.current.id, type: this.current.type, messageIds:messageIds};
-
-        this
-            .$http
-            .post("/socket-server/chat/readMessage", param)
-            .then(() => {
-              unreadMessages.forEach(m => {
-                m.status = "read";
-                m.tooltip = m.senderId === this.principal.details.id ? "对方已查阅" : "您已查阅";
-              });
-              this.saveContact(this.current);
-              this.$nextTick(() => this.$emit('messageCountChange', this.messageCount));
-            });
+      if (unreadMessages.length <= 0) {
+        return ;
       }
+
+      let messageIds = [];
+
+      unreadMessages.forEach(m => {
+        if (m.type === 20) {
+          let reader = m.readerInfo.find(r => r.id === this.principal.details.id);
+          if (!reader) {
+            messageIds.push(m.id);
+          }
+        } else {
+          messageIds.push(m.id);
+        }
+      });
+
+      if (messageIds.length <= 0 ){
+        return ;
+      }
+
+      let param = {targetId:this.current.id, type: this.current.type, messageIds:messageIds};
+
+      this
+          .$http
+          .post("/socket-server/chat/readMessage", param)
+          .then((r) => {
+            unreadMessages.forEach(m => {
+              m.status = "read"
+              if (this.current.type === 20) {
+                m.readerInfo = [];
+              } else {
+                m.readTime = this.$moment(r.data.timestamp);
+              }
+            });
+            this.saveContact(this.current);
+            this.$nextTick(() => this.$emit('messageCountChange', this.messageCount));
+          });
     },
     getUsername(c, userId, unload) {
 

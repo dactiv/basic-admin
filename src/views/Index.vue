@@ -1,6 +1,6 @@
 <template>
 
-  <chat ref="chat" v-model:visible="chatVisible" @messageCountChange="messageCountChange"/>
+  <chat ref="chat" v-model:visible="chatVisible" @messageCountChange="(count) => this.messageCount = count"/>
 
   <a-layout class="height-100-percent">
 
@@ -24,7 +24,7 @@
             <a-menu-item key="dark"><icon-font class="icon" type="icon-moon" /></a-menu-item>
             <a-sub-menu key="profile">
               <template #icon>
-                <a-badge dot :status="connected ? 'success' : 'default'" :offset="[-3, 45]">
+                <a-badge dot :status="connected ? 'success' : 'default'" :offset="[-4, 45]">
                   <a-avatar :src="principal.details.avatar" />
                 </a-badge>
               </template>
@@ -152,9 +152,6 @@ export default {
     }
   },
   methods: {
-    messageCountChange(count) {
-      this.messageCount = count;
-    },
     postPrepare(r) {
       let data = r.data.data;
 

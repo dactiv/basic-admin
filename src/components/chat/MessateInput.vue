@@ -198,7 +198,6 @@ export default {
         senderId: this.principal.details.id,
         creationTime: this.$moment.now(),
         status: "sending",
-        tooltip:"发送中...",
         content: this.inputContent,
       };
 
