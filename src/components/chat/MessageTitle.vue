@@ -13,12 +13,7 @@
     </a-col>
   </a-row>
 
-  <a-drawer :width="250" :closable="false" :visible="room.visible" :bodyStyle="{'padding':'0px'}">
-    <div class="text-right">
-      <a-button type="text" @click="room.visible = false" class="padding-xss-left padding-xss-right">
-        <icon-font class="icon" type="icon-close" />
-      </a-button>
-    </div>
+  <a-drawer :width="250" :closable="false" v-model:visible="room.visible" :bodyStyle="{'padding':'0px'}">
 
     <div class="padding">
       <a-divider class="font-size-sm" orientation="left">名称</a-divider>
