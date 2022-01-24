@@ -2,7 +2,7 @@
 
   <a-spin :spinning="spinning">
 
-    <a-table class="ant-table-striped" :row-selection="selection ? { selectedRowKeys: selectedIds, onSelect: select} : undefined" :rowKey="record=>record.id" :scroll="{ x: 880 }" :pagination="false" :data-source="data" :columns="columns" bordered>
+    <a-table class="ant-table-striped" :row-selection="selection ? { selectedRowKeys: selectedIds, onSelect: select, onChange:selectChange} : undefined" :rowKey="record=>record.id" :scroll="{ x: 880 }" :pagination="false" :data-source="data" :columns="columns" bordered>
 
       <template #name="{ record }">
         <a-button type="text">
@@ -37,7 +37,6 @@
 </template>
 
 <script>
-// FIXME 表格没办法全选
 export default {
   name:"AuthenticationResourceTable",
   props:["selection", "searchData"],
@@ -82,7 +81,6 @@ export default {
   },
   methods:{
     select(record, selected) {
-      this.selectedIds = [];
       if (selected) {
         let parentIds = this.getParentIds(record);
         parentIds.forEach(p => this.selectedIds.push(p));
@@ -94,6 +92,9 @@ export default {
         let childrenIds = this.getChildrenIds(record);
         childrenIds.forEach(c => this.selectedIds.splice(this.selectedIds.findIndex(i => i === c), 1));
       }
+    },
+    selectChange(selectedIds) {
+      this.selectedIds = selectedIds;
     },
     getSelectedRecords() {
       return this.selectedIds.map(id => this.getRecordById(id, this.data));

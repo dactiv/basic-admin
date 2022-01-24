@@ -123,7 +123,41 @@ export default {
           enabledDate:[]
         }
       },
-      current: null
+      current: null,
+      principalProfilesResolver: [{
+        type:10,
+        resolver(targetIds) {
+          return new Promise((resolve) => {
+            let param = {
+              type:"CONSOLE",
+              ids:targetIds
+            };
+            this
+                .$http
+                .post("/authentication/getPrincipalProfile", this.formUrlencoded(param))
+                .then(r => {
+                  let result = this.resolveProfile(r.data.data, this.type, this.getPrincipalName)
+                  resolve(result);
+                });
+          });
+        }
+      },{
+        type:20,
+        resolver(targetIds) {
+          return new Promise((resolve) => {
+            let param = {
+              ids: targetIds
+            };
+            this
+                .$http
+                .post("/socket-server/room/getRooms", this.formUrlencoded(param))
+                .then(r => {
+                  let result = this.resolveProfile(r.data.data, this.type, (p) => p.name)
+                  resolve(result);
+                })
+          });
+        }
+      }]
     }
   },
   methods:{
@@ -355,33 +389,16 @@ export default {
           });
     },
     getPrincipalProfiles(targetIds, type) {
-      return new Promise((resolve) => {
-        // TODO 这里要不要用多态
-        if (type === 10) {
-          let param = {
-            type:"CONSOLE",
-            ids:targetIds
-          };
-          this
-              .$http
-              .post("/authentication/getPrincipalProfile", this.formUrlencoded(param))
-              .then(r => {
-                let result = this.resolveProfile(r.data.data, type, this.getPrincipalName)
-                resolve(result);
-              });
-        } else if (type === 20) {
-          let param = {
-            ids:targetIds
-          };
-          this
-              .$http
-              .post("/socket-server/room/getRooms", this.formUrlencoded(param))
-              .then(r => {
-                let result = this.resolveProfile(r.data.data, type, (p) => p.name)
-                resolve(result);
-              })
-        }
+      let resolver = this.principalProfilesResolver.find(r => r.type === type);
+      if (resolver) {
+        return resolver.resolver(targetIds);
+      }
 
+      return new Promise((resolve) => {
+        resolve({
+          type:type,
+          name:process.env.VUE_APP_SOCKET_CHAT_UNKNOWN_USERNAME
+        });
       });
     },
     resolveProfile(profile, type, renderName) {

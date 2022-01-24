@@ -122,7 +122,7 @@ export default {
           this.fixedScrollPosition();
           return ;
         }
-        // FIXME 重复选择时候改值获取不到数据
+        // FIXME 重复选择时该值获取不到数据
         if (!this.index.first) {
           this.index.first = newContents[0];
         }

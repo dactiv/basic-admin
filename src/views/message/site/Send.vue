@@ -52,20 +52,20 @@
         <template #renderItem="{ item }">
           <a-list-item :key="item.uid">
             <template #actions>
-              <a-button danger @click="removeAttachment(item.uid)">
+              <a-button danger @click="removeAttachment(item.uid)" v-if="item.status !== 'uploading'">
                 <icon-font class="icon" type="icon-ashbin" />
                 <span class="hidden-xs">删除</span>
               </a-button>
             </template>
             <a-list-item-meta>
               <template #title>
-                <a-typography-text :type="item.status !== 'done' ? 'secondary' : item.status === 'error' ? 'danger' : 'success'">{{ item.name }}</a-typography-text>
+                <a-typography-text :type="item.status === 'uploading' ? 'secondary' : item.status === 'error' ? 'danger' : 'success'">{{ item.name }} {{item.status}}</a-typography-text>
               </template>
               <template #description>
-                <a-progress :percent="item.percent" />
+                <a-progress :percent="item.percent" :status="item.status === 'uploading' ? 'active' : item.status === 'error' ? 'exception' : ''" />
               </template>
               <template #avatar>
-                <a-typography-text :type="item.status !== 'done' ? 'secondary' : item.status === 'error' ? 'danger' : 'success'">
+                <a-typography-text :type="item.status === 'uploading' ? 'secondary' : item.status === 'error' ? 'danger' : 'success'">
                   <icon-font class="icon file" :type="getFileIcon(item.name)" />
                 </a-typography-text>
               </template>
@@ -274,35 +274,36 @@ export default {
 
       let file = this.fileList.find(f => f.uid === uid);
 
-      if (file.status !== "done") {
-        return ;
-      }
-
       let _this = this;
 
-      if (!_this.principal.hasPermission('perms[file_manager:delete]')) {
-        _this.$message.error("您没有删除文件的权限");
-        return false;
+      if (file.status === "error") {
+        let fileIndex = _this.fileList.indexOf(a => a.uid === uid);
+        _this.fileList.splice(fileIndex, 1);
+      } else {
+
+        if (!_this.principal.hasPermission('perms[attachment:delete]')) {
+          _this.$message.error("您没有删除文件的权限");
+          return false;
+        }
+
+        _this
+            .$http
+            .post("/message/attachment/delete", _this.formUrlencoded({type:"site", filename:file.name}))
+            .then(r => {
+
+              _this.$message.success(r.data.message);
+
+              let fileIndex = _this.fileList.indexOf(a => a.uid === uid);
+              _this.fileList.splice(fileIndex, 1);
+
+              let attachmentIndex = this.form.attachmentList.indexOf(a => a.uid === uid);
+              this.form.attachmentList.splice(attachmentIndex, 1);
+
+            });
       }
-
-      _this
-          .$http
-          .post("/file-manager/delete", _this.formUrlencoded({bucketName:file.response.data.bucket, filename:file.name}))
-          .then(r => {
-
-            _this.$message.success(r.data.message);
-
-            let fileIndex = _this.fileList.indexOf(a => a.uid === uid);
-            _this.fileList.splice(fileIndex, 1);
-
-            let attachmentIndex = this.form.attachmentList.indexOf(a => a.uid === uid);
-            this.form.attachmentList.splice(attachmentIndex, 1);
-
-          });
 
     },
     fileListChange(info) {
-      // FIXME 上传文件错误后没有现实错误信息展示
       if (info.file.status === "done") {
 
         let attachment = {

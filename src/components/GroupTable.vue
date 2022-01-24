@@ -34,7 +34,6 @@
 </template>
 
 <script>
-// FIXME 表格没办法全选
 export default {
   name:"AuthenticationGroupTable",
   props:["enableDisabledCheckbox", "searchData"],

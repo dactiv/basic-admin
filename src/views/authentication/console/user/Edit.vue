@@ -79,7 +79,7 @@
             <icon-font class="icon" type="icon-group" />
             <span class="hidden-xs">所在组</span>
           </template>
-          <group-table ref="group-table" :enable-disabled-checkbox="false" :searchData="{mergeTree:true, 'filter_[status_eq]': 1, 'filter_[sources_jin]':['CONSOLE']}" @search="onGroupSearch"/>
+          <group-table ref="group-table" :enable-disabled-checkbox="false" :searchData='{mergeTree:true, "filter_[status_eq]": 1, "filter_[sources_jin]":["\"CONSOLE\""]}' @search="onGroupSearch"/>
         </a-tab-pane>
 
         <a-tab-pane key="resource-table" forceRender>
