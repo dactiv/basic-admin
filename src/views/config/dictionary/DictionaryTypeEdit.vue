@@ -68,7 +68,7 @@
           </a-input>
 
           <a-spin :spinning="dataDictionary.spinning">
-            <a-table class="ant-table-striped" :row-selection="{ selectedRowKeys: dataDictionary.selectedIds, onChange: selectDataDictionaryChange}" :rowKey="record=>record.id" :scroll="{ x: 775 }" :pagination="false" :data-source="dataDictionary.page.content" :columns="dataDictionary.columns" bordered>
+            <a-table class="ant-table-striped" :row-selection="{ selectedRowKeys: dataDictionary.selectedIds, onChange: selectDataDictionaryChange}" :rowKey="record=>record.id" :scroll="{ x: 775 }" :pagination="false" :data-source="dataDictionary.page.elements" :columns="dataDictionary.columns" bordered>
               <template #action="{ record }">
                 <div class="text-center">
                   <a-space :size="10">
