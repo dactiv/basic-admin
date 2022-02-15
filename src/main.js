@@ -255,7 +255,7 @@ application.config.globalProperties.attachmentFileSupport = [
 const IconFont = createFromIconfontCN({
     scriptUrl: [
         // commons-icon
-        "//at.alicdn.com/t/font_2732722_wv38iac3mke.js",
+        "//at.alicdn.com/t/font_2732722_60p6gmwwqw6.js",
         // file-icon
         "//at.alicdn.com/t/font_2783178_o30jvdzd5vo.js"
     ]

@@ -2,7 +2,7 @@
 
   <a-breadcrumb class="hidden-xs">
     <a-breadcrumb-item><router-link to='/'><icon-font class="icon" type="icon-home" /> 首页</router-link></a-breadcrumb-item>
-    <a-breadcrumb-item><icon-font class="icon" type="icon-setting" /> 系统管理</a-breadcrumb-item>
+    <a-breadcrumb-item><icon-font class="icon" type="icon-authority" /> 权限管理</a-breadcrumb-item>
     <a-breadcrumb-item><router-link :to="{name:'authentication_group'}"><icon-font class="icon" type="icon-group" /> 组管理</router-link></a-breadcrumb-item>
     <a-breadcrumb-item><icon-font class="icon" type="icon-edit" /> {{ (form.id ? '编辑 [' + form.name + '] ': '添加') + '组' }}</a-breadcrumb-item>
   </a-breadcrumb>
@@ -57,7 +57,7 @@
           <a-col :span="24">
             <a-form-item label="上级组:" name="parentId">
               <a-select class="width-100-percent" v-model:value="form.parentId">
-                <a-select-option v-for="p of parentOptions" :key="p.id + ''" :value="p.id + ''">
+                <a-select-option v-for="p of parentOptions" :key="p.id" :value="p.id">
                   {{p.name}}
                 </a-select-option>
               </a-select>
@@ -84,7 +84,7 @@
       <a-divider />
 
       <a-space :size="10">
-        <a-button type="primary" @click="submitForm" v-if="principal.hasPermission('perms[console_user:save]')" :loading="spinning" >
+        <a-button type="primary" @click="submitForm" v-if="principal.hasPermission('perms[group:save]')" :loading="spinning" >
           <icon-font class="icon" v-if="!spinning" type="icon-select" />
           <span class="hidden-xs">保存</span>
         </a-button>

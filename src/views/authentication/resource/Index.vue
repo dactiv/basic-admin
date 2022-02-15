@@ -2,7 +2,7 @@
 
   <a-breadcrumb class="hidden-xs">
     <a-breadcrumb-item><router-link to='/'><icon-font class="icon" type="icon-home" /> 首页</router-link></a-breadcrumb-item>
-    <a-breadcrumb-item><icon-font class="icon" type="icon-setting" /> 系统管理</a-breadcrumb-item>
+    <a-breadcrumb-item><icon-font class="icon" type="icon-authority" /> 权限管理</a-breadcrumb-item>
     <a-breadcrumb-item><icon-font class="icon" type="icon-attachment" /> 資源管理</a-breadcrumb-item>
   </a-breadcrumb>
 

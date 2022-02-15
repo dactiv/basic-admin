@@ -4,7 +4,7 @@ export const router = [{
     name: "authentication_resource",
     meta: {
         title: "資源管理",
-        parent: "system"
+        parent: "authority"
 
     }
 },{
@@ -13,7 +13,7 @@ export const router = [{
     name: "authentication_resource_detail",
     meta: {
         title: "查看資源",
-        parent: "system",
+        parent: "authority",
         selectMenu: process.env.VUE_APP_SITE_ROOT + "/authentication/resource"
     }
 }]
