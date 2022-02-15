@@ -101,6 +101,26 @@
         </a-col>
       </a-row>
 
+      <a-row :gutter="[24]">
+        <a-col :span="12">
+          <a-form-item label="联系电话:">
+            <a-input v-model:value="form['filter_[phone_number_eq]']" />
+          </a-form-item>
+        </a-col>
+        <a-col :span="12">
+          <a-form-item label="性别:">
+            <a-select v-model:value="form['filter_[gender_eq]']">
+              <a-select-option value="">
+                全部
+              </a-select-option>
+              <a-select-option v-for="(value, name) of genderOptions" :key="value" :value="value">
+                {{name}}
+              </a-select-option>
+            </a-select>
+          </a-form-item>
+        </a-col>
+      </a-row>
+
     </a-form>
   </a-modal>
 
@@ -162,11 +182,13 @@ export default {
       },
       spinning: false,
       statusOptions:[],
+      genderOptions:[],
       searchDialogVisible: false
     }
   },
   created() {
     this.loadConfig({service:"config", enumerateName:"UserStatus"}, r=> this.statusOptions = r.data.data);
+    this.loadConfig({service:"config", enumerateName:"GenderEnum"}, r=> this.genderOptions = r.data.data);
   },
   methods:{
     edit(record) {

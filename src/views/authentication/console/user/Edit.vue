@@ -29,6 +29,23 @@
           </a-col>
         </a-row>
 
+        <a-row :gutter="[24]">
+          <a-col :span="12">
+            <a-form-item has-feedback label="联系电话:" name="phoneNumber">
+              <a-input v-model:value="form.phoneNumber"  />
+            </a-form-item>
+          </a-col>
+          <a-col :span="12">
+            <a-form-item has-feedback label="性别:" name="gender">
+              <a-select class="width-100-percent" v-model:value="form.gender">
+                <a-select-option v-for="(value, name) of genderOptions" :key="value + ''" :value="value + ''">
+                  {{name}}
+                </a-select-option>
+              </a-select>
+            </a-form-item>
+          </a-col>
+        </a-row>
+
         <a-row v-if="form.id === null" :gutter="[24]">
           <a-col :span="12">
             <a-form-item has-feedback label="登陆密码:" name="password">
@@ -90,6 +107,14 @@
           <resource-table ref="resource-table" :selection="true" :searchData="{mergeTree:true, sources:['CONSOLE']}" @search="onResourceSearch"/>
         </a-tab-pane>
 
+        <a-tab-pane key="department-table" forceRender>
+          <template #tab>
+            <icon-font class="icon" type="icon-department" />
+            <span class="hidden-xs">所属部门</span>
+          </template>
+          <department-table ref="department-table" :selection="true" />
+        </a-tab-pane>
+
       </a-tabs>
 
       <a-divider />
@@ -116,14 +141,16 @@
 
 import GroupTable from '@/components/GroupTable.vue';
 import ResourceTable from "@/components/ResourceTable";
+import DepartmentTable from "@/components/DepartmentTable";
 
 export default {
   name:"AuthenticationConsoleUserEdit",
-  components:{GroupTable, ResourceTable},
+  components:{GroupTable, ResourceTable, DepartmentTable},
   data() {
     return {
       spinning:true,
       statusOptions:[],
+      genderOptions:[],
       form: {
         id: null,
         username: "",
@@ -131,6 +158,7 @@ export default {
         password: "",
         groupsInfo:[],
         resourceMap:{},
+        departmentInfo:[],
         confirmPassword:"",
         email: "",
         remark: "",
@@ -141,10 +169,15 @@ export default {
           { required: true, message: "请输入登陆账户", trigger: "change"},
           { validator:this.validateRemoteUsername, trigger: "change"}
         ],
+        gender: [{ required: true, message: "请选择性别", trigger: "change" }],
         realName: [{ required: true, message: "请输入真实姓名", trigger: "change" }],
+        phoneNumber: [
+          { required: true, message: "请输入联系电话", trigger: "change" },
+          { type:"string", pattern: /^[1](([3|5|8][\d])|([4][4,5,6,7,8,9])|([6][2,5,6,7])|([7][^9])|([9][1,8,9]))[\d]{8}$/, message:"联系电话格式不正确，请输入手机号码"}
+        ],
         password: [
           { required: true, message: "请输入登陆密码", trigger: "change"},
-          {type:"string", pattern: /^(?!^[0-9a-z]+$)(?!^[0-9A-Z]+$)(?!^[0-9\x21-\x2f\x3a-\x40\x5b-\x60\x7B-\x7F]+$)(?!^[a-zA-Z]+$)(?!^[a-z\x21-\x2f\x3a-\x40\x5b-\x60\x7B-\x7F]+$)(?!^[A-Z\x21-\x2f\x3a-\x40\x5b-\x60\x7B-\x7F]+$)(?!^[A-Z\x21-\x2f\x3a-\x40\x5b-\x60\x7B-\x7F]+$)[a-z0-9A-Z\x21-\x2f\x3a-\x40\x5b-\x60\x7B-\x7F]+$/, message:"密码段中在要求的四种(大写字母，小写字母，数字，标点符号)类型中至少存在三种"}
+          { type:"string", pattern: /^(?!^[0-9a-z]+$)(?!^[0-9A-Z]+$)(?!^[0-9\x21-\x2f\x3a-\x40\x5b-\x60\x7B-\x7F]+$)(?!^[a-zA-Z]+$)(?!^[a-z\x21-\x2f\x3a-\x40\x5b-\x60\x7B-\x7F]+$)(?!^[A-Z\x21-\x2f\x3a-\x40\x5b-\x60\x7B-\x7F]+$)(?!^[A-Z\x21-\x2f\x3a-\x40\x5b-\x60\x7B-\x7F]+$)[a-z0-9A-Z\x21-\x2f\x3a-\x40\x5b-\x60\x7B-\x7F]+$/, message:"密码段中在要求的四种(大写字母，小写字母，数字，标点符号)类型中至少存在三种"}
         ],
         confirmPassword: [
           { required: true, message: "请输入确认密码", trigger: "change" },
@@ -235,6 +268,20 @@ export default {
           _this.form.resourceMap = resourceMap;
         }
 
+        let departments = _this.$refs['department-table'].getSelectedRecords();
+
+        if (departments.length > 0) {
+          let departmentsInfo = [];
+          departments.forEach(r => {
+            departmentsInfo.push({
+              id:r.id,
+              name:r.name
+            });
+          })
+          _this.form.departmentsInfo = departmentsInfo;
+        }
+
+
         _this
             .$http
             .post("/authentication/console/user/save",_this.form)
@@ -259,12 +306,14 @@ export default {
   mounted() {
     this.$refs['group-table'].search();
     this.$refs['resource-table'].search();
+    this.$refs['department-table'].search();
   },
   created() {
 
     let _this = this;
 
     _this.loadConfig({service:"config", enumerateName:"UserStatus"}, r=> _this.statusOptions = r.data.data);
+    _this.loadConfig({service:"config", enumerateName:"GenderEnum"}, r=> _this.genderOptions = r.data.data);
 
     if (this.$route.query.id !== undefined) {
 
@@ -274,6 +323,7 @@ export default {
           .then(r => {
             _this.form = r.data.data;
             _this.form.status = _this.form.status.value + '';
+            _this.form.gender = _this.form.gender.value + '';
             _this.spinning = false;
           })
           .catch(() => _this.spinning = false);
