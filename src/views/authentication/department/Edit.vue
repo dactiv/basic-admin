@@ -96,7 +96,7 @@ export default {
         return Promise.resolve();
       }
       return new Promise((resolve, reject) => {
-        this.$http.get("/authentication/group/isNameUnique?name=" + this.form.name).then(r => {
+        this.$http.get("/authentication/department/isNameUnique?name=" + this.form.name).then(r => {
           return r.data.data ? resolve() : reject("部门名称已存在");
         });
       });

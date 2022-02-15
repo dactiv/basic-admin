@@ -294,7 +294,7 @@ export default {
 
         _this
             .$http
-            .post("/config/dictionary/saveDictionaryType",_this.formUrlencoded(_this.form))
+            .post("/config/dictionary/saveDictionaryType",_this.form)
             .then((r) => {
 
               let id = r.data.data;

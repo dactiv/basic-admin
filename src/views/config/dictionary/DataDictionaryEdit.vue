@@ -163,7 +163,7 @@ export default {
 
         _this
             .$http
-            .post("/config/dictionary/saveDataDictionary",_this.formUrlencoded(_this.form))
+            .post("/config/dictionary/saveDataDictionary",_this.form)
             .then((r) => {
               let id = r.data.data;
 
@@ -231,7 +231,7 @@ export default {
                         _this.form = r.data.data;
                         _this.form.parentId = _this.form.parentId ? _this.form.parentId + "" : "";
                         _this.form.enabled = _this.form.enabled ? _this.form.enabled.value + "" : "";
-
+                        _this.form.code = _this.form.code.replace(_this.parentCode, "");
                         _this.spinning = false;
 
                         _this.parentChange(_this.form.parentId);
