@@ -54,12 +54,12 @@
               <a-list-item :key="item.id">
                 <a-list-item-meta>
                   <template #title>
-                    <a-typography-link :href="item.meta.link" target="_blank">
+                    <a-typography-link href="javascript:;" @click="download(item.meta.link, item.contentType, item.name)">
                       {{ item.name }}
                     </a-typography-link>
                   </template>
                   <template #avatar>
-                    <a-typography-link :href="item.meta.link" target="_blank">
+                    <a-typography-link href="javascript:;" @click="download(item.meta.link, item.contentType, item.name)">
                       <icon-font class="icon" :type="getFileIcon(item.name)" />
                     </a-typography-link>
                   </template>
@@ -81,6 +81,27 @@
 export default {
   name:"MessageEmailDetail",
   methods:{
+    download(url, type, name) {
+      let _this = this;
+      _this
+          .$http
+          .get(url,{responseType:'blob'})
+          .then((res) => {
+            let blob = new Blob([res.data], {type});
+
+            let downloadElement = document.createElement('a')
+            let href = window.URL.createObjectURL(blob); //创建下载的链接
+
+            downloadElement.href = href;
+            downloadElement.download = name; //下载后文件名
+
+            document.body.appendChild(downloadElement);
+            downloadElement.click(); //点击下载
+
+            document.body.removeChild(downloadElement); //下载完成移除元素
+            window.URL.revokeObjectURL(href); //释放blob对象
+          });
+    },
     reload(){
 
       let _this = this;

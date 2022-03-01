@@ -22,7 +22,7 @@
       >
 
         <a-descriptions-item label="类型">{{ form.type.name }}</a-descriptions-item>
-        <a-descriptions-item label="状态"><a-badge :status="form.executeStatus.value === 0 ? 'processing' : form.status.value === 1 ? 'success' : 'error'" :text="form.executeStatus.name" /></a-descriptions-item>
+        <a-descriptions-item label="状态"><a-badge :status="form.executeStatus.value === 0 ? 'processing' : form.executeStatus.value === 1 ? 'success' : 'error'" :text="form.executeStatus.name" /></a-descriptions-item>
         <a-descriptions-item label="创建时间">{{ timestampFormat(form.creationTime) }} </a-descriptions-item>
         <a-descriptions-item label="下次重试时间">{{ timestampFormat(form.nextRetryTime) }} </a-descriptions-item>
         <a-descriptions-item label="最后发送时间">{{ timestampFormat(form.lastSendTime) }} </a-descriptions-item>
@@ -48,12 +48,12 @@
               <a-list-item :key="item.id">
                 <a-list-item-meta>
                   <template #title>
-                    <a-typography-link :href="item.meta.link" target="_blank" class="">
+                    <a-typography-link href="javascript:;" @click="download(item.meta.link, item.contentType, item.name)">
                       {{ item.name }}
                     </a-typography-link>
                   </template>
                   <template #avatar>
-                    <a-typography-link :href="item.meta.link" target="_blank">
+                    <a-typography-link href="javascript:;" @click="download(item.meta.link, item.contentType, item.name)">
                       <icon-font class="icon" :type="getFileIcon(item.name)" />
                     </a-typography-link>
                   </template>
@@ -75,7 +75,28 @@
 export default {
   name:"MessageEmailDetail",
   methods:{
-    reload(){
+    download(url, type, name) {
+      let _this = this;
+      _this
+          .$http
+          .get(url,{responseType:'blob'})
+          .then((res) => {
+            let blob = new Blob([res.data], {type});
+
+            let downloadElement = document.createElement('a')
+            let href = window.URL.createObjectURL(blob); //创建下载的链接
+
+            downloadElement.href = href;
+            downloadElement.download = name; //下载后文件名
+
+            document.body.appendChild(downloadElement);
+            downloadElement.click(); //点击下载
+
+            document.body.removeChild(downloadElement); //下载完成移除元素
+            window.URL.revokeObjectURL(href); //释放blob对象
+          });
+    },
+    reload() {
 
       let _this = this;
 
